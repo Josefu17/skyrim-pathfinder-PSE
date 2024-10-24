@@ -66,7 +66,8 @@ Postgres-Backend: ```sre-backend.devops-pse.users.h-da.cloud``` (Only available 
 ## Offene Fragen
 
 #### Q1:
-	Das Navigation-Service darf keinen Cache bzw. keine Verbindung zur DB haben. Kann das Web Backend stattdessen Ergebnisse in die DB laden und überprüfen, ob eine Route schonmal angefragt wurde, sodass diese dann aus der DB geladen werden kann?
+
+Das Navigation-Service darf keinen Cache bzw. keine Verbindung zur DB haben. Kann das Web Backend stattdessen Ergebnisse in die DB laden und überprüfen, ob eine Route schonmal angefragt wurde, sodass diese dann aus der DB geladen werden kann?
 
 #### A1:
 
