@@ -71,33 +71,88 @@ Das Navigation-Service darf keinen Cache bzw. keine Verbindung zur DB haben. Kan
 
 #### A1:
 
-## Möglicherweise nützliche Befehle
+## Useful commands
 
-Dateien-Suche mit ```find /path/to/your/project -name "*.yaml"```
+# Database Connection
+## On server:
 
-Alle Docker-Prozesse anzeigen mit ```docker ps```
+Export database:
 
-### Makefile Beispiel
+```docker exec -t 851713c3adfe pg_dumpall -c -U postgres > ~/dumpfile.sql```
+
+check if ```dumpfile.sql``` exists:
+
+```ls -l ~/dumpfile.sql```
+
+## On Local computer:
+
+```scp debian@group2.devops-pse.users.h-da.cloud:~/dumpfile.sql "path/to/folder"```
+
+# Docker
+## Build docker image
+
+```
+docker build -t registry.code.fbi.h-da.de/bpsewise2425/group2/test-application:latest --platform
+linux/amd64 .
+```
+
+
+## Log into the docker registery
+
+```docker login registry.code.fbi.h-da.de```
+
+## Push the docker image
+```
+docker push registry.code.fbi.h-da.de/bpsewise2425/group2/test-application:latest
+```
+
+## Display docker container
+
+ ```docker ps```
+
+## Makefile Beispiel
 start:
 - ```docker-compose up -d```
 
-console:
-- ```docker exec -it ewa_lab_php_apache bash```
-
 stop:
 - ```docker-compose down```
-
-build:
-- ```docker-compose down -v```
-- ```docker-compose build```
-- ```docker-compose up -d --force-recreate mariadb```
-- ```docker-compose up -d```
-
-clean:
-- ```docker rm -v --force ewa_lab_php_apache```
-- ```docker rm -v --force ewa_lab_mariadb```
-- ```docker rm -v --force ewa_lab_phpmyadmin```
-- ```docker network rm ewa_lab_net```
     
 cleanall:
 - ```docker system prune -a```
+
+
+# Todos for Stage 1
+## Project Management
+- ~~Merge request Definition~~
+- ~~Set issue workflow~~
+- ~~Primary communication plattform~~
+- Collaboration best practises + **Documentation**
+
+## DevExp
+- Installation of dependencies with a "one-click" + **Documentation**
+- Start the application with "one-click" + **Documentation**
+- Tests that run locally and in CI + **Documentation**
+- Linter/formatter local and in CI + **Documentation**
+- Debugger + **Documentation** 
+- Project's setup process + Major design decision + **Documentation**
+
+## CI/CD and Operation
+- Pipeline to build the application
+- Deployment of application to a server
+- Trigger automated releases via GitLab
+- Automated tests
+  - unit tests for navigation service
+  - unit tests for backend
+  - startup test for seperated frontend
+  - Display code coverage in GitLab with an icon **???**
+- Linting and formatting
+- dependency proxy usage **???**
+- code analysis tools **???**
+- ~~application runs on server~~
+- local development with a local database
+- The production database must never be deleted; only apply migrations **???**
+- ~~No real credentials (e.g. for log in to the container registry) should be on the server, only scoped API
+tokens~~
+
+
+
