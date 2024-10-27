@@ -74,11 +74,15 @@ Das Navigation-Service darf keinen Cache bzw. keine Verbindung zur DB haben. Kan
 ## Useful commands
 
 # Database Connection
+
+```docker exec -it app_postgres_1 psql -U pg-2 -d navigation```
+
 ## On server:
 
 Export database:
 
-```docker exec -t 851713c3adfe pg_dumpall -c -U postgres > ~/dumpfile.sql```
+
+```docker exec -t 851713c3adfe pg_dumpall -c -U pg-2 > ~/dumpfile.sql```
 
 check if ```dumpfile.sql``` exists:
 
@@ -86,7 +90,7 @@ check if ```dumpfile.sql``` exists:
 
 ## On Local computer:
 
-```scp debian@group2.devops-pse.users.h-da.cloud:~/dumpfile.sql "path/to/folder"```
+```scp debian@group2.devops-pse.users.h-da.cloud:~/dumpfile.sql "path/to/repo"```
 
 # Docker
 ## Build docker image
