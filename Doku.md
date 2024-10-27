@@ -92,6 +92,11 @@ check if ```dumpfile.sql``` exists:
 
 ```scp debian@group2.devops-pse.users.h-da.cloud:~/dumpfile.sql "path/to/repo"```
 
+
+## Update database on server
+```pg_dump -U pg-2 -d navigation > dumpfile.sql```
+
+
 # Docker
 ## Build docker image
 
