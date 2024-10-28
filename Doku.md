@@ -14,9 +14,11 @@
 
 ### Code Styling
 
-- Underscore/Camelcase?
+- Underscore (underscore_example)
 - Englisch
 - Tab(4 Leerzeichen)
+- Linter: pylint
+- Formatter: black
 
 ### Merge Request Definition of Done
 
@@ -89,6 +91,7 @@ check if ```dumpfile.sql``` exists:
 ```ls -l ~/dumpfile.sql```
 
 ## On Local computer:
+secure copy from deployment server to local computer:
 
 ```scp debian@group2.devops-pse.users.h-da.cloud:~/dumpfile.sql "path/to/repo"```
 
@@ -100,7 +103,7 @@ check if ```dumpfile.sql``` exists:
 
 ```Get-Content dumpfile.sql | docker exec -i group2-postgres-1 psql -U pg-2 -d navigation```
 
-## Connect to database on local computer
+## Connect to local database
 ```docker exec -it group2-postgres-1 psql -U pg-2 -d navigation```
 
 # Docker
@@ -160,11 +163,11 @@ cleanall:
   - unit tests for backend
   - startup test for seperated frontend
   - Display code coverage in GitLab with an icon **???**
-- Linting and formatting
+- ~~Linting and formatting~~
 - dependency proxy usage **???**
 - code analysis tools **???**
 - ~~application runs on server~~
-- local development with a local database
+- local development with a ~~local database~~
 - The production database must never be deleted; only apply migrations **???**
 - ~~No real credentials (e.g. for log in to the container registry) should be on the server, only scoped API
 tokens~~
