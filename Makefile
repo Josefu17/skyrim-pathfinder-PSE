@@ -1,12 +1,16 @@
 build:
-	cd ./docker/
-	docker build -t registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application:latest
-	cd ..
+	docker build -t registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application:latest .
+
 push:
-	cd ./docker/
-	docker push registry.code.fbi.h-da.de/bpsewise2425/group2/test-application:latest
-	cd ..
+	docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application:latest
+
 run:
-	cd ./docker/
 	docker-compose up -d
-	cd ..
+
+login:
+	docker login registry.code.fbi.h-da.de
+
+update:
+	make login
+	make build
+	make push

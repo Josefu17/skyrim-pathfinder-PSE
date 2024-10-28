@@ -1,6 +1,30 @@
 # Dokumentation der Gruppe 2
 
+## Table of contents
+- [Dokumentation der Gruppe 2](#Dokumentation-der-Gruppe-2)
+  - [Gruppen-Konventionen](#Gruppen-Konventionen)
+  - [Server Erreichbarkeit](#Server-Erreichbarkeit)
+  - [Useful commands](#Useful-commands)
+- [Database Connection](#Database-Connection)
+  - [On server](#On-server)
+  - [On Local computer](#On-Local-computer)
+  - [Update database on server](#Update-database-on-server)
+  - [Insert dumpfile content into local database](#Insert-dumpfile-content-into-local-database)
+  - [Connect to local database](#Connect-to-local-database)
+- [Docker](#Docker)
+  - [Docker on local computer](#Docker-on-local-computer)
+  - [Docker on deployment server](#Docker-on-deployment-server)
+  - [Update docker container (from local to server)](#Update-docker-container-from-local-to-server)
+- [make](#make)
+  - [Makefile Beispiel](#Makefile-Beispiel)
+- [Todos for Stage 1](#Todos-for-Stage-1)
+  - [Project Management](#Project-Management)
+  - [DevExp](#DevExp)
+  - CI/CD and Operation
+- [Questions](#Questions)
+
 ## Gruppen-Konventionen
+[back to top](#Dokumentation-der-Gruppe-2)
 
 - Primäre Kommunikationsplattform: Discord
 - Kollaborations-Best-Practices: Kanban
@@ -28,6 +52,7 @@
 - Code styling erfüllt
 
 ## Server Erreichbarkeit
+[back to top](#Dokumentation-der-Gruppe-2)
 
 Jedes der Server wird auf seine eigene Weise erreicht. Hier wird festgehalten, auf welche Weise man den jeweiligen Server erreichen kann.
 
@@ -65,30 +90,18 @@ Postgres-Backend: ```sre-backend.devops-pse.users.h-da.cloud``` (Only available 
 - Username: ```pg-2```
 - Password: ```pg-2```
 
-## Offene Fragen
-
-#### Q1:
-
-Das Navigation-Service darf keinen Cache bzw. keine Verbindung zur DB haben. Kann das Web Backend stattdessen Ergebnisse in die DB laden und überprüfen, ob eine Route schonmal angefragt wurde, sodass diese dann aus der DB geladen werden kann?
-
-#### A1:
-
-#### Q2:
-
-Die Funktionsweise des gitlab-ci, service und artifacts
-
-#### A1:
-
 ## Useful commands
+[back to top](#Dokumentation-der-Gruppe-2)
 
 # Database Connection
+[back to top](#Dokumentation-der-Gruppe-2)
 
 ```docker exec -it app_postgres_1 psql -U pg-2 -d navigation```
 
 ## On server:
+[back to top](#Dokumentation-der-Gruppe-2)
 
 Export database:
-
 
 ```docker exec -t 851713c3adfe pg_dumpall -c -U pg-2 > ~/dumpfile.sql```
 
@@ -97,44 +110,158 @@ check if ```dumpfile.sql``` exists:
 ```ls -l ~/dumpfile.sql```
 
 ## On Local computer:
+[back to top](#Dokumentation-der-Gruppe-2)
+
 secure copy from deployment server to local computer:
 
 ```scp debian@group2.devops-pse.users.h-da.cloud:~/dumpfile.sql "path/to/repo"```
 
-
 ## Update database on server
+[back to top](#Dokumentation-der-Gruppe-2)
+
 ```pg_dump -U pg-2 -d navigation > dumpfile.sql```
 
 ## Insert dumpfile content into local database
+[back to top](#Dokumentation-der-Gruppe-2)
 
 ```Get-Content dumpfile.sql | docker exec -i group2-postgres-1 psql -U pg-2 -d navigation```
 
 ## Connect to local database
+[back to top](#Dokumentation-der-Gruppe-2)
+
 ```docker exec -it group2-postgres-1 psql -U pg-2 -d navigation```
 
 # Docker
-## Build docker image
+[back to top](#Dokumentation-der-Gruppe-2)
 
-```
-docker build -t registry.code.fbi.h-da.de/bpsewise2425/group2/test-application:latest --platform
-linux/amd64 .
-```
+### Display docker images
 
+ ```docker images```
 
-## Log into the docker registery
-
-```docker login registry.code.fbi.h-da.de```
-
-## Push the docker image
-```
-docker push registry.code.fbi.h-da.de/bpsewise2425/group2/test-application:latest
-```
-
-## Display docker container
+### Display running docker containers
 
  ```docker ps```
 
+
+## Docker on local computer
+[back to top](#Dokumentation-der-Gruppe-2)
+
+### Build docker image
+run the following command in git root-directory:
+
+```make build```
+
+this runs:
+```
+docker build -t registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application:latest --platform
+linux/amd64 .
+```
+```--platform linux/amd64``` is only for ARM system like a MacBook
+
+
+### Log into the docker registery
+run the following command in git root-directory:
+
+```make login```
+
+this runs:
+
+```docker login registry.code.fbi.h-da.de```
+
+### Push the docker image
+run the following command in git root-directory:
+
+```make push```
+
+this runs:
+
+```
+docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application:latest
+```
+
+## Docker on deployment server
+[back to top](#Dokumentation-der-Gruppe-2)
+
+### Log into the docker registery
+run the following command on the deployment server:
+
+```make login```
+
+this runs:
+
+```@docker login registry.code.fbi.h-da.de```[*command note](#command-notes)
+
+**The first time you log in, you have to use the API access token, 
+as you should not use your personal credentials on the server.**
+- name: ```API_access```
+- you can find the password in the file named "[API_access.txt](API_access.txt)" 
+
+### Load docker image and start docker container
+run the following command on the deployment server:
+
+```make start```
+
+this runs:
+
+```@(cd ./app/ && docker-compose up -d)```[*command note](#command-notes)
+
+### Stop running docker container
+run the following command on the deployment server:
+
+```make stop```
+
+this runs:
+
+```@(cd ./app/ && docker-compose down)```[*command note](#command-notes)
+
+### Remove docker image
+run the following command on the deployment server:
+
+```make remove```
+
+this runs:
+
+```@docker rmi registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application```[*command note](#command-notes)
+
+## Update docker container (from local to server)
+[back to top](#Dokumentation-der-Gruppe-2)
+
+After saving your changes run the following command in git root-directory:
+
+```make update```
+
+this runs:
+
+```
+make login
+make build
+make push 
+```
+
+Then connect to the [server](#Deployment-Server) and run the following command on the standard directory "debian@group2:~$":
+
+```make update```
+
+this runs:
+
+```
+make login
+make stop
+make remove
+make start
+```
+
+#### Command notes
+- @ prevents the echoing of the executed command
+- ( ) executes command in a subshell. 
+This allows you to jump back to your original location after executing the command.
+
+# make
+[back to top](#Dokumentation-der-Gruppe-2)
+
 ## Makefile Beispiel
+[back to top](#Dokumentation-der-Gruppe-2)
+
 start:
 - ```docker-compose up -d```
 
@@ -146,13 +273,19 @@ cleanall:
 
 
 # Todos for Stage 1
+[back to top](#Dokumentation-der-Gruppe-2)
+
 ## Project Management
+[back to top](#Dokumentation-der-Gruppe-2)
+
 - ~~Merge request Definition~~
 - ~~Set issue workflow~~
 - ~~Primary communication plattform~~
 - Collaboration best practises + **Documentation**
 
 ## DevExp
+[back to top](#Dokumentation-der-Gruppe-2)
+
 - Installation of dependencies with a "one-click" + **Documentation**
 - Start the application with "one-click" + **Documentation**
 - Tests that run locally and in CI + **Documentation**
@@ -161,6 +294,8 @@ cleanall:
 - Project's setup process + Major design decision + **Documentation**
 
 ## CI/CD and Operation
+[back to top](#Dokumentation-der-Gruppe-2)
+
 - Pipeline to build the application
 - Deployment of application to a server
 - Trigger automated releases via GitLab
@@ -178,5 +313,18 @@ cleanall:
 - ~~No real credentials (e.g. for log in to the container registry) should be on the server, only scoped API
 tokens~~
 
+# Questions
+[back to top](#Dokumentation-der-Gruppe-2)
 
+
+### Q1:
+The navigation service must not have a cache or a connection to the DB. Can the web backend instead load results into the DB and check whether a route has already been requested so that it can then be loaded from the DB?
+
+### A1:
+
+
+### Q2:
+How does gitlab-ci service and artifacts work?
+
+### A1:
 
