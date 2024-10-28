@@ -1,0 +1,18 @@
+
+# docker-compose.yml für lokal
+version: '3.1'
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: pg-2
+      POSTGRES_PASSWORD: pg-2
+      POSTGRES_DB: navigation
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

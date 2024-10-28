@@ -96,6 +96,12 @@ check if ```dumpfile.sql``` exists:
 ## Update database on server
 ```pg_dump -U pg-2 -d navigation > dumpfile.sql```
 
+## Insert dumpfile content into local database
+
+```Get-Content dumpfile.sql | docker exec -i group2-postgres-1 psql -U pg-2 -d navigation```
+
+## Connect to database on local computer
+```docker exec -it group2-postgres-1 psql -U pg-2 -d navigation```
 
 # Docker
 ## Build docker image
