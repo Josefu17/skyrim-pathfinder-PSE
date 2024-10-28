@@ -73,6 +73,12 @@ Das Navigation-Service darf keinen Cache bzw. keine Verbindung zur DB haben. Kan
 
 #### A1:
 
+#### Q2:
+
+Die Funktionsweise des gitlab-ci, service und artifacts
+
+#### A1:
+
 ## Useful commands
 
 # Database Connection
