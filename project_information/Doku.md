@@ -182,7 +182,7 @@ services:
 ```
 To start the database in Docker container: 
 ```
-docker exec -it app_postgres_1 psql -U pg-2 -d navigation
+docker exec -it group2-postgres-1 psql -U pg-2 -d navigation
 ```
 
 # Docker
