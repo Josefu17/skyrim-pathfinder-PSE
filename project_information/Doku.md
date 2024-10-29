@@ -1,27 +1,48 @@
 # Dokumentation der Gruppe 2
 
 ## Table of contents
-- [Dokumentation der Gruppe 2](#Dokumentation-der-Gruppe-2)
-  - [Gruppen-Konventionen](#Gruppen-Konventionen)
-  - [Server Erreichbarkeit](#Server-Erreichbarkeit)
-  - [Useful commands](#Useful-commands)
-- [Database Connection](#Database-Connection)
-  - [On server](#On-server)
-  - [On Local computer](#On-Local-computer)
-  - [Update database on server](#Update-database-on-server)
-  - [Insert dumpfile content into local database](#Insert-dumpfile-content-into-local-database)
-  - [Connect to local database](#Connect-to-local-database)
-- [Docker](#Docker)
-  - [Docker on local computer](#Docker-on-local-computer)
-  - [Docker on deployment server](#Docker-on-deployment-server)
-  - [Update docker container (from local to server)](#Update-docker-container-from-local-to-server)
+- [Dokumentation der Gruppe 2](#dokumentation-der-gruppe-2)
+  - [Table of contents](#table-of-contents)
+  - [Gruppen-Konventionen](#gruppen-konventionen)
+    - [Festgelegte Sprachen](#festgelegte-sprachen)
+    - [Code Styling](#code-styling)
+    - [Merge Request Definition of Done](#merge-request-definition-of-done)
+  - [Server Erreichbarkeit](#server-erreichbarkeit)
+    - [Map-Server](#map-server)
+    - [Deployment-Server](#deployment-server)
+    - [Postgres-Server](#postgres-server)
+  - [Useful commands](#useful-commands)
+- [Database Connection](#database-connection)
+  - [On server:](#on-server)
+    - [Secure database on server](#secure-database-on-server)
+  - [On Local computer:](#on-local-computer)
+    - [Insert dumpfile content into local database](#insert-dumpfile-content-into-local-database)
+    - [Connect to local database](#connect-to-local-database)
+- [Docker](#docker)
+    - [Display docker images](#display-docker-images)
+    - [Display running docker containers](#display-running-docker-containers)
+  - [Docker on local computer](#docker-on-local-computer)
+    - [Build docker image](#build-docker-image)
+    - [Log into the docker registery](#log-into-the-docker-registery)
+    - [Push the docker image](#push-the-docker-image)
+  - [Docker on deployment server](#docker-on-deployment-server)
+    - [Log into the docker registery](#log-into-the-docker-registery-1)
+    - [Load docker image and start docker container](#load-docker-image-and-start-docker-container)
+    - [Stop running docker container](#stop-running-docker-container)
+    - [Remove docker image](#remove-docker-image)
+  - [Update docker container (from local to server)](#update-docker-container-from-local-to-server)
+      - [Command notes](#command-notes)
 - [make](#make)
-  - [Makefile Beispiel](#Makefile-Beispiel)
-- [Todos for Stage 1](#Todos-for-Stage-1)
-  - [Project Management](#Project-Management)
-  - [DevExp](#DevExp)
-  - CI/CD and Operation
-- [Questions](#Questions)
+  - [Makefile Beispiel](#makefile-beispiel)
+- [Todos for Stage 1](#todos-for-stage-1)
+  - [Project Management](#project-management)
+  - [DevExp](#devexp)
+  - [CI/CD and Operation](#cicd-and-operation)
+- [Questions](#questions)
+    - [Q1:](#q1)
+    - [A1:](#a1)
+    - [Q2:](#q2)
+    - [A1:](#a1-1)
 
 ## Gruppen-Konventionen
 [back to top](#Dokumentation-der-Gruppe-2)
@@ -96,40 +117,73 @@ Postgres-Backend: ```sre-backend.devops-pse.users.h-da.cloud``` (Only available 
 # Database Connection
 [back to top](#Dokumentation-der-Gruppe-2)
 
-```docker exec -it app_postgres_1 psql -U pg-2 -d navigation```
-
 ## On server:
 [back to top](#Dokumentation-der-Gruppe-2)
 
-Export database:
+**Export database:** To export the database, the following command is executed within the Docker container. The PostgreSQL container ID is passed as a parameter, and the database is created as a PostgreSQL instance: 
 
-```docker exec -t 851713c3adfe pg_dumpall -c -U pg-2 > ~/dumpfile.sql```
+```
+docker exec -t 851713c3adfe pg_dumpall -c -U pg-2 > ~/dumpfile.sql
+```
 
 check if ```dumpfile.sql``` exists:
 
-```ls -l ~/dumpfile.sql```
+```
+ls -l ~/dumpfile.sql
+```
+
+### Secure database on server
+[back to top](#Dokumentation-der-Gruppe-2)
+
+The command is used to create and secure backup of the database.
+```
+pg_dump -U pg-2 -d navigation > dumpfile.sql
+```
 
 ## On Local computer:
 [back to top](#Dokumentation-der-Gruppe-2)
 
-secure copy from deployment server to local computer:
+The scp command is used to copy the dump file from the server to the local computer. The paths of the dump file on the server and the target path on the local computer are provided as parameters.
 
-```scp debian@group2.devops-pse.users.h-da.cloud:~/dumpfile.sql "path/to/repo"```
+```
+scp debian@group2.devops-pse.users.h-da.cloud:~/dumpfile.sql "path/to/repo"
+```
 
-## Update database on server
+
+
+### Insert dumpfile content into local database
 [back to top](#Dokumentation-der-Gruppe-2)
 
-```pg_dump -U pg-2 -d navigation > dumpfile.sql```
+This command recreates the PostgreSQL database running in a Docker container. The pipe operator sends the output of ```Get-Content``` to the next command, which executes and starts the database in the Docker container.
 
-## Insert dumpfile content into local database
-[back to top](#Dokumentation-der-Gruppe-2)
+```
+Get-Content dumpfile.sql | docker exec -i group2-postgres-1 psql -U pg-2 -d navigation
+```
 
-```Get-Content dumpfile.sql | docker exec -i group2-postgres-1 psql -U pg-2 -d navigation```
-
-## Connect to local database
+### Connect to local database
 [back to top](#Dokumentation-der-Gruppe-2)
 
 ```docker exec -it group2-postgres-1 psql -U pg-2 -d navigation```
+
+To connect to the local database, you need to start the following container: 
+```
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: pg-2
+      POSTGRES_PASSWORD: pg-2
+      POSTGRES_DB: navigation
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+```
+To start the database in Docker container: 
+```
+docker exec -it app_postgres_1 psql -U pg-2 -d navigation
+```
 
 # Docker
 [back to top](#Dokumentation-der-Gruppe-2)
