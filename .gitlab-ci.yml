@@ -42,5 +42,6 @@ analyze-job:
     - pip install --upgrade pip
     - pip install pylint
     - pip install black
+    - pip install sqlalchemy psycopg2-binary 
     - python -m pylint src/*.py
     - python -m black src/*.py
