@@ -32,7 +32,7 @@ test-job:
   script:
     - pip install --upgrade pip --no-cache-dir
     - pip install pytest --no-cache-dir
-    - python -m pytest ./tests/test.py
+    - python -m pytest ./tests/test.py -s --verbose
 
 # analyze-job:
 #   stage: analyze
