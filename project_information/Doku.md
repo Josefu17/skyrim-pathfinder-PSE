@@ -380,5 +380,9 @@ The navigation service must not have a cache or a connection to the DB. Can the 
 ### Q2:
 How does gitlab-ci service and artifacts work?
 
-### A1:
+### A2:
 
+### Q3:
+Where is "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}" set?
+
+### A3:

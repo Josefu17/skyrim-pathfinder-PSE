@@ -1,0 +1,50 @@
+stages:
+  #- build
+  - test
+  #- analyze
+
+build-job:
+  stage: build
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.10-alpine  # Beispiel für ein Python-Projekt
+  services:
+    - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.10-alpine
+      alias: python
+    - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/postgres:latest
+      alias: postgres
+  script:
+    - pip install --upgrade pip
+    - python setup.py sdist bdist_wheel  # Erstelle das Paket
+    - ls dist/
+  artifacts:
+    paths:
+      - build/  # Das Verzeichnis, das als Artefakt gespeichert wird
+
+test-job:
+  stage: test
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.10-alpine
+  #services:
+    #- name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.10-alpine
+      #alias: python
+    #- name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/postgres:latest
+      #alias: postgres
+  #dependencies:
+   #- build-job  # Benenne die Abhängigkeit zu build-job
+  script:
+    - pip install --upgrade pip --no-cache-dir
+    - pip install pytest --no-cache-dir
+    - python -m pytest ./tests/
+
+analyze-job:
+  stage: analyze
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.10-alpine
+  services:
+    - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.10-alpine
+      alias: python
+  dependencies:
+    - build-job
+  script:
+    - pip install --upgrade pip
+    - pip install pylint
+    - pip install black
+    - python -m pylint src/
+    - python -m black src/
