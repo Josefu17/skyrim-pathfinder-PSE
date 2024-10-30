@@ -42,7 +42,9 @@
     - [Q1:](#q1)
     - [A1:](#a1)
     - [Q2:](#q2)
-    - [A1:](#a1-1)
+    - [A2:](#a2)
+    - [Q3:](#q3)
+    - [A3:](#a3)
 
 ## Gruppen-Konventionen
 [back to top](#Dokumentation-der-Gruppe-2)
@@ -381,8 +383,10 @@ The navigation service must not have a cache or a connection to the DB. Can the 
 How does gitlab-ci service and artifacts work?
 
 ### A2:
+Services are set for usage in the following script.
 
 ### Q3:
 Where is "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}" set?
 
 ### A3:
+Its set in the predefined CI/CD GitLab variables (We can not see it in GitLab)

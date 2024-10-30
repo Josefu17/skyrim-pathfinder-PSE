@@ -1,7 +1,7 @@
 stages:
   #- build
   - test
-  #- analyze
+  - analyze
 
 #build-job:
   # stage: build
@@ -35,17 +35,12 @@ test-job:
     - python -m pytest ./tests/*.py --verbose
 
 
-# analyze-job:
-#   stage: analyze
-#   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.10-alpine
-#   services:
-#     - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.10-alpine
-#       alias: python
-#   dependencies:
-#     - build-job
-#   script:
-#     - pip install --upgrade pip
-#     - pip install pylint
-#     - pip install black
-#     - python -m pylint src/
-#     - python -m black src/
+analyze-job:
+  stage: analyze
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.10-alpine
+  script:
+    - pip install --upgrade pip
+    - pip install pylint
+    - pip install black
+    - python -m pylint src/*.py
+    - python -m black src/*.py
