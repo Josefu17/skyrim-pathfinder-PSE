@@ -23,10 +23,10 @@
     - [Display running docker containers](#display-running-docker-containers)
   - [Docker on local computer](#docker-on-local-computer)
     - [Build docker image](#build-docker-image)
-    - [Log into the docker registery](#log-into-the-docker-registery)
+    - [Log into the docker registry](#log-into-the-docker-registery)
     - [Push the docker image](#push-the-docker-image)
   - [Docker on deployment server](#docker-on-deployment-server)
-    - [Log into the docker registery](#log-into-the-docker-registery-1)
+    - [Log into the docker registry](#log-into-the-docker-registery-1)
     - [Load docker image and start docker container](#load-docker-image-and-start-docker-container)
     - [Stop running docker container](#stop-running-docker-container)
     - [Remove docker image](#remove-docker-image)
@@ -89,11 +89,11 @@ oder mit jq ```curl https://maps.proxy.devops-pse.users.h-da.cloud/map?name=skyr
 
 Es benötigt einige Schritte und einen [ssh-Schlüssel](https://code.fbi.h-da.de/help/user/ssh.md#generate-an-ssh-key-pair) um Zugriff auf den Deployment-Server zu erhalten.
 
--> Verbinden mit ssh-Server ```ssh debian@group2.devops-pse.users.h-da.cloud``` 
+- Verbinden mit ssh-Server ```ssh debian@group2.devops-pse.users.h-da.cloud``` 
 
--> Passwort für den Zugriff auf den lokalen ssh-Schlüssel eingeben
+- Passwort für den Zugriff auf den lokalen ssh-Schlüssel eingeben
 	
--> User zum Server hinzufügen, indem der public ssh-key zur Datei ".ssh/authorized_keys" hinzugefügt wird.
+- User zum Server hinzufügen, indem der public ssh-key zur Datei ".ssh/authorized_keys" hinzugefügt wird.
 
 Deployment-Server Links (mit TLS):
 - [API](https://api.group2.proxy.devops-pse.users.h-da.cloud/): ```https://api.group2.proxy.devops-pse.users.h-da.cloud/```
@@ -213,7 +213,7 @@ linux/amd64 .
 ```--platform linux/amd64``` is only for ARM system like a MacBook
 
 
-### Log into the docker registery
+### Log into the docker registry
 run the following command in git root-directory:
 
 ```make login```
@@ -236,7 +236,7 @@ docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application:late
 ## Docker on deployment server
 [back to top](#Dokumentation-der-Gruppe-2)
 
-### Log into the docker registery
+### Log into the docker registry
 run the following command on the deployment server:
 
 ```make login```
