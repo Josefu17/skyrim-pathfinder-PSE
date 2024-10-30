@@ -32,11 +32,8 @@ test-job:
   script:
     - pip install --upgrade pip --no-cache-dir
     - pip install pytest --no-cache-dir
-<<<<<<< HEAD
-    - python -m pytest ./tests/*.py
-=======
     - python -m pytest ./tests/*.py --verbose
->>>>>>> c80a341aef37ee66b331d00e88a4165e7f05fd27
+
 
 # analyze-job:
 #   stage: analyze
