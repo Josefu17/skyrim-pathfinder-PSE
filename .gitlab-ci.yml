@@ -22,26 +22,24 @@ stages:
 test-job:
   stage: test
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.13-alpine
-  #services:
-    #- name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.10-alpine
-      #alias: python
-    #- name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/postgres:latest
-      #alias: postgres
-  #dependencies:
-   #- build-job  # Benenne die Abhängigkeit zu build-job
+  services:
+    - name: postgres:latest
+      alias: postgres
+  variables:
+    POSTGRES_USER: "pg-2"
+    POSTGRES_PASSWORD: "pg-2"
+    POSTGRES_DB: "navigation"
+  before_script:
+  - pip install -r requirements.txt
   script:
-    - pip install --upgrade pip --no-cache-dir
-    - pip install pytest --no-cache-dir
-    - python -m pytest ./tests/*.py --verbose
+    - python -m pytest ./src/test*.py --verbose
 
 
 analyze-job:
   stage: analyze
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.13-alpine
+  before_script:
+    - pip install -r requirements.txt
   script:
-    - pip install --upgrade pip
-    - pip install pylint
-    - pip install black
-    - pip install sqlalchemy psycopg2-binary 
     - python -m pylint src/*.py
     - python -m black src/*.py

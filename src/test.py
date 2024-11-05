@@ -1,8 +1,8 @@
-# test.py
-
+""" just a test file"""
 
 def test_true():
-    assert True == True
+    """returns true"""
+    assert True
 
 
 if __name__ == "__main__":
