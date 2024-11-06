@@ -15,7 +15,7 @@ services:
       - app-network
 
   app:
-    image: python:3.9-slim
+    image: python:3.13-slim
     environment:
       USER: pg-2
       PASSWORD: pg-2
