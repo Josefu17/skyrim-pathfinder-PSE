@@ -3,8 +3,10 @@
 import math
 from collections import defaultdict
 import heapq
+import json
 from sqlalchemy.orm import sessionmaker
 from database import new_engine, Cities, Connections
+
 
 SESSIONMAKER = sessionmaker(bind=new_engine)
 SESSION = SESSIONMAKER()
@@ -65,7 +67,7 @@ def dijkstra(graph, start_city_id, end_city_id):
 
     return path, distances[end_city_id]
 
-def shortest_route(start_city_name, end_city_name):
+def get_route(start_city_name, end_city_name):
     """displays the shortest route"""
     start_city = SESSION.query(Cities).filter_by(name=start_city_name).first()
     end_city = SESSION.query(Cities).filter_by(name=end_city_name).first()
@@ -81,7 +83,5 @@ def shortest_route(start_city_name, end_city_name):
 
 
     path_names = [SESSION.query(Cities).get(city_id).name for city_id in path]
-    calculated_route = f"Route: {' -> '.join(path_names)}\nDistance: {distance}"
-    return calculated_route
-
-print(shortest_route("Markarth", "Winterhold"))
+    route = {"route": " -> ".join(path_names), "distance": distance}
+    return json.dumps(route)

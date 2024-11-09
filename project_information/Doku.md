@@ -23,10 +23,10 @@
     - [Display running docker containers](#display-running-docker-containers)
   - [Docker on local computer](#docker-on-local-computer)
     - [Build docker image](#build-docker-image)
-    - [Log into the docker registry](#log-into-the-docker-registery)
+    - [Log into the docker registry](#log-into-the-docker-registry)
     - [Push the docker image](#push-the-docker-image)
   - [Docker on deployment server](#docker-on-deployment-server)
-    - [Log into the docker registry](#log-into-the-docker-registery-1)
+    - [Log into the docker registry](#log-into-the-docker-registry-1)
     - [Load docker image and start docker container](#load-docker-image-and-start-docker-container)
     - [Stop running docker container](#stop-running-docker-container)
     - [Remove docker image](#remove-docker-image)
@@ -34,10 +34,18 @@
       - [Command notes](#command-notes)
 - [make](#make)
   - [Makefile Beispiel](#makefile-beispiel)
-- [Todos for Stage 1](#todos-for-stage-1)
+- [Stage 1 - Documentation](#stage-1---documentation)
   - [Project Management](#project-management)
   - [DevExp](#devexp)
+    - [Debugger (debugpy)](#debugger-debugpy)
+      - [Changes in `docker-compose.yml`](#changes-in-docker-composeyml)
+        - [Setup for Vs Code](#setup-for-vs-code)
+        - [Setup for pycharm](#setup-for-pycharm)
   - [CI/CD and Operation](#cicd-and-operation)
+- [Todos for Stage 1](#todos-for-stage-1)
+  - [Project Management](#project-management-1)
+  - [DevExp](#devexp-1)
+  - [CI/CD and Operation](#cicd-and-operation-1)
 - [Questions](#questions)
     - [Q1:](#q1)
     - [A1:](#a1)
@@ -327,6 +335,62 @@ stop:
 cleanall:
 - ```docker system prune -a```
 
+# Stage 1 - Documentation
+## Project Management
+## DevExp
+### Debugger (debugpy)
+- Add debugypy to requirements.txt
+- Add to the docker-compose.yml file so that the debugger runs in the Python container.
+
+#### Changes in `docker-compose.yml`
+```
+command: >
+  sh -c "pip install --upgrade pip && \
+         pip install -r /app/requirements.txt && \
+         python -Xfrozen_modules=off -m debugpy --listen 0.0.0.0:5678 --wait-for-client /app/src/dijkstra_algorithm.py"
+```
+- `-Xfrozen_modules=off`
+  - So that breakpoints work correctly
+- `listen 0.0.0.0:5678`
+  - The debugger listens on all network interfaces (0.0.0.0) and waits for connections on port 5678
+- Add ports to `docker-compose.yml`
+```
+ports:
+      - "80:80"
+      - "5678:5678"
+```
+##### Setup for Vs Code
+Create a file .vscode/launch.json in the root directory.
+
+```
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Remote Attach",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 5678
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/src",
+          "remoteRoot": "/app/src"
+        }
+      ]
+    }
+  ]
+}
+
+```
+Remote Attach: so that VS Code can attach to a running Python application on a remote system
+
+##### Setup for pycharm
+...
+
+## CI/CD and Operation
 
 # Todos for Stage 1
 [back to top](#Dokumentation-der-Gruppe-2)
