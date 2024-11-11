@@ -32,6 +32,9 @@
     - [Remove docker image](#remove-docker-image)
   - [Update docker container (from local to server)](#update-docker-container-from-local-to-server)
       - [Command notes](#command-notes)
+- [Frontend](#frontend)
+  - [Path finder page](#path-finder-page)
+  - [Documentation page](#documentation-page)
 - [make](#make)
   - [Makefile Beispiel](#makefile-beispiel)
 - [Stage 1 - Documentation](#stage-1---documentation)
@@ -58,7 +61,7 @@
     - [A4](#a4)
 
 ## Gruppen-Konventionen
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 - Primäre Kommunikationsplattform: Discord
 - Kollaborations-Best-Practices: Kanban
@@ -68,7 +71,7 @@
 - Backend: Python
 - Navigations-service: grpc
 - Datenbank: Postgres
-- (frontend: html/js/css(/php))
+- (frontend: html/js/css)
 
 ### Code Styling
 
@@ -89,7 +92,7 @@
 documentation will be rejected.
 
 ## Server Erreichbarkeit
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 Jedes der Server wird auf seine eigene Weise erreicht. Hier wird festgehalten, auf welche Weise man den jeweiligen Server erreichen kann.
 
@@ -128,13 +131,28 @@ Postgres-Backend: ```sre-backend.devops-pse.users.h-da.cloud``` (Only available 
 - Password: ```pg-2```
 
 ## Useful commands
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
+
+### On Deployment Server
+We added functions to the file ~/.bashrc for better DevEx. Following are added functions and their usage:
+
+- ```permalias```: to add a new alias to .bash_aliases
+  - ```permalias <new_command_name>='<actual -command>'```
+- ```enter```: to access the terminal of given docker container
+  - ```enter <docker container>```
+
+Now the added aliases in the ~/.bash_aliases with their usage:
+- ```cls```: ```clear```
+  - just a lazy example
+- ```refresh```: ```source ~/.bashrc```
+  - refreshes the terminal so manually added changes to the bash files are implemented and usable
+  - integrated into permalias
 
 # Database Connection
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 ## On server:
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 **Export database:** To export the database, the following command is executed within the Docker container. The PostgreSQL container ID is passed as a parameter, and the database is created as a PostgreSQL instance: 
 
@@ -149,7 +167,7 @@ ls -l ~/dumpfile.sql
 ```
 
 ### Secure database on server
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 The command is used to create and secure backup of the database.
 ```
@@ -157,7 +175,7 @@ pg_dump -U pg-2 -d navigation > dumpfile.sql
 ```
 
 ## On Local computer:
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 The scp command is used to copy the dump file from the server to the local computer. The paths of the dump file on the server and the target path on the local computer are provided as parameters.
 
@@ -165,10 +183,8 @@ The scp command is used to copy the dump file from the server to the local compu
 scp debian@group2.devops-pse.users.h-da.cloud:~/dumpfile.sql "path/to/repo"
 ```
 
-
-
 ### Insert dumpfile content into local database
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 This command recreates the PostgreSQL database running in a Docker container. The pipe operator sends the output of ```Get-Content``` to the next command, which executes and starts the database in the Docker container.
 
@@ -177,7 +193,7 @@ Get-Content dumpfile.sql | docker exec -i group2-postgres-1 psql -U pg-2 -d navi
 ```
 
 ### Connect to local database
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 ```docker exec -it group2-postgres-1 psql -U pg-2 -d navigation```
 
@@ -227,7 +243,7 @@ docker exec -it group2-postgres-1 psql -U pg-2 -d navigation
 ```
 
 # Docker
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 ### Display docker images
 
@@ -239,7 +255,7 @@ docker exec -it group2-postgres-1 psql -U pg-2 -d navigation
 
 
 ## Docker on local computer
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 ### Build docker image
 run the following command in git root-directory:
@@ -275,7 +291,7 @@ docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application:late
 ```
 
 ## Docker on deployment server
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 ### Log into the docker registry
 run the following command on the deployment server:
@@ -319,7 +335,7 @@ this runs:
 ```@docker rmi registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application```[*command note](#command-notes)
 
 ## Update docker container (from local to server)
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 After saving your changes run the following command in git root-directory:
 
@@ -351,11 +367,34 @@ make start
 - ( ) executes command in a subshell. 
 This allows you to jump back to your original location after executing the command.
 
+# Frontend
+[back to top](#dokumentation-der-gruppe-2)
+
+The frontend is served by the running container on the [deployment server](#deployment-server). You can access it via the [frontend URL](https://group2.proxy.devops-pse.users.h-da.cloud/).
+
+## Path Finder page
+[back to top](#dokumentation-der-gruppe-2)
+
+index.html, the default entry point, will automatically redirect you to the "Path Finder" page. 
+This page lists all available cities, allowing you to select a start and endpoint to calculate a route. 
+Selecting the same city for both start and endpoint is restricted to ensure meaningful route calculations.
+
+(Currently, cities are loaded from a JSON file.) 
+TODO: Connect with the backend API to dynamically fetch city data and calculate routes. 
+Implement output for displaying the received path after calculation.
+
+## Documentation page
+[back to top](#dokumentation-der-gruppe-2)
+
+The "Path Finder" page includes a link to this documentation, 
+where you can find detailed information about our project. 
+Additionally, this page provides a link back to the "Path Finder" page for easy navigation.
+
 # make
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 ## Makefile Beispiel
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 start:
 - ```docker-compose up -d```
@@ -424,10 +463,10 @@ Remote Attach: so that VS Code can attach to a running Python application on a r
 ## CI/CD and Operation
 
 # Todos for Stage 1
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 ## Project Management
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 - ~~Merge request Definition~~
 - ~~Set issue workflow~~
@@ -435,7 +474,7 @@ Remote Attach: so that VS Code can attach to a running Python application on a r
 - Collaboration best practises + **Documentation**
 
 ## DevExp
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 ### Installation and Removal of Dependencies
 
@@ -469,7 +508,7 @@ These commands provide a "one-click" solution for managing dependencies, ensurin
 - Project's setup process + Major design decision + **Documentation**
 
 ## CI/CD and Operation
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 - Pipeline to build the application
 - Deployment of application to a server
@@ -489,7 +528,7 @@ These commands provide a "one-click" solution for managing dependencies, ensurin
 tokens~~
 
 # Questions
-[back to top](#Dokumentation-der-Gruppe-2)
+[back to top](#dokumentation-der-gruppe-2)
 
 
 ### Q1:

@@ -1,8 +1,4 @@
-
-__pycache__/
-*.py[cod]
-
-
-.pytest_cache/
-src/.pytest_cache/
-.idea
+*/__pycache__/
+*/*.py[cod]
+*/.pytest_cache/
+*/.idea
