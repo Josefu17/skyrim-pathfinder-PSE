@@ -15,8 +15,8 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import ProgrammingError
 import requests
-from tables import Cities, Connections, Base
-
+from src.database.schema.city import Cities, Base
+from src.database.schema.connection import Connections
 
 USER = "pg-2"
 PASSWORD = "pg-2"
@@ -24,11 +24,9 @@ HOST = "postgres"
 PORT = "5432"
 DB_NAME = "navigation"
 
-
 engine = create_engine(
     f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/postgres"
 )
-
 
 with engine.connect() as connection:
     try:
@@ -48,11 +46,9 @@ with engine.connect() as connection:
         print(f"Error: {e}")
         raise
 
-
 new_engine = create_engine(
     f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}"
 )
-
 
 with new_engine.connect() as new_connection:
     try:
@@ -60,7 +56,6 @@ with new_engine.connect() as new_connection:
         print("Tables created")
     except ProgrammingError as e:
         print(f"Error creating tables: {e}")
-
 
 SESSION_MAKER = sessionmaker(bind=new_engine)
 SESSION = SESSION_MAKER()
@@ -83,7 +78,7 @@ try:
             )
             SESSION.add(db_city)
             SESSION.commit()
-            print(f"City { city['name'] } added")
+            print(f"City {city['name']} added")
         city_map[city["name"]] = db_city.id
 
     for connection in data["connections"]:
@@ -102,7 +97,7 @@ try:
             )
             SESSION.add(db_connection)
             print(
-                f"Connection from { connection['parent'] } to { connection['child'] } added"
+                f"Connection from {connection['parent']} to {connection['child']} added"
             )
 
     SESSION.commit()

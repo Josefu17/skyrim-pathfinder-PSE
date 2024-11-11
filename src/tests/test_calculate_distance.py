@@ -1,7 +1,7 @@
 """Tests calculate_distance"""
 
 import math
-from dijkstra_algorithm import calculate_distance
+from ..navigation_service.navigation_service import calculate_distance
 
 
 class City:

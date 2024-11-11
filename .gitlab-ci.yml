@@ -32,8 +32,7 @@ test-job:
   before_script:
   - pip install -r requirements.txt
   script:
-    - python -m pytest ./src/test*.py --verbose
-
+    - python -m pytest ./src/tests/ --verbose
 
 analyze-job:
   stage: analyze

@@ -1,4 +1,4 @@
-.PHONY: install remove push start login stop restart update connect-to-database
+.PHONY: install remove build push start login stop nav-enter nav-test restart update connect-to-database
 
 # Dependency management
 install:
@@ -24,14 +24,15 @@ login:
 stop:
 	docker-compose down
 
-restart:
-	make stop
-	make start
+nav-enter:
+	docker exec -it group2-navigation-service-1 bash
 
-update:
-	make login
-	make build
-	make push
+nav-test:
+	python -m pytest ./app/src/tests/
+
+restart: stop start
+
+update: login build push
 
 connect-to-database:
 	docker exec -it group2-postgres-1 psql -U pg-2 -d navigation
