@@ -1,3 +1,14 @@
+.PHONY: install remove push start login stop restart update connect-to-database
+
+# Dependency management
+install:
+	pip install -r requirements.txt
+	@echo "Dependencies installed."
+
+remove:
+	pip uninstall -y -r requirements.txt
+	@echo "Dependencies removed."
+
 build:
 	docker build -t registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application:latest .
 
