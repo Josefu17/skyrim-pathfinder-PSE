@@ -1,4 +1,4 @@
-"""This module calulates the route between two endpoints"""
+"""This module calculates the route between two endpoints"""
 
 import math
 from collections import defaultdict
@@ -67,6 +67,7 @@ def dijkstra(graph, start_city_id, end_city_id):
 
     return path, distances[end_city_id]
 
+
 def get_route(start_city_name, end_city_name):
     """displays the shortest route"""
     start_city = SESSION.query(Cities).filter_by(name=start_city_name).first()
@@ -78,9 +79,8 @@ def get_route(start_city_name, end_city_name):
     graph = create_graph()
     path, distance = dijkstra(graph, start_city.id, end_city.id)
 
-    if distance == float('inf'):
-        return f"No connection betwenn {start_city_name} and {end_city_name}"
-
+    if distance == float("inf"):
+        return f"No connection between {start_city_name} and {end_city_name}"
 
     path_names = [SESSION.query(Cities).get(city_id).name for city_id in path]
     route = {"route": " -> ".join(path_names), "distance": distance}

@@ -37,6 +37,7 @@
 - [Stage 1 - Documentation](#stage-1---documentation)
   - [Project Management](#project-management)
   - [DevExp](#devexp)
+    - [One Click Dependencies Installation / Deletion](#Installation-and-Removal-of-Dependencies)
     - [Debugger (debugpy)](#debugger-debugpy)
       - [Changes in `docker-compose.yml`](#changes-in-docker-composeyml)
         - [Setup for Vs Code](#setup-for-vs-code)
@@ -47,12 +48,14 @@
   - [DevExp](#devexp-1)
   - [CI/CD and Operation](#cicd-and-operation-1)
 - [Questions](#questions)
-    - [Q1:](#q1)
-    - [A1:](#a1)
-    - [Q2:](#q2)
-    - [A2:](#a2)
-    - [Q3:](#q3)
-    - [A3:](#a3)
+    - [Q1](#q1)
+    - [A1](#a1)
+    - [Q2](#q2)
+    - [A2](#a2)
+    - [Q3](#q3)
+    - [A3](#a3)
+    - [Q4](#q4)
+    - [A4](#a4)
 
 ## Gruppen-Konventionen
 [back to top](#Dokumentation-der-Gruppe-2)
@@ -81,6 +84,9 @@
 - Tests(Unit & Integration)
 - Erfüllt Anforderungen (Issues)
 - Code styling erfüllt
+- Requires approval from at least one reviewer.
+- All necessary documentation must be included at the time of creation; merge requests with missing or incomplete 
+documentation will be rejected.
 
 ## Server Erreichbarkeit
 [back to top](#Dokumentation-der-Gruppe-2)
@@ -190,6 +196,31 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
 ```
+Alternatively, one can start the local db with the following CLI commands:
+
+Running for the first time:
+```
+docker/podman run -d \
+  --name postgres \
+  -e POSTGRES_USER=pg-2 \
+  -e POSTGRES_PASSWORD=pg-2 \
+  -e POSTGRES_DB=navigation \
+  -p 5433:5432 \
+  -v postgres_data:/var/lib/postgresql/data \
+  docker.io/library/postgres:latest
+```
+Running existing container:
+```
+docker/podman run -d \
+  --name postgres \
+  -e POSTGRES_USER=pg-2 \
+  -e POSTGRES_PASSWORD=pg-2 \
+  -e POSTGRES_DB=navigation \
+  -p 5433:5432 \
+  -v postgres_data:/var/lib/postgresql/data \
+  docker.io/library/postgres:latest
+```
+
 To start the database in Docker container: 
 ```
 docker exec -it group2-postgres-1 psql -U pg-2 -d navigation
@@ -220,7 +251,7 @@ this runs:
 docker build -t registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application:latest --platform
 linux/amd64 .
 ```
-```--platform linux/amd64``` is only for ARM system like a MacBook
+```--platform linux/amd64``` is only necessary for ARM systems like a MacBook
 
 
 ### Log into the docker registry
@@ -406,7 +437,31 @@ Remote Attach: so that VS Code can attach to a running Python application on a r
 ## DevExp
 [back to top](#Dokumentation-der-Gruppe-2)
 
-- Installation of dependencies with a "one-click" + **Documentation**
+### Installation and Removal of Dependencies
+
+Two targets have been added to the `Makefile`: `install` and `remove`. These targets check if a Python virtual 
+environment exists. If it does not, they will create it automatically. Then, depending on the command, they will install
+or remove the dependencies.
+
+#### Usage
+
+To install the dependencies, run the following command from the root folder:
+
+```bash
+make install
+```
+
+To remove the dependencies, run:
+
+```bash
+make remove
+```
+
+These commands provide a "one-click" solution for managing dependencies, ensuring a clean and isolated environment.
+
+---
+
+
 - Start the application with "one-click" + **Documentation**
 - Tests that run locally and in CI + **Documentation**
 - Linter/formatter local and in CI + **Documentation**
@@ -442,6 +497,7 @@ The navigation service must not have a cache or a connection to the DB. Can the 
 
 ### A1:
 
+---
 
 ### Q2:
 How does gitlab-ci service and artifacts work?
@@ -449,8 +505,28 @@ How does gitlab-ci service and artifacts work?
 ### A2:
 Services are set for usage in the following script.
 
+---
+
 ### Q3:
 Where is "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}" set?
 
 ### A3:
-Its set in the predefined CI/CD GitLab variables (We can not see it in GitLab)
+It's set in the predefined CI/CD GitLab variables (We can not see it in GitLab)
+
+---
+
+### Q4:
+In relation to Q1, a couple of follow-up questions regarding the implementation and the interaction between 
+map Service - Database - Web Backend and the Navigation Service:
+- When there is a new request for a route finding, should the web backend get the latest state from
+the Map Service every time and update the database accordingly?
+- If so, isn't the database kind of pointless here? What is the point of having a database if we have to update the 
+state at every request? Couldn't we simply communicate directly with the Map Service and use the data that we receive 
+from it?
+- If not, when or under what condition should the web backend update the database?
+- Is it a feasible proposition to save the calculated routes in its own bridge table (Zwischentabelle) and read directly
+from it if there are no changes to the database or would this be undesired / unnecessary?
+
+### A4:
+
+---
