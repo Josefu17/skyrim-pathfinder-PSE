@@ -4,7 +4,7 @@ to listen for incoming requests.
 """
 
 from xmlrpc.server import SimpleXMLRPCServer
-from dijkstra_algorithm import get_route
+from src.navigation_service.navigation_service import get_route
 
 server = SimpleXMLRPCServer(("0.0.0.0", 8000))
 server.register_function(get_route, "get_route")

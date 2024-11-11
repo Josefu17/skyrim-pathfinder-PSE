@@ -5,7 +5,7 @@ from collections import defaultdict
 import heapq
 import json
 from sqlalchemy.orm import sessionmaker
-from database import new_engine, Cities, Connections
+from src.database.database import new_engine, Cities, Connections
 
 
 SESSIONMAKER = sessionmaker(bind=new_engine)

@@ -14,7 +14,7 @@ services:
     networks:
       - app-network
 
-  app:
+  navigation-service:
     image: python:3.13-slim
     environment:
       USER: pg-2
@@ -28,20 +28,23 @@ services:
       - "8000:8000"
       - "5678:5678"
     volumes:
+      - ./Makefile:/Makefile
       - ./src:/app/src
       - ./requirements.txt:/app/requirements.txt
     networks:
       - app-network
     command: >
       sh -c "pip install --upgrade pip && \
-        pip install -r /app/requirements.txt && \
-        python /app/src/server.py \
-        tail -f /dev/null"
-
+         pip install -r /app/requirements.txt && \
+         apt update && \
+         apt install make && \
+         cd /app && \
+         export PYTHONPATH=$(pwd) && \
+         python -m src.rpc_api.server && \
+         tail -f /dev/null"
 
 volumes:
   postgres_data:
-
 
 networks:
   app-network:
