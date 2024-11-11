@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Path finder</title>
+    <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="./css/path_finder.css"/>
+</head>
+<body class="flex1_container">
+<script id="script" src="./js/path_finder.js"></script>
+<noscript id="noscript">
+    <p>Please activate JavaScript !</p>
+</noscript>
+<header class="flex_item">
+    <a id="doc_link" href="./doc.html">Documentation</a>
+</header>
+<main class="flex_item flex2_container">
+    <h1 class="flex_item">Path finder</h1>
+    <section class="flex_item">
+        <h2>Map endpoints</h2>
+        <img id="map_image" src="../assets/images/map.png" width='222' height='227' alt="">
+        <p>Here are all endpoints of the map listed:</p>
+        <ul id="endpoint_list"></ul>
+    </section>
+    <section class="flex_item">
+        <h2>Find path</h2>
+        <form id="path_points_form" name="path_points_form" class="flex3_container"
+              action="./path_finder.html" method="post">
+            <label for="startpoint" class="flex_item">Select the startpoint
+                <select id="startpoint" name="startpoint">
+                    <option value="0">not selected</option>
+                </select>
+            </label>
+            <label for="endpoint" class="flex_item">Select the endpoint
+                <select id="endpoint" name="endpoint">
+                    <option value="0">not selected</option>
+                </select>
+            </label>
+            <input id="path_points_submit_button" type="submit" value="Find path" class="flex_item"/>
+        </form>
+    </section>
+</main>
+<footer class="flex_item">
+    <fieldset>
+        <legend accesskey="f">Developers</legend>
+        <p>Arian Farzad</p>
+        <p>Târik-Cemal Atis</p>
+        <p>Yusuf Birdane</p>
+    </fieldset>
+</footer>
+</body>
+</html>
