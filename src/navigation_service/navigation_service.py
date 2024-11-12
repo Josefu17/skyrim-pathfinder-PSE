@@ -83,5 +83,8 @@ def get_route(start_city_name, end_city_name):
         return f"No connection between {start_city_name} and {end_city_name}"
 
     path_names = [SESSION.query(Cities).get(city_id).name for city_id in path]
-    route = {"route": " -> ".join(path_names), "distance": distance}
-    return json.dumps(route)
+    route = {
+        "route": path_names, 
+        "distance": round(distance, 2)
+    }
+    return json.dumps(route, indent=4)
