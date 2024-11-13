@@ -1,6 +1,7 @@
 /* General styles for all screen sizes (Smartphones are considered standard)*/
 
 /* ELEMENT */
+
 body {
     background-image: url('../../assets/images/app_background.png');
     background-size: 100% 100%; /* Stretches the image both horizontally and vertically */
@@ -26,17 +27,14 @@ body {
     display: flex;
 }
 
-main {
-    height: 100%;
-    flex: 1; /* fills remaining space, footer slides to the downwards */
-}
-
 /* Hides all bullet points */
 ul {
     list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
-/* Adjusts size of all select elements*/
+/* Adjusts all select elements*/
 select {
     color: wheat;
     background-color: #234875;
@@ -50,12 +48,12 @@ select {
     text-align: center;
 }
 
+/* Adjusts footer element*/
 footer {
     position: relative; /* Position relative to control margin on the page */
-    width: calc(99% - 10%); /* 99% of window width minus 2x 5% margin. 100% could let appear a scrollbar*/
-    margin: 0 5%; /* 5% margin on both sides */
-    padding: 10px;
-    text-align: center;
+    width: calc(99% - 10%); /*;  99% of window width minus 2x 5% margin. 100% could let appear a scrollbar*/
+    margin: 1.5%; /* 5% margin on both sides */
+    padding: 0.5%;
 }
 
 /* CLASS */
@@ -65,7 +63,9 @@ footer {
     user-select: text;
 }
 
-/* Flexbox1 layout settings */
+/* FLEX_CONTAINER */
+
+/* flex1 */
 .flex1_container {
     display: flex;
     flex-direction: column;
@@ -74,7 +74,16 @@ footer {
     align-items: center;
 }
 
-/* Flexbox2 layout settings */
+/* flex2 */
+.flex2_container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+/* flex3 */
 .flex3_container {
     display: flex;
     flex-direction: column;
@@ -105,8 +114,45 @@ footer {
     border-radius: 1rem;
 }
 
-.flex3_container input[type="submit"] {
-    background-color: silver;
+/* flex4 */
+.flex4_container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+/* flex5 */
+.flex5_container {
+    width: inherit;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-self: center;
+    align-content: center;
+    margin: 0.2rem;
+    padding: 0.2rem;
+}
+
+.flex5_container .flex_item {
+    margin: 0.2rem;
+    padding: 0.2rem;
+    align-self: center;
+}
+
+/* flex6 */
+.flex6_container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.flex6_container .flex_item {
+    width: 85%;
+    margin: 0.75rem;
+    text-align: justify;
 }
 
 /* ID */
@@ -143,6 +189,8 @@ footer {
 #endpoint_list > * {
     flex: 0 2 calc(3%); /* each element has 3% of its parent's container for itself */
     text-align: center;
+    align-content: center;
+    align-self: center;
     margin: 0.5rem;
 }
 
@@ -154,7 +202,7 @@ footer {
 }
 
 /* Response settings*/
-#response_section {
+#route_p, #distance_p {
     display: inline-block; /* Makes the element behave like a block-level element with inline behavior. */
     text-align: left;
     white-space: pre-wrap; /* Preserves line breaks and allows wrapping */
