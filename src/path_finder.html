@@ -27,25 +27,25 @@
         <form id="path_points_form" name="path_points_form" class="flex3_container"
               action="./path_finder.html" method="post">
             <label for="startpoint" class="flex_item">Select the startpoint
-                <select id="startpoint" name="startpoint">
-                    <option value="0">not selected</option>
+                <select id="startpoint" name="startpoint" tabindex="-1">
+                    <option value="0" selected>not selected</option>
                 </select>
             </label>
             <label for="endpoint" class="flex_item">Select the endpoint
-                <select id="endpoint" name="endpoint">
-                    <option value="0">not selected</option>
+                <select id="endpoint" name="endpoint" tabindex="-2">
+                    <option value="0" selected>not selected</option>
                 </select>
             </label>
             <input id="path_points_submit_button" type="submit" value="Find path" class="flex_item"/>
         </form>
     </section>
 </main>
-<footer class="flex_item">
-    <fieldset>
-        <legend accesskey="f">Developers</legend>
-        <p>Arian Farzad</p>
-        <p>Târik-Cemal Atis</p>
-        <p>Yusuf Birdane</p>
+<footer class="flex_item flex4_container">
+    <fieldset class="flex_item flex5_container">
+        <legend accesskey="f" class="flex_item">Developers</legend>
+        <p class="flex_item">Arian Farzad</p>
+        <p class="flex_item">Târik-Cemal Atis</p>
+        <p class="flex_item">Yusuf Birdane</p>
     </fieldset>
 </footer>
 </body>

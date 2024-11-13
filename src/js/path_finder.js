@@ -15,7 +15,7 @@ const LEVELS = ['debug', 'info', 'warn', 'error', 'none'];
  * - 'error'  - Only error messages will be printed.
  * - 'none'   - No log messages are printed.
  */
-const LOG_LEVEL = 'none'; // Default value
+const LOG_LEVEL = 'info'; // Default value
 const TEST = LOG_LEVEL !== 'none'; // LOG_LEVEL == 'none' deactivates test()
 
 function Init() {
@@ -192,27 +192,30 @@ class Path_finder {
         /* As long as fetching from Backend doesn't work; load json map data
          * response structure: map{"cities": [{...}, ...], "connections": [{...}, ...], "mapname": "..." }
          */
-        fetch('../../assets/json/skyrim_information.json')
+        fetch('../../assets/json/load_cities_response_body.json')
             .then(response => response.json())
             .then(map => {
                 const endpoint_list = document.getElementById('endpoint_list');
                 const select_startpoint = document.getElementById('startpoint');
                 const select_endpoint = document.getElementById('endpoint');
-                map.cities.forEach(city => {
+
+                for (let i = 0; map.cities[i.toString()]; i++) {
+                    let city_name = map.cities[i.toString()].toString();
+
                     let list_item = document.createElement('li');
-                    list_item.innerText = city.name;
+                    list_item.innerText = city_name;
                     endpoint_list.appendChild(list_item);
 
                     let option = document.createElement('option');
                     option.value = (++counter).toString();
-                    option.textContent = city.name;
+                    option.textContent = city_name;
                     select_startpoint.appendChild(option);
 
                     option = document.createElement('option');
                     option.value = counter.toString();
-                    option.textContent = city.name;
+                    option.textContent = city_name;
                     select_endpoint.appendChild(option);
-                });
+                }
             })
             .catch(error => c_log('error', '[Path_finder](load_cities): Error fetching cities:', error));
     }
@@ -228,7 +231,7 @@ class Path_finder {
         let startpoint = document.getElementById('startpoint');
         for (let child of startpoint.children) {
             if (child.selected) {
-                c_log('info', '[retrieve_form_data]: startpoint set to ', child.getAttribute('value'), child.innerText);
+                c_log('info', '[Path_finder](disable_endpoint): startpoint set to ', child.getAttribute('value'), child.innerText);
                 to_be_disabled = parseInt(child.value);
                 break;
             }
@@ -290,10 +293,8 @@ class Path_finder {
 
         try {
             let listItems = document.getElementById("path_points_form").childElementCount;
-            let startpoint_is_set = !(document.getElementById("startpoint").value === "0" ||
-                document.getElementById("startpoint").value === "");
-            let endpoint_is_set = !(document.getElementById("endpoint").value === "0" ||
-                document.getElementById("startpoint").value === "");
+            let startpoint_is_set = !(document.getElementById("startpoint").value === "0" || document.getElementById("startpoint").value === "");
+            let endpoint_is_set = !(document.getElementById("endpoint").value === "0" || document.getElementById("startpoint").value === "");
             let button = document.getElementById("path_points_submit_button");
             button.disabled = !(listItems > 1 && startpoint_is_set && endpoint_is_set);
         } catch (e) {
@@ -349,14 +350,14 @@ class Path_finder {
         let startpoint = document.getElementById('startpoint');
         for (let child of startpoint.children) {
             if (child.selected) {
-                c_log('info', '[Path_finder](retrieve_form_data): ', child.getAttribute('value'), child.innerText);
+                c_log('info', '[Path_finder](retrieve_form_data): ', child.getAttribute('value'), ' ', child.innerText);
                 form_data.startpoint = child.innerText;
             }
         }
         let endpoint = document.getElementById('endpoint');
         for (let child of endpoint.children) {
             if (child.selected) {
-                c_log('info','[Path_finder](retrieve_form_data): ', child.getAttribute('value'), child.innerText);
+                c_log('info', '[Path_finder](retrieve_form_data): ', child.getAttribute('value'), ' ', child.innerText);
                 form_data.endpoint = child.innerText;
             }
         }
@@ -393,18 +394,33 @@ class Path_finder {
         c_log('info', '[Path_finder](get_route): ', request_body);
 
         // As long as fetching in general doesn't work; use the request body itself as response
-        let response_data = request_body;
+        let response_data = {};
+        let startpoint = '';
+        let endpoint = '';
+        let route = '';
 
         // As long as fetching from Backend doesn't work; load json map data
-        await fetch('../../assets/json/skyrim_information.json', {
-            method: 'GET', // Standardmethode ist GET, aber du kannst auch andere Methoden wie POST verwenden
-            headers: {
-                'Content-Type': 'application/json; charset=utf-8', // Setzt den Content-Type Header
-            }
-        })
+        await fetch('../../assets/json/get_route_response_body.json')
             .then(response => response.json())
             .then(data => {
-                response_data = data;
+                for (let i = 0; data.route[i.toString()]; i++) {
+                    let city_name = data.route[i.toString()];
+
+                    // set startpoint(first) and endpoint(last)
+                    if (i === 0) {
+                        startpoint = city_name;
+                    } else {
+                        endpoint = city_name;
+                    }
+
+                    route += city_name + ' => ';
+                }
+                route = route.substring(0, (route.length - ' => '.length));
+
+                response_data.route = 'Route from ' + startpoint + ' to ' + endpoint + ': ' + route + '.';
+
+                response_data.distance = 'The distance is ' + (parseFloat(data.distance).toFixed(2)).toString() + ' [units of length].';
+
             })
             .catch(error => c_log('error', '[Path_finder](get_route): Error:', error));
 
@@ -425,7 +441,7 @@ class Path_finder {
             body: post_body_data
         });*/
 
-        return response_data;
+        return format_json(response_data);
     }
 
     /** Updates the HTML response section with the provided data.
@@ -441,29 +457,41 @@ class Path_finder {
 
         data = format_json(data);
         c_log('info', '[Path_finder](update_response_section): ', data);
+        let response_data = JSON.parse(data);
 
-        let response;
-
-        if (document.getElementById("response") == null) {
-            // Create section for response
+        if (document.getElementById("response_article") == null) {
+            // Create section for response_article
             let section = document.createElement('section');
             section.id = "response_section";
             section.className = "flex_item";
 
-            let footer = document.getElementsByTagName('footer')[0];
             document.getElementsByTagName('main')[0].appendChild(section);
 
-            // Create a place to display the response
-            response = document.createElement('p');
-            response.id = "response";
-            response.className = "flex1_item";
-            response.innerText = data;
+            // Create an article for response paragraphs
+            let article = document.createElement('article');
+            article.id = "response_article";
+            article.className = "flex6_container";
 
-            section.appendChild(response);
+            section.appendChild(article);
+
+            // Create a paragraph for the route
+            let route_p = document.createElement('p');
+            route_p.id = "route_p";
+            route_p.className = "flex_item";
+            route_p.innerText = response_data.route;
+
+            article.appendChild(route_p);
+
+            // Create a paragraph for the distance
+            let distance_p = document.createElement('p');
+            distance_p.id = "distance_p";
+            distance_p.className = "flex_item";
+            distance_p.innerText = response_data.distance;
+
+            article.appendChild(distance_p);
         } else {
-            response = document.getElementById('response');
+            document.getElementById('route_p').innerHTML = response_data.route;
+            document.getElementById('distance_p').innerHTML = response_data.distance;
         }
-
-        response.innerText = data;
     }
 }
