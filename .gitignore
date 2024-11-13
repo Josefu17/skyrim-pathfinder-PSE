@@ -1,4 +1,5 @@
 *__pycache__/
 *.py[cod]
 *.pytest_cache
-*.idea
+.idea
+project_information/API_access.txt
