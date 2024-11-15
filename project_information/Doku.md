@@ -2,7 +2,6 @@
 
 ## Table of contents
 - [Dokumentation der Gruppe 2](#dokumentation-der-gruppe-2)
-  - [Table of contents](#table-of-contents)
   - [Gruppen-Konventionen](#gruppen-konventionen)
     - [Festgelegte Sprachen](#festgelegte-sprachen)
     - [Code Styling](#code-styling)
@@ -33,7 +32,7 @@
   - [Update docker container (from local to server)](#update-docker-container-from-local-to-server)
       - [Command notes](#command-notes)
 - [Frontend](#frontend)
-  - [Path finder page](#path-finder-page)
+  - [Pathfinder page](#path-finder-page)
   - [Documentation page](#documentation-page)
 - [make](#make)
   - [Makefile Beispiel](#makefile-beispiel)
@@ -409,7 +408,7 @@ cleanall:
 ## Project Management
 ## DevExp
 ### Debugger (debugpy)
-- Add debugypy to requirements.txt
+- Add debugpy to requirements.txt
 - Add to the docker-compose.yml file so that the debugger runs in the Python container.
 
 #### Changes in `docker-compose.yml`

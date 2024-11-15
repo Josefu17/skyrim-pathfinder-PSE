@@ -1,16 +1,16 @@
-""" Creates Tables for database """
+""" Python file for database class Connection"""
 
 from sqlalchemy import Column, Integer, ForeignKey
-from src.database.schema.city import Base
+from src.database.schema.base import Base
 
 
-class Connections(Base):
-    """Creates connections table"""
+class Connection(Base):
+    """Database class Connection"""
 
-    __tablename__ = "connections"
+    __tablename__ = "connection"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    parent_city_id = Column(Integer, ForeignKey("cities.id"), nullable=False)
-    child_city_id = Column(Integer, ForeignKey("cities.id"), nullable=False)
+    parent_city_id = Column(Integer, ForeignKey("city.id"), nullable=False)
+    child_city_id = Column(Integer, ForeignKey("city.id"), nullable=False)
 
     def to_dict(self):
         """convert object into dictionary"""
