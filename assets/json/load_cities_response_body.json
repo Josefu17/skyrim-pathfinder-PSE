@@ -1,20 +1,84 @@
 {
-  "cities": {
-    "0": "Markarth",
-    "1": "Karthwasten",
-    "2": "Dragon Bridge",
-    "3": "Solitude",
-    "4": "Morthal",
-    "5": "Rorikstead",
-    "6": "Falkreath",
-    "7": "Helgen",
-    "8": "Riverwood",
-    "9": "Whiterun",
-    "10": "Ivarstead",
-    "11": "Riften",
-    "12": "Shor’s Stone",
-    "13": "Windhelm",
-    "14": "Winterhold",
-    "15": "Dawnstar"
-  }
+  "cities": [
+    {
+      "name": "Markarth",
+      "position_x": 380,
+      "position_y": 1196
+    },
+    {
+      "name": "Karthwasten",
+      "position_x": 628,
+      "position_y": 992
+    },
+    {
+      "name": "Dragon Bridge",
+      "position_x": 822,
+      "position_y": 714
+    },
+    {
+      "name": "Solitude",
+      "position_x": 1054,
+      "position_y": 576
+    },
+    {
+      "name": "Morthal",
+      "position_x": 1218,
+      "position_y": 814
+    },
+    {
+      "name": "Rorikstead",
+      "position_x": 936,
+      "position_y": 1184
+    },
+    {
+      "name": "Falkreath",
+      "position_x": 1270,
+      "position_y": 1769
+    },
+    {
+      "name": "Helgen",
+      "position_x": 1568,
+      "position_y": 1714
+    },
+    {
+      "name": "Riverwood",
+      "position_x": 1596,
+      "position_y": 1500
+    },
+    {
+      "name": "Whiterun",
+      "position_x": 1582,
+      "position_y": 1280
+    },
+    {
+      "name": "Ivarstead",
+      "position_x": 1932,
+      "position_y": 1628
+    },
+    {
+      "name": "Riften",
+      "position_x": 2542,
+      "position_y": 1824
+    },
+    {
+      "name": "Shor’s Stone",
+      "position_x": 2474,
+      "position_y": 1608
+    },
+    {
+      "name": "Windhelm",
+      "position_x": 2300,
+      "position_y": 1010
+    },
+    {
+      "name": "Winterhold",
+      "position_x": 2138,
+      "position_y": 592
+    },
+    {
+      "name": "Dawnstar",
+      "position_x": 1646,
+      "position_y": 566
+    }
+  ]
 }
