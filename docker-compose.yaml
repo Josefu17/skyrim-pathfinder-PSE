@@ -3,6 +3,7 @@ version: '3.1'
 services:
   postgres:
     image: postgres:latest
+    container_name: group2-postgres-1
     environment:
       POSTGRES_USER: pg-2
       POSTGRES_PASSWORD: pg-2
@@ -16,14 +17,7 @@ services:
 
   navigation-service:
     image: python:3.13-slim
-    environment:
-      USER: pg-2
-      PASSWORD: pg-2
-      HOST: postgres
-      PORT: 5432
-      DB_NAME: navigation
-    depends_on:
-      - postgres
+    container_name: group2-navigation-service-1
     ports:
       - "8000:8000"
       - "5678:5678"
@@ -39,9 +33,30 @@ services:
          apt update && \
          apt install make && \
          cd /app && \
-         export PYTHONPATH=$(pwd) && \
+         export PYTHONPATH=$$(pwd) && \
          python -m src.rpc_api.server && \
          tail -f /dev/null"
+
+  web-backend:
+    image: python:3.13-slim
+    container_name: group2-web-backend-1
+    depends_on:
+      - postgres
+      - navigation-service
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./src:/app/src
+      - ./requirements.txt:/app/requirements.txt
+    networks:
+      - app-network
+    command: >
+      sh -c "pip install --upgrade pip && \
+        pip install -r /app/requirements.txt && \
+        cd /app && \
+        export PYTHONPATH=$$(pwd) && \
+        python -m src.web_backend.web_backend_controller && \
+        tail -f /dev/null"
 
 volumes:
   postgres_data:

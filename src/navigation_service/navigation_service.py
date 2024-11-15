@@ -1,44 +1,76 @@
 """This module calculates the route between two endpoints"""
 
+import heapq
 import math
 from collections import defaultdict
-import heapq
-import json
-from sqlalchemy.orm import sessionmaker
-from src.database.database import new_engine, Cities, Connections
 
 
-SESSIONMAKER = sessionmaker(bind=new_engine)
-SESSION = SESSIONMAKER()
+def get_route(start_city_name, end_city_name, data):
+    """Displays the shortest route"""
+    start_city, end_city = None, None
+    cities = data["cities"]
+
+    # Find start and end cities
+    for city in cities:
+        if city["name"] == start_city_name:
+            start_city = city
+        elif city["name"] == end_city_name:
+            end_city = city
+        if start_city and end_city:
+            break
+
+    if not start_city or not end_city:
+        return {
+            "error": f"One of the cities not found: {start_city_name}, {end_city_name}"
+        }
+
+    graph = create_graph(data)
+    try:
+        path, distance = dijkstra(graph, start_city["id"], end_city["id"])
+        if distance == float("inf"):
+            return {
+                "error": f"No connection between {start_city_name} and {end_city_name}"
+            }
+
+        path_names = {
+            str(index): get_city_by_id(cities, city_id)["name"]
+            for index, city_id in enumerate(path)
+        }
+        result = {"route": path_names, "distance": round(distance, 2)}
+
+        return result
+
+    except KeyError as e:
+        return {"error": f"Error by route calculation: Missing key {e}"}
+    except ValueError as e:
+        return {"error": f"Error by route calculation: {e}"}
 
 
-def calculate_distance(city_1, city_2):
-    """calculates the distance between cities"""
-    return math.sqrt(
-        (city_1.position_x - city_2.position_x) ** 2
-        + (city_1.position_y - city_2.position_y) ** 2
-    )
-
-
-def create_graph():
+def create_graph(data):
     """add all connections for each city"""
     graph = defaultdict(list)
-    cities = {city.id: city for city in SESSION.query(Cities).all()}
-    connections = SESSION.query(Connections).all()
+
+    connections = data["connections"]
+    cities = data["cities"]
 
     for connection in connections:
-        city_1 = cities[connection.parent_city_id]
-        city_2 = cities[connection.child_city_id]
+        city_1 = get_city_by_id(cities, connection["parent_city_id"])
+        city_2 = get_city_by_id(cities, connection["child_city_id"])
+
+        if not city_1 or not city_2:
+            continue
+
         distance = calculate_distance(city_1, city_2)
 
-        graph[city_1.id].append((distance, city_2.id))
-        graph[city_2.id].append((distance, city_1.id))
+        graph[city_1["id"]].append((distance, city_2["id"]))
+        graph[city_2["id"]].append((distance, city_1["id"]))
 
     return graph
 
 
 def dijkstra(graph, start_city_id, end_city_id):
     """calculates the shortest route"""
+
     min_heap = [(0, start_city_id)]
     distances = {city_id: float("inf") for city_id in graph}
     distances[start_city_id] = 0
@@ -68,23 +100,17 @@ def dijkstra(graph, start_city_id, end_city_id):
     return path, distances[end_city_id]
 
 
-def get_route(start_city_name, end_city_name):
-    """displays the shortest route"""
-    start_city = SESSION.query(Cities).filter_by(name=start_city_name).first()
-    end_city = SESSION.query(Cities).filter_by(name=end_city_name).first()
+def calculate_distance(city_1, city_2):
+    """calculates the distance between cities"""
+    return math.sqrt(
+        (city_1["position_x"] - city_2["position_x"]) ** 2
+        + (city_1["position_y"] - city_2["position_y"]) ** 2
+    )
 
-    if not start_city or not end_city:
-        return f"One of the cities not found: {start_city_name}, {end_city_name}"
 
-    graph = create_graph()
-    path, distance = dijkstra(graph, start_city.id, end_city.id)
-
-    if distance == float("inf"):
-        return f"No connection between {start_city_name} and {end_city_name}"
-
-    path_names = [SESSION.query(Cities).get(city_id).name for city_id in path]
-    route = {
-        "route": path_names, 
-        "distance": round(distance, 2)
-    }
-    return json.dumps(route, indent=4)
+def get_city_by_id(cities, city_id):
+    """returns the city dictionary with the given id in cities"""
+    for city in cities:
+        if city["id"] == city_id:
+            return city
+    return None

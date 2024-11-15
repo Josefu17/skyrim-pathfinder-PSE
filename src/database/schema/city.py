@@ -1,14 +1,13 @@
-""" Creates Tables for database """
+""" Python file for database class City"""
 
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import declarative_base
+from src.database.schema.base import Base
 
-Base = declarative_base()
 
-class Cities(Base):
-    """Creates cities table"""
+class City(Base):
+    """Database class City"""
 
-    __tablename__ = "cities"
+    __tablename__ = "city"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     position_x = Column(Integer, nullable=False)

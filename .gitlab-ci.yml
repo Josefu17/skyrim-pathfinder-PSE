@@ -40,5 +40,5 @@ analyze-job:
   before_script:
     - pip install -r requirements.txt
   script:
-    - python -m pylint src/*.py
-    - python -m black src/*.py
+    - python -m pylint --rcfile=.pylintrc src/*.py
+    - python -m black --config pyproject.toml src/*.py

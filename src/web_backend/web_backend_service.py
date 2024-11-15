@@ -1,0 +1,42 @@
+"""Service for web backend, works with backend controller."""
+
+import xmlrpc.client
+
+from src.database.dao.city_dao import CityDAO
+from src.database.dao.connection_dao import ConnectionDAO
+
+
+def fetch_route_from_navigation_service(start_city_name, end_city_name):
+    """Fetch the shortest route from the navigation service by providing 2 cities"""
+    try:
+        with xmlrpc.client.ServerProxy("http://navigation-service:8000/") as proxy:
+            cities, connections = (
+                CityDAO.get_all_cities(),
+                ConnectionDAO.get_all_connections(),
+            )
+
+            # convert objects to dicts to work with RPC-API
+            cities_data = [city.to_dict() for city in cities]
+            connections_data = [
+                {
+                    "parent_city_id": conn.parent_city_id,
+                    "child_city_id": conn.child_city_id,
+                }
+                for conn in connections
+            ]
+
+            data = {
+                "cities": cities_data,
+                "connections": connections_data,
+            }
+
+            result = proxy.get_route(start_city_name, end_city_name, data)
+
+            if result:
+                return result
+            return {"error": "Error by Route Calculation"}
+
+    except xmlrpc.client.Error as e:
+        return f"XML-RPC error: {e}"
+    except ConnectionError as e:
+        return f"Network error: {e}"
