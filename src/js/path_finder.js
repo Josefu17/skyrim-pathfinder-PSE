@@ -369,6 +369,10 @@ class Path_finder {
         let form_data = this.retrieve_form_data();
         c_log('info', '[Path_finder](process_form_data): form_data: ', form_data);
 
+        if (form_data === '') {
+            return;
+        }
+
         try {
             let response_data = await this.get_route(form_data);
 
@@ -416,6 +420,12 @@ class Path_finder {
             }
         }
 
+        if (form_data.startpoint === undefined || form_data.endpoint === undefined) {
+            return '';
+        } else if (form_data.startpoint === form_data.endpoint) {
+            c_log("error", "[Path_finder](retrieve_form_data): Startpoint and endpoint are the same.");
+            return '';
+        }
         return format_json(form_data);
     }
 
