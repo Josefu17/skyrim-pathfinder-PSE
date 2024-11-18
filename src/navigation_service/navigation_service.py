@@ -6,7 +6,8 @@ from collections import defaultdict
 
 
 def get_route(start_city_name, end_city_name, data):
-    """Displays the shortest route"""
+    """calculates the shortest route and returns a dict containing the route as well as the
+    total distance"""
     start_city, end_city = None, None
     cities = data["cities"]
 

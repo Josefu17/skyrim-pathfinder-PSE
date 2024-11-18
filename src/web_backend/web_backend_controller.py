@@ -3,7 +3,10 @@
 from flask import Flask, jsonify, request
 
 from src.map_service.map_service import fetch_and_store_map_data_if_needed
-from src.web_backend.web_backend_service import fetch_route_from_navigation_service
+from src.web_backend.web_backend_service import (
+    fetch_route_from_navigation_service,
+    fetch_cities_as_dicts,
+)
 from src.database.dao.city_dao import CityDAO
 from src.database.dao.connection_dao import ConnectionDAO
 
@@ -11,6 +14,8 @@ from src.database.dao.connection_dao import ConnectionDAO
 app = Flask(__name__)
 
 
+# TODO is not in use right now, might become relevant later to
+#  return entire map information, 17-11-2024, yb
 @app.route("/maps", methods=["GET"])
 def get_map_data():
     """Fetch and return map data including cities and connections."""
@@ -30,18 +35,7 @@ def get_map_data():
 @app.route("/cities", methods=["GET"])
 def get_cities():
     """Fetch and return cities."""
-    # Fetch all cities as objects
-    cities = CityDAO.get_all_cities()
-
-    # Convert each city to a dictionary, excluding the 'id' field
-    cities_data = [
-        {
-            "name": city.name,
-            "position_x": city.position_x,
-            "position_y": city.position_y,
-        }
-        for city in cities
-    ]
+    cities_data = fetch_cities_as_dicts()
 
     # Return JSON response with the formatted city data
     return jsonify({"cities": cities_data})
@@ -61,7 +55,7 @@ def calculate_route():
     if "error" in route_result:
         return jsonify(route_result), 400
 
-    return jsonify(route_result)
+    return jsonify(route_result), 200
 
 
 if __name__ == "__main__":

@@ -40,3 +40,19 @@ def fetch_route_from_navigation_service(start_city_name, end_city_name):
         return f"XML-RPC error: {e}"
     except ConnectionError as e:
         return f"Network error: {e}"
+
+
+def fetch_cities_as_dicts():
+    """Retrieve and return cities information from the database as dictionary"""
+    # Fetch all cities as objects
+    cities = CityDAO.get_all_cities()
+    # Convert each city to a dictionary, excluding the 'id' field
+    cities_data = [
+        {
+            "name": city.name,
+            "position_x": city.position_x,
+            "position_y": city.position_y,
+        }
+        for city in cities
+    ]
+    return cities_data
