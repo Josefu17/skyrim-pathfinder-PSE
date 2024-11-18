@@ -10,6 +10,7 @@ services:
       POSTGRES_DB: navigation
     ports:
       - "5433:5432"
+      - "5678:5678"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -45,6 +46,7 @@ services:
       - navigation-service
     ports:
       - "5000:5000"
+      - "5678:5678"
     volumes:
       - ./src:/app/src
       - ./requirements.txt:/app/requirements.txt

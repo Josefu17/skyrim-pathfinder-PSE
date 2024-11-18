@@ -2,4 +2,4 @@
 *.py[cod]
 *.pytest_cache
 .idea
-project_information/API_access.txt
+docs/API_access.txt
