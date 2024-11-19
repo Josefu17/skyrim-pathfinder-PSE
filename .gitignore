@@ -3,3 +3,5 @@
 *.pytest_cache
 .idea
 docs/API_access.txt
+# created by coverage.py automatically to create coverage report
+.coverage

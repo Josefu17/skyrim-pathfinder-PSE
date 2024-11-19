@@ -25,9 +25,14 @@ test-job:
     - . /venv/bin/activate  
     - pip install -r requirements.txt
   script:
-    - python -m pytest ./src/tests/ --verbose
+    - pytest --cov=src -cov-report=xml:coverage.xml src/tests/ --cov-config=setup.cfg
   needs:
-    - build-job  
+    - build-job
+  artifacts:
+    paths:
+      - coverage.xml
+  coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)%$/'
+
 
 analyze-job:
   stage: analyze

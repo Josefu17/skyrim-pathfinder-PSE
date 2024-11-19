@@ -1,7 +1,7 @@
 """Tests calculate_distance"""
 
 import math
-from ..navigation_service.navigation_service import calculate_distance
+from src.navigation_service.navigation_service import calculate_distance
 
 
 class City:
