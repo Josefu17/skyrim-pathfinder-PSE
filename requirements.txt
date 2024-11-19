@@ -7,3 +7,5 @@ black
 requests
 debugpy
 flask
+coverage
+pytest-cov

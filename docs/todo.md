@@ -26,7 +26,7 @@
   - [x] unit tests for navigation service
   - [ ] unit tests for backend
   - [ ] startup test for seperated frontend
-  - [ ] Display code coverage in GitLab with an icon 
+  - [x] Display code coverage in GitLab with an icon + [**Documentation**](ci.md#Code-coverage-and-displaying-the-badge-in-gitLab)
 - [x] Linting and formatting
 - [x] dependency proxy usage 
 - [ ] code analysis tools 
