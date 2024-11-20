@@ -1,4 +1,6 @@
-"""Tests calculate_distance"""
+"""
+Tests calculate_distance
+"""
 
 import math
 from src.navigation_service.navigation_service import calculate_distance

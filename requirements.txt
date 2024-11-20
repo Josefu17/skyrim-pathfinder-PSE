@@ -9,3 +9,4 @@ debugpy
 flask
 coverage
 pytest-cov
+pytest-mock
