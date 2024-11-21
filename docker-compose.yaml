@@ -84,7 +84,7 @@ services:
         pip install -r /app/requirements.txt && \
         cd /app && \
         export PYTHONPATH=$$(pwd) && \
-        python -m src.database.connection"
+        python -m src.database.create_database"
 
 
 volumes:
