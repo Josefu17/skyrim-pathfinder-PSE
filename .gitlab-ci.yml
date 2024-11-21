@@ -25,14 +25,11 @@ test-job:
     - . /venv/bin/activate  
     - pip install -r requirements.txt
   script:
-    - pytest --cov=src --cov-report=html:htmlcov src/tests/ --cov-config=setup.cfg
-    - ls -al
+    - pytest --cov=src --cov-report=term src/tests/ --cov-config=setup.cfg
   needs:
     - build-job
-  artifacts:
-    paths:
-      - htmlcov
-  coverage: '/^TOTAL\s+\d+\s+\d+\s+(\d+)%$/'
+  coverage: '/TOTAL\s+\d+\s+\d+\s+(\d+)%/'
+
 
 
 analyze-job:
