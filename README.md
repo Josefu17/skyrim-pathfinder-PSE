@@ -1,5 +1,6 @@
 [![coverage report](https://code.fbi.h-da.de/bpse-wise2425/group2/badges/main/coverage.svg)](https://code.fbi.h-da.de/bpse-wise2425/group2/-/commits/main)
 
+
 # Documentation Project System Development
 **Developers: Yusuf Birdane | Tarik-Cemal Atis | Arian Farzad**
 

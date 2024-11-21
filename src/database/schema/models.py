@@ -1,7 +1,8 @@
 """file to register all the database classes"""
+
 # pylint: disable=unused-import
-from src.database.schema.city import City # noqa
-from src.database.schema.connection import Connection # noqa
+from src.database.schema.city import City  # noqa
+from src.database.schema.connection import Connection  # noqa
 
 
 # Register models by importing them
