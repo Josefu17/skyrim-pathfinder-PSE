@@ -3,5 +3,7 @@
 *.pytest_cache
 .idea
 docs/API_access.txt
+%SystemDrive%
 # created by coverage.py automatically to create coverage report
 .coverage
+venv

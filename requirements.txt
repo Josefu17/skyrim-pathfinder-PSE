@@ -7,6 +7,7 @@ black
 requests
 debugpy
 flask
+flask-cors
 coverage
 pytest-cov
 pytest-mock

@@ -1,27 +1,29 @@
 """Backend Controller to expose API endpoints"""
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
+from src.database.db_connection import with_db_session, get_db_session
+from src.database.dao.city_dao import CityDAO
+from src.database.dao.connection_dao import ConnectionDAO
 from src.map_service.map_service import fetch_and_store_map_data_if_needed
 from src.web_backend.web_backend_service import (
     fetch_route_from_navigation_service,
-    fetch_cities_as_dicts,
 )
-from src.database.dao.city_dao import CityDAO
-from src.database.dao.connection_dao import ConnectionDAO
-
 
 app = Flask(__name__)
+CORS(app)
 
 
 # TODO is not in use right now, might become relevant later to
 #  return entire map information, 17-11-2024, yb
 @app.route("/maps", methods=["GET"])
-def get_map_data():
+@with_db_session
+def get_map_data(session):
     """Fetch and return map data including cities and connections."""
     # Fetch  cities and connections data
-    cities = CityDAO.get_all_cities()
-    connections = ConnectionDAO.get_all_connections()
+    cities = CityDAO.get_all_cities(session)
+    connections = ConnectionDAO.get_all_connections(session)
 
     cities_data = [city.to_dict() for city in cities]
     connections_data = [
@@ -33,16 +35,19 @@ def get_map_data():
 
 
 @app.route("/cities", methods=["GET"])
-def get_cities():
+@with_db_session
+def get_cities(session):
     """Fetch and return cities."""
-    cities_data = fetch_cities_as_dicts()
+    cities = CityDAO.get_all_cities(session)
+    cities_data = [city.to_dict() for city in cities]
 
     # Return JSON response with the formatted city data
     return jsonify({"cities": cities_data})
 
 
 @app.route("/cities/route", methods=["GET"])
-def calculate_route():
+@with_db_session
+def calculate_route(session):
     """Calculate shortest route for given 2 endpoints"""
     start_city_name = request.args.get("startpoint")
     end_city_name = request.args.get("endpoint")
@@ -50,7 +55,9 @@ def calculate_route():
     if not start_city_name or not end_city_name:
         return jsonify({"error": "Start and end cities are required"}), 400
 
-    route_result = fetch_route_from_navigation_service(start_city_name, end_city_name)
+    route_result = fetch_route_from_navigation_service(
+        start_city_name, end_city_name, session
+    )
 
     if "error" in route_result:
         return jsonify(route_result), 400
@@ -60,6 +67,7 @@ def calculate_route():
 
 if __name__ == "__main__":
     # Fetch and update map data if necessary
-    fetch_and_store_map_data_if_needed()
+    with get_db_session() as db_session:
+        fetch_and_store_map_data_if_needed(session=db_session)
 
     app.run(debug=True, host="0.0.0.0", port=5000)

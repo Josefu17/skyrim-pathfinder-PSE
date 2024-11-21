@@ -9,6 +9,7 @@ remove:
 	pip uninstall -y -r requirements.txt
 	@echo "Dependencies removed."
 
+# Docker management
 build:
 	docker build -t registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application:latest .
 
@@ -24,15 +25,24 @@ login:
 stop:
 	docker-compose down
 
+restart: stop start
+
+update: login build push
+
+# Test management
+test:
+	python -m pytest ./src/tests/
+
+coverage-windows:
+	python -m pytest --cov=src --cov-report=html src/tests/ --cov-config=setup.cfg && start htmlcov\index.html
+
+# Navigation service management
 nav-enter:
 	docker exec -it group2-navigation-service-1 bash
 
 nav-test:
 	python -m pytest ./app/src/tests/
 
-restart: stop start
-
-update: login build push
-
+# Database management
 connect-to-database:
 	docker exec -it group2-postgres-1 psql -U pg-2 -d navigation

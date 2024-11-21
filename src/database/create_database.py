@@ -14,20 +14,18 @@ If the database does not exist:
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import ProgrammingError
 
-from src.database.schema.city import Base
+from src.database.schema.city import City
+from src.database.schema.connection import Connection
 
-USER = "pg-2"
-PASSWORD = "pg-2"
-HOST = "postgres"
-PORT = "5432"
-DB_NAME = "navigation"
+from src.database.schema.base import Base
+from src.database.db_connection import engine, USER, PASSWORD, HOST, PORT, DB_NAME
 
-engine = create_engine(
-    f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/postgres"
-)
+print(City)
+print(Connection)
 
 with engine.connect() as connection:
     try:
+        connection.execution_options(isolation_level="AUTOCOMMIT")
         result = connection.execute(
             text("SELECT 1 FROM pg_database WHERE datname = :db_name"),
             {"db_name": DB_NAME},
@@ -51,6 +49,6 @@ new_engine = create_engine(
 with new_engine.connect() as new_connection:
     try:
         Base.metadata.create_all(new_engine)
-        print("Tables created")
+        print(f"Registered tables: {Base.metadata.tables.keys()}")
     except ProgrammingError as e:
         print(f"Error creating tables: {e}")

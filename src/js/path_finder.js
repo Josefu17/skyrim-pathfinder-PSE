@@ -21,7 +21,7 @@ const TEST = LOG_LEVEL !== 'none'; // LOG_LEVEL == 'none' deactivates test()
 
 function Init() {
     "use strict";
-    c_log('debug', '[Path_finder:global](Init)');
+    c_log('info', '[Path_finder:global](Init)');
 
     try {
         //delete noscript-tag from page since js is working
@@ -31,10 +31,12 @@ function Init() {
         c_log('error', "[Path_finder:global](Init): ", e);
     }
 
+    // Object is necessary for the functionality of the page
+    // noinspection JSUnusedLocalSymbols
     let path_finder = new Path_finder();
 
     if (TEST) {
-        path_finder.test();
+        // write tests here
     }
 }
 
@@ -85,7 +87,7 @@ function c_log(level, message, extra1, extra2, extra3) {
  */
 function is_valid_json(string) {
     "use strict";
-    c_log('debug', '[Path_finder:global](is_valid_json)');
+    c_log('info', '[Path_finder:global](is_valid_json)');
 
     try {
         JSON.parse(string);
@@ -107,7 +109,7 @@ function is_valid_json(string) {
  */
 function is_formatted_json(jsonString) {
     "use strict";
-    c_log('debug', '[Path_finder:global](is_formatted_json)');
+    c_log('info', '[Path_finder:global](is_formatted_json)');
 
     return jsonString.includes('\n') && jsonString.includes('  ');
 }
@@ -119,7 +121,7 @@ function is_formatted_json(jsonString) {
  */
 function format_json(string) {
     "use strict";
-    c_log('debug', '[Path_finder:global](format_json)');
+    c_log('info', '[Path_finder:global](format_json)');
 
     if (is_valid_json(string)) {
         if (!is_formatted_json(string)) {
@@ -142,6 +144,7 @@ function format_json(string) {
  * - Retrieves form data and processes it by forwarding it to a service.
  * - Handles the service response and updates the webpage with the response data.
  */
+// noinspection JSUnusedGlobalSymbols
 class Path_finder {
 
     // private class attributes
@@ -164,7 +167,7 @@ class Path_finder {
      */
     constructor() {
         "use strict";
-        c_log('debug', '[Path_finder](constructor)');
+        c_log('info', '[Path_finder](constructor)');
 
         try {
             // load cities for page initialization
@@ -196,7 +199,7 @@ class Path_finder {
      * */
     get_city_by_name(name) {
         "use strict";
-        c_log('debug', '[Path_finder](get_city_by_name)');
+        c_log('info', '[Path_finder](get_city_by_name)');
 
         for (let city of this.#cities) {
             if (name === city.get_name()) {
@@ -215,7 +218,7 @@ class Path_finder {
      * */
     get_city_by_coordinates(position_x, position_y) {
         "use strict";
-        c_log('debug', '[Path_finder](get_city_by_coordinates)');
+        c_log('info', '[Path_finder](get_city_by_coordinates)');
 
         for (let city of this.#cities) {
             if (position_x === city.get_position_x() && position_y === city.get_position_y()) {
@@ -231,17 +234,21 @@ class Path_finder {
      */
     load_cities() {
         "use strict";
-        c_log('debug', '[Path_finder](load_cities)');
+        c_log('info', '[Path_finder](load_cities)');
 
-        /* TODO: fetch from Backend api
-         * As long as fetching from Backend doesn't work; load json map data
+        /* Fetches the cities from the backend API.
          * response structure: map{"cities": [{...}, ...], "connections": [{...}, ...], "mapname": "..." }
          */
-        fetch('../../assets/json/load_cities_response_body.json')
-            .then(response => response.json())
+        fetch('http://localhost:5000/cities')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('[Path_finder](load_cities): Network problems: ' + response.statusText);
+                }
+                return response.json();
+            })
             .then(map => {
                 if (map.cities !== undefined) {
-
+                    c_log('debug', '[Path_finder](load_cities) response: ', format_json(map));
                     const endpoint_list = document.getElementById('endpoint_list');
                     const select_startpoint = document.getElementById('startpoint');
                     const select_endpoint = document.getElementById('endpoint');
@@ -266,7 +273,7 @@ class Path_finder {
                         option.textContent = city.name;
                         select_endpoint.appendChild(option);
                     }
-                } else throw 'Cities undefined';
+                } else throw '[Path_finder](load_cities): Cities undefined';
             })
             .catch(error => c_log('error', '[Path_finder](load_cities): Error fetching cities: ', error));
     }
@@ -275,14 +282,14 @@ class Path_finder {
      */
     disable_endpoint() {
         "use strict";
-        c_log('debug', '[Path_finder](disable_endpoint)');
+        c_log('info', '[Path_finder](disable_endpoint)');
 
         let to_be_disabled = 0;
 
         let startpoint = document.getElementById('startpoint');
         for (let child of startpoint.children) {
             if (child.selected) {
-                c_log('info', '[Path_finder](disable_endpoint): startpoint set to ', child.getAttribute('value'), child.innerText);
+                c_log('debug', '[Path_finder](disable_endpoint): startpoint set to ', child.getAttribute('value'), child.innerText);
                 to_be_disabled = parseInt(child.value);
                 break;
             }
@@ -309,29 +316,6 @@ class Path_finder {
         this.check_form_completion();
     }
 
-    /** Method for testing in general.
-     *
-     * TODO: remove if not needed anymore
-     */
-    test() {
-        "use strict";
-        c_log('debug', '[Path_finder](test)');
-
-        // Auto selects start and endpoint to directly enable the submit button for testing
-        document.getElementById("startpoint").selectedIndex = 0;
-        document.getElementById("endpoint").selectedIndex = 0;
-        this.check_form_completion();
-
-        // Test cases with different log levels
-        if (LEVELS.indexOf('debug') === LEVELS.indexOf(LOG_LEVEL)) {
-            c_log('debug', '[Path_finder](test): This is a debug message'); // Will not show, because LOG_LEVEL is 'warn'
-            c_log('info', '[Path_finder](test): This is an info message');  // Will not show, because LOG_LEVEL is 'warn'
-            c_log('warn', '[Path_finder](test): This is a warning message'); // Will show, because LOG_LEVEL is 'warn' or higher
-            c_log('error', '[Path_finder](test): This is an error message'); // Will always show, because 'error' is the highest level
-            c_log('none', '[Path_finder](test): This message should not be logged'); // Will not show, because the level is 'none'
-        }
-    }
-
     /** Checks if the form is filled out correctly.
      *
      * If both the start and endpoint are set,
@@ -340,7 +324,7 @@ class Path_finder {
      */
     check_form_completion() {
         "use strict";
-        c_log('debug', '[Path_finder](check_form_completion)');
+        c_log('info', '[Path_finder](check_form_completion)');
 
         try {
             let listItems = document.getElementById("path_points_form").childElementCount;
@@ -364,16 +348,18 @@ class Path_finder {
      */
     async process_form_data() {
         "use strict";
-        c_log('debug', '[Path_finder](process_form_data)');
+        c_log('info', '[Path_finder](process_form_data)');
 
         let form_data = this.retrieve_form_data();
-        c_log('info', '[Path_finder](process_form_data): form_data: ', form_data);
+        c_log('debug', '[Path_finder](process_form_data): form_data: ', form_data);
 
         if (form_data === '') {
             return;
         }
 
         try {
+            // await is necessary to wait for the response from the service
+            // noinspection ES6RedundantAwait
             let response_data = await this.get_route(form_data);
 
             this.update_response_section(response_data);
@@ -400,7 +386,7 @@ class Path_finder {
      */
     retrieve_form_data() {
         "use strict";
-        c_log('debug', '[Path_finder](retrieve_form_data)');
+        c_log('info', '[Path_finder](retrieve_form_data)');
 
         let form_data = {};
 
@@ -408,14 +394,14 @@ class Path_finder {
         let startpoint = document.getElementById('startpoint');
         for (let child of startpoint.children) {
             if (child.selected) {
-                c_log('info', '[Path_finder](retrieve_form_data): ', child.getAttribute('value'), ' ', child.innerText);
+                c_log('debug', '[Path_finder](retrieve_form_data): ', child.getAttribute('value'), ' ', child.innerText);
                 form_data.startpoint = child.innerText;
             }
         }
         let endpoint = document.getElementById('endpoint');
         for (let child of endpoint.children) {
             if (child.selected) {
-                c_log('info', '[Path_finder](retrieve_form_data): ', child.getAttribute('value'), ' ', child.innerText);
+                c_log('debug', '[Path_finder](retrieve_form_data): ', child.getAttribute('value'), ' ', child.innerText);
                 form_data.endpoint = child.innerText;
             }
         }
@@ -452,62 +438,51 @@ class Path_finder {
      */
     async get_route(request_body) {
         "use strict";
-        c_log('debug', '[Path_finder](get_route)');
+        c_log('info', '[Path_finder](get_route)');
 
-        request_body = format_json(request_body);
-        c_log('info', '[Path_finder](get_route): request_body: ', request_body);
+        // Format the incoming request body if needed (you didn't provide the `format_json` function)
 
-        // As long as fetching in general doesn't work; use the request body itself as response
+        let request_body_json = format_json(request_body)
+        c_log('debug', '[Path_finder](get_route): request_body: ', request_body_json);
+
+        let request_body_obj = JSON.parse(request_body_json);
+
         let response_data = {};
-        let startpoint = '';
-        let endpoint = '';
+        let startpoint = request_body_obj.startpoint;
+        let endpoint = request_body_obj.endpoint;
         let route = '';
 
-        // As long as fetching from Backend doesn't work; load json map data
-        await fetch('../../assets/json/get_route_response_body.json')
-            .then(response => response.json())
+        // Fetch the route from the API using the startpoint and endpoint from the request body
+        await fetch(`http://localhost:5000/cities/route?startpoint=${startpoint}&endpoint=${endpoint}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('[Path_finder](get_route): Network problems: ' + response.statusText);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.route !== undefined) {
-
+                    // Loop through the route array to build the route string
                     for (let i = 0; data.route[i.toString()]; i++) {
-                        let city_name = data.route[i.toString()];
-
-                        // set startpoint(first) and endpoint(last)
-                        if (i === 0) {
-                            startpoint = city_name;
-                        } else {
-                            endpoint = city_name;
-                        }
-                        route += city_name + ' => ';
+                        // Append each city to the route string
+                        route += data.route[i.toString()] + ' => ';
                     }
+                    // Remove the last ' => ' from the route string
                     route = route.substring(0, (route.length - ' => '.length));
 
+                    // Construct the response data
                     response_data.route = 'Route from ' + startpoint + ' to ' + endpoint + ': ' + route + '.';
-
                     response_data.distance = 'The distance is ' + (parseFloat(data.distance).toFixed(2)).toString() + ' [units of length].';
-                } else throw 'Route undefined'
+                } else throw '[Path_finder](get_route): Route undefined';
             })
-            .catch(error => c_log('error', '[Path_finder](get_route): Error fetching route: ', error));
-
-        // https://echo.fbi.h-da.de/
-        // https://api.group2.proxy.devops-pse.users.h-da.cloud
-        // TODO: fetch data from web backend api(incomplete)
-        /*const response = fetch('https://echo.fbi.h-da.de/',
-        {
-            method: 'GET',
-            headers:
-                {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json; charset=utf-8',
-                    'Access-Control-Allow-Origin': '*',
-                    'Sec-Fetch-Mode': 'cors'
-                },
-            mode: 'no-cors',
-            body: post_body_data
-        });*/
+            .catch(error => {
+                c_log('error', '[Path_finder](get_route): Error fetching route: ', error);
+                response_data.error = 'Failed to fetch route data.';
+            });
 
         return format_json(response_data);
     }
+
 
     /** Updates the HTML response section with the provided data.
      *
@@ -518,10 +493,10 @@ class Path_finder {
      */
     update_response_section(data) {
         "use strict";
-        c_log('debug', '[Path_finder](update_response_section)');
+        c_log('info', '[Path_finder](update_response_section)');
 
         data = format_json(data);
-        c_log('info', '[Path_finder](update_response_section): ', data);
+        c_log('debug', '[Path_finder](update_response_section): ', data);
         let response_data = JSON.parse(data);
 
         if (document.getElementById("response_article") == null) {
@@ -566,6 +541,7 @@ class Path_finder {
  * - saving city information
  * - TODO: list tasks when class starts to be used
  */
+// noinspection JSUnusedGlobalSymbols
 class City {
 
     // private class attributes
@@ -591,7 +567,7 @@ class City {
      */
     constructor(name, position_x, position_y) {
         "use strict";
-        c_log('debug', '[Path_finder](constructor)');
+        c_log('info', '[City](constructor)');
 
         this.#name = name;
         this.#position_x = position_x;
@@ -603,7 +579,7 @@ class City {
      */
     get_name() {
         "use strict";
-        c_log('debug', '[Path_finder](get_name)');
+        c_log('info', '[City](get_name)');
 
         return this.#name;
     }
@@ -613,7 +589,7 @@ class City {
      */
     get_position_x() {
         "use strict";
-        c_log('debug', '[Path_finder](get_position_x)');
+        c_log('info', '[City](get_position_x)');
 
         return this.#position_x;
     }
@@ -623,7 +599,7 @@ class City {
      */
     get_position_y() {
         "use strict";
-        c_log('debug', '[Path_finder](get_position_y)');
+        c_log('info', '[City](get_position_y)');
 
         return this.#position_y;
     }
@@ -633,7 +609,7 @@ class City {
      */
     to_json_string() {
         "use strict";
-        c_log('debug', '[Path_finder](to_json_string)');
+        c_log('info', '[City](to_json_string)');
 
         return JSON.stringify(this.to_json());
     }
@@ -643,7 +619,7 @@ class City {
      */
     to_formatted_json_string() {
         "use strict";
-        c_log('debug', '[Path_finder](to_formatted_json_string)');
+        c_log('info', '[City](to_formatted_json_string)');
 
         return format_json(this.to_json());
     }
@@ -653,7 +629,7 @@ class City {
      */
     to_json() {
         "use strict";
-        c_log('debug', '[Path_finder](to_json)');
+        c_log('info', '[City](to_json)');
 
         let self = {};
         self.name = this.#name;

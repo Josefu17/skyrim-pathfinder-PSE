@@ -42,6 +42,6 @@ tokens
 - [x] Backend
   - [x] Fetch map and store it in database
   - [x] API endpoints for the frontend
-- [ ] Frontend
-  - [ ] Fetch and display map
-  - [ ] User interaction
+- [x] Frontend
+  - [x] Fetch and display map
+  - [x] User interaction
