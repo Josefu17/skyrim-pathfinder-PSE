@@ -14,14 +14,13 @@ If the database does not exist:
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import ProgrammingError
 
-from src.database.schema.city import City
-from src.database.schema.connection import Connection
-
-from src.database.schema.base import Base
 from src.database.db_connection import engine, USER, PASSWORD, HOST, PORT, DB_NAME
+from src.database.schema.base import Base
+from src.database.schema import models
 
-print(City)
-print(Connection)
+# Ensure db models are registered
+models.register_models()
+
 
 with engine.connect() as connection:
     try:
@@ -34,12 +33,12 @@ with engine.connect() as connection:
 
         if not exists:
             connection.execute(text(f"CREATE DATABASE {DB_NAME}"))
-            print(f"Database '{DB_NAME}' created.")
+            print(f"Database '{DB_NAME}' created.", flush=True)
         else:
-            print(f"Database '{DB_NAME}' already exists.")
+            print(f"Database '{DB_NAME}' already exists.", flush=True)
 
     except ProgrammingError as e:
-        print(f"Error: {e}")
+        print(f"Error: {e}", flush=True)
         raise
 
 new_engine = create_engine(
@@ -49,6 +48,6 @@ new_engine = create_engine(
 with new_engine.connect() as new_connection:
     try:
         Base.metadata.create_all(new_engine)
-        print(f"Registered tables: {Base.metadata.tables.keys()}")
+        print(f"Registered tables: {Base.metadata.tables.keys()}", flush=True)
     except ProgrammingError as e:
-        print(f"Error creating tables: {e}")
+        print(f"Error creating tables: {e}", flush=True)
