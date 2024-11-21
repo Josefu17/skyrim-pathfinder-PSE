@@ -6,13 +6,13 @@ from src.database.dao.city_dao import CityDAO
 from src.database.dao.connection_dao import ConnectionDAO
 
 
-def fetch_route_from_navigation_service(start_city_name, end_city_name):
+def fetch_route_from_navigation_service(start_city_name, end_city_name, session):
     """Fetch the shortest route from the navigation service by providing 2 cities"""
     try:
         with xmlrpc.client.ServerProxy("http://navigation-service:8000/") as proxy:
             cities, connections = (
-                CityDAO.get_all_cities(),
-                ConnectionDAO.get_all_connections(),
+                CityDAO.get_all_cities(session),
+                ConnectionDAO.get_all_connections(session),
             )
 
             # convert objects to dicts to work with RPC-API
@@ -42,10 +42,10 @@ def fetch_route_from_navigation_service(start_city_name, end_city_name):
         return f"Network error: {e}"
 
 
-def fetch_cities_as_dicts():
+def fetch_cities_as_dicts(session):
     """Retrieve and return cities information from the database as dictionary"""
     # Fetch all cities as objects
-    cities = CityDAO.get_all_cities()
+    cities = CityDAO.get_all_cities(session)
     # Convert each city to a dictionary, excluding the 'id' field
     cities_data = [
         {

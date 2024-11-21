@@ -1,12 +1,6 @@
 """Data Access Object for City."""
 
-from sqlalchemy.orm import sessionmaker
-
-from src.database.database import new_engine
 from src.database.schema.city import City
-
-SESSION_MAKER = sessionmaker(bind=new_engine)
-SESSION = SESSION_MAKER()
 
 
 # Cities dao
@@ -14,30 +8,30 @@ class CityDAO:
     """Data Access Object for City."""
 
     @staticmethod
-    def get_all_cities():
+    def get_all_cities(session):
         """get all cities as list"""
-        return SESSION.query(City).all()
+        return session.query(City).all()
 
     @staticmethod
-    def get_city_by_name(name):
+    def get_city_by_name(name, session):
         """get city by name"""
-        return SESSION.query(City).filter_by(name=name).first()
+        return session.query(City).filter_by(name=name).first()
 
     @staticmethod
-    def get_city_by_id(city_id):
+    def get_city_by_id(city_id, session):
         """get city by id"""
-        return SESSION.query(City).get(city_id)
+        return session.get(City, city_id)
 
     @staticmethod
-    def save_city(city):
+    def save_city(city, session):
         """save city"""
-        SESSION.add(city)
-        SESSION.commit()
+        session.add(city)
+        session.commit()
 
     @staticmethod
-    def delete_city(city_id):
+    def delete_city(city_id, session):
         """delete city"""
-        city = SESSION.query(City).get(city_id)
+        city = session.get(City, city_id)
         if city:
-            SESSION.delete(city)
-            SESSION.commit()
+            session.delete(city)
+            session.commit()

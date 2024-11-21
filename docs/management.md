@@ -70,4 +70,3 @@ To manage the workflow of issues, we’ve defined the following stages:
 - Assign each merge request to at least one team member
 - A merge request must be reviewed and approved by at least one other person before merging
 - No direct commits to the main branch; it must remain clean.
-- 

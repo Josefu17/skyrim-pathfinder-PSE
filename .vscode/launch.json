@@ -2,12 +2,27 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Remote Attach",
+      "name": "Python: Remote Attach (Navigation Service)",
       "type": "debugpy",
       "request": "attach",
       "connect": {
         "host": "localhost",
         "port": 5678
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/src",
+          "remoteRoot": "/app/src"
+        }
+      ]
+    },
+    {
+      "name": "Python: Remote Attach (Web Backend)",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 5679
       },
       "pathMappings": [
         {

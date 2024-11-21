@@ -71,3 +71,12 @@ The client sends XML-RPC requests to the server to call the `get_route` function
     </params>
 </methodResponse>
 ```
+## Frontend
+### Fetch and display maps from the Web Backend.
+The ``load_cities()`` function fetches all cities with their x and y positions from http://localhost:5000/cities. The response returns JSON data that includes all cities in the database. We use JavaScript to create a DOM element to display all the cities.
+
+### User Interaction
+The user is provided with dropdown fields for both the starting point and the destination. Users can select cities and receive an optimal route to their destination. We have made the user interaction easy and intuitive, ensuring that users cannot select the same city for both the start and destination or enter an invalid city.
+
+### Display the route on the map
+After the user selects the start and destination city, the frontend sends a request (e.g.: http://localhost:5000/cities/route?startpoint=Markarth&endpoint=Riften). The server calculates the route and responds with the route and distance, which the frontend then displays in new DOM elements.

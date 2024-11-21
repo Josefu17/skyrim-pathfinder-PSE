@@ -14,6 +14,10 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pg-2 -d navigation"]
+      interval: 10s
+      retries: 5
 
   navigation-service:
     image: python:3.13-slim
@@ -27,6 +31,9 @@ services:
       - ./requirements.txt:/app/requirements.txt
     networks:
       - app-network
+    depends_on:
+      postgres:
+        condition: service_healthy
     command: >
       sh -c "pip install --upgrade pip && \
          pip install -r /app/requirements.txt && \
@@ -41,8 +48,10 @@ services:
     image: python:3.13-slim
     container_name: group2-web-backend-1
     depends_on:
-      - postgres
-      - navigation-service
+      postgres:
+        condition: service_healthy
+      navigation-service:
+        condition: service_started
     ports:
       - "5000:5000"
       - "5679:5678"
@@ -58,6 +67,25 @@ services:
         export PYTHONPATH=$$(pwd) && \
         python -m src.web_backend.web_backend_controller && \
         tail -f /dev/null"
+
+  db-init:
+    image: python:3.13-slim
+    container_name: db-init
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - ./requirements.txt:/app/requirements.txt
+    networks:
+      - app-network
+    command: >
+      sh -c "pip install --upgrade pip && \
+        pip install -r /app/requirements.txt && \
+        cd /app && \
+        export PYTHONPATH=$$(pwd) && \
+        python -m src.database.connection"
+
 
 volumes:
   postgres_data:

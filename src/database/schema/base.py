@@ -1,7 +1,5 @@
 """ Python file for database base class Base"""
 
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import declarative_base
 
-
-class Base(DeclarativeBase):
-    """Database Base Class"""
+Base = declarative_base()
