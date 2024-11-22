@@ -27,7 +27,7 @@ services:
       - "5678:5678"
     volumes:
       - ./Makefile:/Makefile
-      - ./src:/app/src
+      - ./backend:/app/backend
       - ./requirements.txt:/app/requirements.txt
       - ./env/.env:/app/env/.env
     networks:
@@ -42,7 +42,7 @@ services:
          apt install make && \
          cd /app && \
          export PYTHONPATH=$$(pwd) && \
-         python -m src.rpc_api.server && \
+         python -m backend.src.rpc_api.server && \
          tail -f /dev/null"
 
   web-backend:
@@ -57,7 +57,7 @@ services:
       - "5000:5000"
       - "5679:5678"
     volumes:
-      - ./src:/app/src
+      - ./backend:/app/backend
       - ./requirements.txt:/app/requirements.txt
       - ./env/.env:/app/env/.env
     networks:
@@ -67,7 +67,7 @@ services:
         pip install -r /app/requirements.txt && \
         cd /app && \
         export PYTHONPATH=$$(pwd) && \
-        python -m src.web_backend.web_backend_controller && \
+        python -m backend.src.web_backend.web_backend_controller && \
         tail -f /dev/null"
 
   db-init:
@@ -77,7 +77,7 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./src:/app/src
+      - ./backend:/app/backend
       - ./requirements.txt:/app/requirements.txt
       - ./env/.env:/app/env/.env
     networks:
@@ -87,7 +87,7 @@ services:
         pip install -r /app/requirements.txt && \
         cd /app && \
         export PYTHONPATH=$$(pwd) && \
-        python -m src.database.create_database"
+        python -m backend.src.database.create_database"
 
 
 volumes:
