@@ -29,7 +29,7 @@ services:
       - ./Makefile:/Makefile
       - ./backend:/app/backend
       - ./requirements.txt:/app/requirements.txt
-      - ./env/.env:/app/env/.env
+      - ./backend/env/.env:/app/backend/env/.env
     networks:
       - app-network
     depends_on:
@@ -59,7 +59,7 @@ services:
     volumes:
       - ./backend:/app/backend
       - ./requirements.txt:/app/requirements.txt
-      - ./env/.env:/app/env/.env
+      - ./backend/env/.env:/app/backend/env/.env
     networks:
       - app-network
     command: >
@@ -79,7 +79,7 @@ services:
     volumes:
       - ./backend:/app/backend
       - ./requirements.txt:/app/requirements.txt
-      - ./env/.env:/app/env/.env
+      - ./backend/env/.env:/app/backend/env/.env
     networks:
       - app-network
     command: >

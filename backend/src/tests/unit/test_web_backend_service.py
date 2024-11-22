@@ -5,7 +5,9 @@ from unittest.mock import patch, MagicMock
 
 from sqlalchemy.orm import Session
 
-from backend.src.web_backend.web_backend_service import fetch_route_from_navigation_service
+from backend.src.web_backend.web_backend_service import (
+    fetch_route_from_navigation_service,
+)
 
 
 @patch("backend.src.web_backend.web_backend_service.xmlrpc.client.ServerProxy")
@@ -130,4 +132,4 @@ def test_fetch_route_network_error(
 
     # Call the function with mock session and assert results
     result = fetch_route_from_navigation_service("Markarth", "Riften", mock_session)
-    assert result == "Network error: A network error occurred"
+    assert result == "Connection error: A network error occurred"

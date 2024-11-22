@@ -6,6 +6,9 @@ from backend.src.database.dao.city_dao import CityDAO
 from backend.src.database.dao.connection_dao import ConnectionDAO
 from backend.src.database.schema.city import City
 from backend.src.database.schema.connection import Connection
+from backend.src.logging_config import get_logging_configuration
+
+logger = get_logging_configuration()
 
 MAP_URL = "https://maps.proxy.devops-pse.users.h-da.cloud/map?name=skyrim"
 
@@ -15,6 +18,9 @@ def fetch_and_store_map_data_if_needed(session):
     try:
         response = requests.get(MAP_URL, timeout=10)
         response.raise_for_status()
+
+        logger.info("Map data fetched successfully")
+
         data = response.json()
 
         city_map = {}
@@ -28,7 +34,7 @@ def fetch_and_store_map_data_if_needed(session):
                     position_y=city["positionY"],
                 )
                 CityDAO.save_city(db_city, session)
-                print(f"City {city['name']} added")
+                logger.info("City %s saved", city["name"])
             city_map[city["name"]] = db_city.id
 
         new_connections = []
@@ -48,14 +54,14 @@ def fetch_and_store_map_data_if_needed(session):
                         parent_city_id=parent_city_id, child_city_id=child_city_id
                     )
                     new_connections.append(db_connection)
-                    print(
-                        f"New Connection found from: {connection['parent']} "
-                        f"to: {connection['child']}"
+                    logger.info(
+                        "New Connection found from: %s to: %s",
+                        parent_city_id,
+                        child_city_id,
                     )
 
         if new_connections:
             ConnectionDAO.save_connections_bulk(new_connections, session)
-            print("New Connections saved")
-
+            logger.info("New Connections saved successfully")
     except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
+        logger.error("Error fetching map data: %s", e)

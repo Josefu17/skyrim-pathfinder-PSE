@@ -93,7 +93,9 @@ def test_get_cities(
 
 # Test for the `/cities/route` endpoint
 @patch("backend.src.web_backend.web_backend_controller.get_db_session")
-@patch("backend.src.web_backend.web_backend_controller.fetch_route_from_navigation_service")
+@patch(
+    "backend.src.web_backend.web_backend_controller.fetch_route_from_navigation_service"
+)
 def test_calculate_route(
     mock_fetch_route, mock_get_db_session, flask_client: FlaskClient
 ):
