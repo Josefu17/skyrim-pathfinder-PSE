@@ -1,5 +1,5 @@
 # CI/CD and Operation
-Refer to the [CI/CD Operation Todo](./todo.md#cicd-and-operation) for an overview of related tasks and their current progress status. 
+Refer to the [CI/CD Operation Todo](Stages/stage_1.md#cicd-and-operation) for an overview of related tasks and their current progress status. 
 The following is a detailed explanation for them.
 ## Pipeline to build the application
 ## Deployment of application to a server

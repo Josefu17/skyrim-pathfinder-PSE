@@ -46,11 +46,16 @@ To manage the workflow of issues, we’ve defined the following stages:
 - No direct commits on main branch
 - Convention for commit messages
   - use imperative
-  - ADD:
-  - INIT:
-  - FIX:
-  - ADJUST:
-  - DELETE:
+  - **ADD**
+  - **INIT**
+  - **FIX**
+  - **ADJUST**
+  - **DELETE**
+- Set priorities for issues
+- New branches should use main as their starting point
+- Improve issue descriptions by providing clear descriptions and any dependencies or prerequisites for 
+an issue if applicable
+- Ensure high code coverage and try to add tests to new components ASAP, ideally along the development!
 
 
 ### Merge Request Definition of Done

@@ -1,0 +1,43 @@
+# Stage 2 Overview (Deadline 04.12.2024)
+
+## Table of Contents
+- [Requirements of Stage 2](#requirements-of-stage-2)
+- [Retrospective Summary](#stage-2-retrospective-summary)
+
+# Requirements of Stage 2
+
+## Requirements from previous Stage
+- Complete any missing requirements from Stage 1, as they are still relevant. For an overview, 
+refer to: [Stage 1](stage_1.md)
+
+## New Requirements
+1. **Regularly update dependencies using the Renovate tool.**
+2. **Implement a CI job for dependency vulnerability scanning:**
+   - [ ] Set up vulnerability scanning (e.g., GitLab dependency scanning).
+   - [ ] Schedule this check to run daily on the main branch and deployed version.
+   - [ ] Apply security patches promptly to keep the deployed application secure.
+
+3. **Implement basic integration tests (optional, bonus points if implemented correctly):**
+   - [ ] Automate a test that starts all services and performs at least one route calculation.
+   - [x] Unit tests for the navigation service logic, with at least 90% code coverage.
+   - [x] Unit tests for the Web Backend, ensuring the main flow is tested.
+   - [ ] Ensure the Frontend starts and verify that the main components are present.
+
+4. **Ensure the application remains continuously running:**
+   - [ ] Provide a `/healthz` endpoint on the backend that returns the application's health status.
+   - [ ] Endpoint URL should be either:
+     - `https://api.groupX.proxy.devops-pse.users.h-da.cloud/healthz`
+     - `https://groupX.proxy.devops-pse.users.h-da.cloud/healthz`
+   - [ ] Response body should be JSON:
+     ```json
+     {
+       "status": "healthy"
+     }
+     ```
+     
+
+---
+
+# Stage 2 Retrospective Summary
+// TBD
+

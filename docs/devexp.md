@@ -1,5 +1,5 @@
 # DevExp
-Refer to the [DevExp Todo](./todo.md#devexp) for an overview of related tasks and their current progress status. 
+Refer to the [DevExp Todo](Stages/stage_1.md#devexp) for an overview of related tasks and their current progress status. 
 The following is a detailed explanation for them.
 ## Debugger (debugpy)
 - Add debugpy to requirements.txt

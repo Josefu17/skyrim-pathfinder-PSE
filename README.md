@@ -21,4 +21,4 @@ The web backend api provides this route to the frontend, allowing the user to vi
 - [DevExp](/docs/devexp.md)
 - [CI/CD Operation](/docs/ci.md)
 - [Application](/docs/app.md)
-- [To do](/docs/todo.md)
+- [Stage Overview](/docs/Stages/stage_1.md)
