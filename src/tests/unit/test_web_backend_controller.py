@@ -17,31 +17,39 @@ def flask() -> FlaskClient:
 
 
 # Test for the `/maps` endpoint
-@patch("src.web_backend.web_backend_controller.CityDAO")
-@patch("src.web_backend.web_backend_controller.ConnectionDAO")
-def test_get_map_data(mock_connection_dao, mock_city_dao, flask_client: FlaskClient):
+@patch("src.web_backend.web_backend_controller.get_db_session")
+@patch("src.web_backend.web_backend_controller.service_get_map_data")
+def test_get_map_data(
+    mock_service_get_map_data, mock_get_db_session, flask_client: FlaskClient
+):
     """Test the get_map_data endpoint."""
-    # Mock CityDAO and ConnectionDAO
-    mock_city_1 = MagicMock()
-    mock_city_1.to_dict.return_value = {
-        "id": 1,
-        "name": "Markarth",
-        "position_x": 100,
-        "position_y": 200,
-    }
-    mock_city_2 = MagicMock()
-    mock_city_2.to_dict.return_value = {
-        "id": 2,
-        "name": "Riften",
-        "position_x": 300,
-        "position_y": 400,
-    }
-    mock_city_dao.get_all_cities.return_value = [mock_city_1, mock_city_2]
+    # Mock the database session
+    mock_session = MagicMock()
+    mock_get_db_session.return_value.__enter__.return_value = mock_session
 
-    mock_connection_1 = MagicMock()
-    mock_connection_1.parent_city_id = 1
-    mock_connection_1.child_city_id = 2
-    mock_connection_dao.get_all_connections.return_value = [mock_connection_1]
+    # Mock service_get_map_data to return mock cities and connections data
+    mock_service_get_map_data.return_value = (
+        [
+            {
+                "id": 1,
+                "name": "Markarth",
+                "position_x": 100,
+                "position_y": 200,
+            },
+            {
+                "id": 2,
+                "name": "Riften",
+                "position_x": 300,
+                "position_y": 400,
+            },
+        ],
+        [
+            {
+                "parent_city_id": 1,
+                "child_city_id": 2,
+            }
+        ],
+    )
 
     response = flask_client.get("/maps")
     assert response.status_code == 200
@@ -51,25 +59,29 @@ def test_get_map_data(mock_connection_dao, mock_city_dao, flask_client: FlaskCli
 
 
 # Test for the `/cities` endpoint
-@patch("src.web_backend.web_backend_controller.CityDAO")
-def test_get_cities(mock_city_dao, flask_client: FlaskClient):
+@patch("src.web_backend.web_backend_controller.get_db_session")
+@patch("src.web_backend.web_backend_controller.service_get_cities_data")
+def test_get_cities(
+    mock_service_get_cities_data, mock_get_db_session, flask_client: FlaskClient
+):
     """Test the get_cities endpoint."""
-    # Create mock city objects
-    mock_city_1 = MagicMock()
-    mock_city_1.to_dict.return_value = {
-        "name": "Markarth",
-        "position_x": 100,
-        "position_y": 200,
-    }
+    # Mock the database session
+    mock_session = MagicMock()
+    mock_get_db_session.return_value.__enter__.return_value = mock_session
 
-    mock_city_2 = MagicMock()
-    mock_city_2.to_dict.return_value = {
-        "name": "Riften",
-        "position_x": 300,
-        "position_y": 400,
-    }
-
-    mock_city_dao.get_all_cities.return_value = [mock_city_1, mock_city_2]
+    # Mock service_get_cities_data to return mock cities data
+    mock_service_get_cities_data.return_value = [
+        {
+            "name": "Markarth",
+            "position_x": 100,
+            "position_y": 200,
+        },
+        {
+            "name": "Riften",
+            "position_x": 300,
+            "position_y": 400,
+        },
+    ]
 
     response = flask_client.get("/cities")
     assert response.status_code == 200
@@ -80,9 +92,16 @@ def test_get_cities(mock_city_dao, flask_client: FlaskClient):
 
 
 # Test for the `/cities/route` endpoint
+@patch("src.web_backend.web_backend_controller.get_db_session")
 @patch("src.web_backend.web_backend_controller.fetch_route_from_navigation_service")
-def test_calculate_route(mock_fetch_route, flask_client: FlaskClient):
+def test_calculate_route(
+    mock_fetch_route, mock_get_db_session, flask_client: FlaskClient
+):
     """Test the calculate_route endpoint."""
+    # Mock the database session
+    mock_session = MagicMock()
+    mock_get_db_session.return_value.__enter__.return_value = mock_session
+
     # Mock fetch_route_from_navigation_service response
     mock_fetch_route.return_value = {
         "route": {"0": "Markarth", "1": "Riften"},

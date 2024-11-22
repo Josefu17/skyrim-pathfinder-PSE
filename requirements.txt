@@ -11,3 +11,4 @@ flask-cors
 coverage
 pytest-cov
 pytest-mock
+python-dotenv

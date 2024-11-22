@@ -56,3 +56,22 @@ def fetch_cities_as_dicts(session):
         for city in cities
     ]
     return cities_data
+
+
+def service_get_map_data(session):
+    """Fetch map data for controller"""
+    cities = CityDAO.get_all_cities(session)
+    connections = ConnectionDAO.get_all_connections(session)
+
+    cities_data = [city.to_dict() for city in cities]
+    connections_data = [
+        {"parent_city_id": conn.parent_city_id, "child_city_id": conn.child_city_id}
+        for conn in connections
+    ]
+    return cities_data, connections_data
+
+
+def service_get_cities_data(session):
+    """Fetch cities data for controller"""
+    cities = CityDAO.get_all_cities(session)
+    return [city.to_dict() for city in cities]

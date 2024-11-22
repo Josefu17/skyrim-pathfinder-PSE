@@ -8,7 +8,7 @@ from src.database.schema.base import Base
 
 # Create a new engine for the in-memory SQLite database with foreign keys enabled
 engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(bind=engine)
+SESSION_LOCAL = sessionmaker(bind=engine)
 
 
 @pytest.fixture(scope="function", name="db")
@@ -21,7 +21,7 @@ def test_db():
 
     # Create tables after enabling foreign keys
     Base.metadata.create_all(engine)
-    session = SessionLocal()
+    session = SESSION_LOCAL()
     yield session
     session.close()
     # Tear down the database (drop all tables)
