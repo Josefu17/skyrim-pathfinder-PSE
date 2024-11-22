@@ -4,9 +4,9 @@ WORKDIR /usr/share/nginx/html
 
 RUN mkdir -p js css docs assets/images assets/json
 
-COPY src/*.html .
-COPY src/js/*.js ./js
-COPY src/css/*.css ./css
+COPY frontend/src/*.html .
+COPY frontend/src/js/*.js ./js
+COPY frontend/src/css/*.css ./css
 COPY assets/json/* ./assets/json
 COPY assets/images/* ./assets/images
 # COPY docs/Doku.md ./docs

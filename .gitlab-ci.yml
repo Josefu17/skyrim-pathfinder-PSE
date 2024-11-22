@@ -25,7 +25,7 @@ test-job:
     - . /venv/bin/activate  
     - pip install -r requirements.txt
   script:
-    - pytest --cov=src --cov-report=term src/tests/ --cov-config=setup.cfg
+    - pytest --cov=backend/src --cov-report=term backend/src/tests/ --cov-config=setup.cfg
   needs:
     - build-job
   coverage: '/TOTAL\s+\d+\s+\d+\s+(\d+)%/'
@@ -41,7 +41,7 @@ analyze-job:
     - . /venv/bin/activate  
     - pip install -r requirements.txt
   script:
-    - python -m pylint --rcfile=.pylintrc src
-    - python -m black --config pyproject.toml src
+    - python -m pylint --rcfile=.pylintrc backend/src
+    - python -m black --config pyproject.toml backend/src
   needs:
     - build-job  

@@ -31,17 +31,18 @@ update: login build push
 
 # Test management
 test:
-	python -m pytest ./src/tests/
+	python -m pytest ./backend/src/tests/
+# jest? ./frontend/src/tests/
 
 coverage-windows:
-	python -m pytest --cov=src --cov-report=html src/tests/ --cov-config=setup.cfg && start htmlcov\index.html
+	python -m pytest --cov=backend/src --cov-report=html backend/src/tests/ --cov-config=setup.cfg && start htmlcov\index.html
 
 # Navigation service management
 nav-enter:
 	docker exec -it group2-navigation-service-1 bash
 
 nav-test:
-	python -m pytest ./app/src/tests/
+	python -m pytest ./app/backend/src/tests/
 
 # Database management
 connect-to-database:
