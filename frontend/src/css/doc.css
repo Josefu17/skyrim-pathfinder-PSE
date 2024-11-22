@@ -1,6 +1,6 @@
 body
 {
-    background-image: url('../../../assets/images/app_background.png');
+    background-image: url('../../assets/images/app_background.png');
     background-size: 100% 100%; /* Stretches the image both horizontally and vertically */
     background-position: top left; /* Aligns the image to the top-left corner */
     background-repeat: no-repeat; /* Prevents the image from repeating */

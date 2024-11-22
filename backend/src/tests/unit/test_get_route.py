@@ -51,7 +51,8 @@ def test_get_route_valid_route(mocker):
         side_effect=mock_create_graph,
     )
     mocker.patch(
-        "backend.src.navigation_service.navigation_service.dijkstra", side_effect=mock_dijkstra
+        "backend.src.navigation_service.navigation_service.dijkstra",
+        side_effect=mock_dijkstra,
     )
 
     result = get_route("CityA", "CityC", data)
@@ -71,7 +72,8 @@ def test_get_route_no_connection(mocker):
         side_effect=mock_create_graph,
     )
     mocker.patch(
-        "backend.src.navigation_service.navigation_service.dijkstra", side_effect=mock_dijkstra
+        "backend.src.navigation_service.navigation_service.dijkstra",
+        side_effect=mock_dijkstra,
     )
 
     result = get_route("CityA", "CityE", data)

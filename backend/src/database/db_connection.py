@@ -1,15 +1,19 @@
 """handles connection sessions to the database"""
 
-from contextlib import contextmanager
 import os
+from contextlib import contextmanager
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
+from backend.src.logging_config import get_logging_configuration
+
 # Load environment variables from the .env file
-dotenv_path = os.path.join(os.path.dirname(__file__), "../../../env/.env")
+dotenv_path = os.path.join(os.path.dirname(__file__), "../../env/.env")
 load_dotenv(dotenv_path)
+
+logger = get_logging_configuration()
 
 
 class DatabaseConnection:
@@ -41,6 +45,8 @@ class DatabaseConnection:
         )
         self.session_local = sessionmaker(bind=self.engine)
 
+        logger.info("Database connection initialized for database: %s", self.database)
+
     def _check_missing_parameters(self):
         """Helper method to check and raise an error if any parameters are missing"""
         params = {
@@ -59,10 +65,12 @@ class DatabaseConnection:
 
     def get_engine(self):
         """Get the database engine"""
+        logger.debug("Getting database engine")
         return self.engine
 
     def get_session_local(self) -> sessionmaker:
         """Get the session maker"""
+        logger.debug("Getting session maker")
         return self.session_local
 
 
@@ -72,7 +80,9 @@ def get_db_session(config=None) -> Session:
     db_connection = DatabaseConnection(config)
     session_local = db_connection.get_session_local()
     db = session_local()
+    logger.debug("Database session opened")
     try:
         yield db
     finally:
         db.close()
+        logger.debug("Database session closed")

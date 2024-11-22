@@ -17,6 +17,9 @@ from sqlalchemy.exc import ProgrammingError
 from backend.src.database.db_connection import DatabaseConnection
 from backend.src.database.schema.base import Base
 from backend.src.database.schema import models
+from backend.src.logging_config import get_logging_configuration
+
+logger = get_logging_configuration()
 
 # Ensure db models are registered
 models.register_models()
@@ -39,12 +42,11 @@ with postgres_engine.connect() as connection:
 
         if not exists:
             connection.execute(text(f"CREATE DATABASE {NAVIGATION_DB_NAME}"))
-            print(f"Database '{NAVIGATION_DB_NAME}' created.", flush=True)
+            logger.info("Database '%s' created successfully.", NAVIGATION_DB_NAME)
         else:
-            print(f"Database '{NAVIGATION_DB_NAME}' already exists.", flush=True)
-
+            logger.info("Database '%s' already exists.", NAVIGATION_DB_NAME)
     except ProgrammingError as e:
-        print(f"Error: {e}", flush=True)
+        logger.error("Error: %s", e)
         raise
 
 # Step 2: Connect to the 'navigation' database and create the tables
@@ -54,6 +56,6 @@ navigation_engine = navigation_connection.get_engine()
 with navigation_engine.connect() as new_connection:
     try:
         Base.metadata.create_all(navigation_engine)
-        print(f"Registered tables: {Base.metadata.tables.keys()}", flush=True)
+        logger.info("Registered tables: %s", Base.metadata.tables.keys())
     except ProgrammingError as e:
-        print(f"Error creating tables: {e}", flush=True)
+        logger.error("Error creating tables: %s", e)

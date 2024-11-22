@@ -4,11 +4,19 @@ import xmlrpc.client
 
 from backend.src.database.dao.city_dao import CityDAO
 from backend.src.database.dao.connection_dao import ConnectionDAO
+from backend.src.logging_config import get_logging_configuration
+
+logger = get_logging_configuration()
 
 
 def fetch_route_from_navigation_service(start_city_name, end_city_name, session):
     """Fetch the shortest route from the navigation service by providing 2 cities"""
     try:
+        logger.info(
+            "Fetching route from %s and %s from navigation service.",
+            start_city_name,
+            end_city_name,
+        )
         with xmlrpc.client.ServerProxy("http://navigation-service:8000/") as proxy:
             cities, connections = (
                 CityDAO.get_all_cities(session),
@@ -33,13 +41,23 @@ def fetch_route_from_navigation_service(start_city_name, end_city_name, session)
             result = proxy.get_route(start_city_name, end_city_name, data)
 
             if result:
+                logger.info(
+                    "Route fetched successfully from %s and %s.",
+                    start_city_name,
+                    end_city_name,
+                )
                 return result
+            logger.error(
+                "Error calculating route from %s to %s.", start_city_name, end_city_name
+            )
             return {"error": "Error by Route Calculation"}
 
     except xmlrpc.client.Error as e:
+        logger.error("XML-RPC error: %s", e)
         return f"XML-RPC error: {e}"
     except ConnectionError as e:
-        return f"Network error: {e}"
+        logger.error("Connection error: %s", e)
+        return f"Connection error: {e}"
 
 
 def fetch_cities_as_dicts(session):
@@ -74,4 +92,11 @@ def service_get_map_data(session):
 def service_get_cities_data(session):
     """Fetch cities data for controller"""
     cities = CityDAO.get_all_cities(session)
-    return [city.to_dict() for city in cities]
+    return [
+        {
+            "name": city.name,
+            "position_x": city.position_x,
+            "position_y": city.position_y,
+        }
+        for city in cities
+    ]
