@@ -29,6 +29,7 @@ services:
       - ./Makefile:/Makefile
       - ./src:/app/src
       - ./requirements.txt:/app/requirements.txt
+      - ./env/.env:/app/env/.env
     networks:
       - app-network
     depends_on:
@@ -58,6 +59,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./requirements.txt:/app/requirements.txt
+      - ./env/.env:/app/env/.env
     networks:
       - app-network
     command: >
@@ -77,6 +79,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./requirements.txt:/app/requirements.txt
+      - ./env/.env:/app/env/.env
     networks:
       - app-network
     command: >
