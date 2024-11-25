@@ -239,7 +239,7 @@ class Path_finder {
         /* Fetches the cities from the backend API.
          * response structure: map{"cities": [{...}, ...], "connections": [{...}, ...], "mapname": "..." }
          */
-        fetch('http://localhost:5000/cities')
+        fetch('https://api.group2.proxy.devops-pse.users.h-da.cloud/cities')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('[Path_finder](load_cities): Network problems: ' + response.statusText);
@@ -453,7 +453,7 @@ class Path_finder {
         let route = '';
 
         // Fetch the route from the API using the startpoint and endpoint from the request body
-        await fetch(`http://localhost:5000/cities/route?startpoint=${startpoint}&endpoint=${endpoint}`)
+        await fetch(`https://api.group2.proxy.devops-pse.users.h-da.cloud/cities/route?startpoint=${startpoint}&endpoint=${endpoint}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('[Path_finder](get_route): Network problems: ' + response.statusText);

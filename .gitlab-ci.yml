@@ -18,7 +18,9 @@ build-job:
 
 test-job:
   stage: test
-  image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}  
+  image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}
+  variables:
+    PYTHONPATH: $CI_PROJECT_DIR/backend/src
   before_script:
     - apk add --no-cache python3 py3-pip
     - python3 -m venv /venv  
@@ -34,7 +36,9 @@ test-job:
 
 analyze-job:
   stage: analyze
-  image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}  
+  image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}
+  variables:
+    PYTHONPATH: $CI_PROJECT_DIR/backend/src
   before_script:
     - apk add --no-cache python3 py3-pip  
     - python3 -m venv /venv  
