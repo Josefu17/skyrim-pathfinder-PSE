@@ -173,4 +173,4 @@ def test_main_script(mock_app_run, mock_get_db_session, mock_fetch_and_store_map
 
     # Assertions
     mock_fetch_and_store_map_data.assert_called_once_with(session=mock_session)
-    mock_app_run.assert_called_once_with(debug=True, host="0.0.0.0", port=5000)
+    mock_app_run.assert_called_once_with(debug=True, host="0.0.0.0", port=4243)

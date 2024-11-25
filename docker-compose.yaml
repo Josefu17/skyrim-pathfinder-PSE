@@ -20,33 +20,25 @@ services:
       retries: 5
 
   navigation-service:
-    image: python:3.13-slim
+    build:
+      context: .
+      dockerfile: /backend/src/navigation_service/Dockerfile
+    image: registry.code.fbi.h-da.de/bpse-wise2425/group2/navigation-service:latest
     container_name: group2-navigation-service-1
     ports:
       - "8000:8000"
       - "5678:5678"
-    volumes:
-      - ./Makefile:/Makefile
-      - ./backend:/app/backend
-      - ./requirements.txt:/app/requirements.txt
-      - ./backend/env/.env:/app/backend/env/.env
     networks:
       - app-network
     depends_on:
       postgres:
         condition: service_healthy
-    command: >
-      sh -c "pip install --upgrade pip && \
-         pip install -r /app/requirements.txt && \
-         apt update && \
-         apt install make && \
-         cd /app && \
-         export PYTHONPATH=$$(pwd) && \
-         python -m backend.src.rpc_api.server && \
-         tail -f /dev/null"
 
   web-backend:
-    image: python:3.13-slim
+    build:
+      context: .
+      dockerfile: /backend/src/web_backend/Dockerfile
+    image: registry.code.fbi.h-da.de/bpse-wise2425/group2/web-backend:latest
     container_name: group2-web-backend-1
     depends_on:
       postgres:
@@ -54,40 +46,22 @@ services:
       navigation-service:
         condition: service_started
     ports:
-      - "5000:5000"
+      - "4243:4243"
       - "5679:5678"
-    volumes:
-      - ./backend:/app/backend
-      - ./requirements.txt:/app/requirements.txt
-      - ./backend/env/.env:/app/backend/env/.env
     networks:
       - app-network
-    command: >
-      sh -c "pip install --upgrade pip && \
-        pip install -r /app/requirements.txt && \
-        cd /app && \
-        export PYTHONPATH=$$(pwd) && \
-        python -m backend.src.web_backend.web_backend_controller && \
-        tail -f /dev/null"
 
   db-init:
-    image: python:3.13-slim
+    build:
+      context: .
+      dockerfile: /backend/src/database/Dockerfile
+    image: registry.code.fbi.h-da.de/bpse-wise2425/group2/db-init:latest
     container_name: db-init
     depends_on:
       postgres:
         condition: service_healthy
-    volumes:
-      - ./backend:/app/backend
-      - ./requirements.txt:/app/requirements.txt
-      - ./backend/env/.env:/app/backend/env/.env
     networks:
       - app-network
-    command: >
-      sh -c "pip install --upgrade pip && \
-        pip install -r /app/requirements.txt && \
-        cd /app && \
-        export PYTHONPATH=$$(pwd) && \
-        python -m backend.src.database.create_database"
 
 
 volumes:
