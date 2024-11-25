@@ -33,3 +33,12 @@ class Connection(Base):
         )
         logger.debug("Connection representation: %s", repr_str)
         return repr_str
+
+    def __eq__(self, other):
+        if not isinstance(other, Connection):
+            return False
+        return (
+            self.id == other.id
+            and self.parent_city_id == other.parent_city_id
+            and self.child_city_id == other.child_city_id
+        )

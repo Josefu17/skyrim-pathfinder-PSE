@@ -36,3 +36,13 @@ class City(Base):
         )
         logger.debug("City representation: %s", repr_str)
         return repr_str
+
+    def __eq__(self, other):
+        if not isinstance(other, City):
+            return False
+        return (
+            self.name == other.name
+            and self.position_x == other.position_x
+            and self.position_y == other.position_y
+            and self.id == other.id
+        )

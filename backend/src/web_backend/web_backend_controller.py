@@ -68,9 +68,14 @@ def calculate_route():
     return jsonify(route_result), 200
 
 
-if __name__ == "__main__":
+def main():
+    """Main function to initialize the backend"""
     logger.info("Starting web backend controller.")
     with get_db_session() as db_session:
         fetch_and_store_map_data_if_needed(session=db_session)
 
     app.run(debug=True, host="0.0.0.0", port=5000)
+
+
+if __name__ == "__main__":
+    main()
