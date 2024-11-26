@@ -75,3 +75,6 @@ def main():
         fetch_and_store_map_data_if_needed(session=db_session)
 
     app.run(debug=True, host="0.0.0.0", port=4243)
+
+if __name__ == "__main__":
+    main()
