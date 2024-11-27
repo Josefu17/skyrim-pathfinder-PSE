@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from backend.src.database.db_connection import get_db_session
+from backend.src.health.health_check import check_all_criteria
 from backend.src.logging_config import get_logging_configuration
 from backend.src.map_service.map_service import fetch_and_store_map_data_if_needed
 from backend.src.web_backend.web_backend_service import (
@@ -67,6 +68,17 @@ def calculate_route():
     logger.info("Route calculated successfully.")
     return jsonify(route_result), 200
 
+@app.route("/healthz", methods=["GET"])
+def health_check():
+    """checks the health status of the application"""
+    criteria_status = check_all_criteria()
+
+    if all(status is True for status in criteria_status.values() if isinstance(status, bool)):
+        logger.info("All criteria passed")
+        return jsonify({"status": "healthy", "details": criteria_status}), 200
+
+    logger.error("Some criteria failed")
+    return jsonify({"status": "unhealthy", "details": criteria_status}), 503
 
 def main():
     """Main function to initialize the backend"""

@@ -12,11 +12,7 @@ logger = get_logging_configuration()
 def fetch_route_from_navigation_service(start_city_name, end_city_name, session):
     """Fetch the shortest route from the navigation service by providing 2 cities"""
     try:
-        logger.info(
-            "Fetching route from %s and %s from navigation service.",
-            start_city_name,
-            end_city_name,
-        )
+
         with xmlrpc.client.ServerProxy("http://navigation-service:8000/") as proxy:
             cities, connections = (
                 CityDAO.get_all_cities(session),

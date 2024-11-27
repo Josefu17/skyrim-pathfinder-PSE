@@ -51,3 +51,6 @@ nav-test:
 # Database management
 connect-to-database:
 	docker exec -it group2-postgres-1 psql -U pg-2 -d navigation
+
+lint:
+	python -m pylint backend/src

@@ -24,11 +24,11 @@ refer to: [Stage 1](stage_1.md)
    - [ ] Ensure the Frontend starts and verify that the main components are present.
 
 4. **Ensure the application remains continuously running:**
-   - [ ] Provide a `/healthz` endpoint on the backend that returns the application's health status.
-   - [ ] Endpoint URL should be either:
+   - [x] Provide a `/healthz` endpoint on the backend that returns the application's health status.
+   - [x] Endpoint URL should be either:
      - `https://api.groupX.proxy.devops-pse.users.h-da.cloud/healthz`
      - `https://groupX.proxy.devops-pse.users.h-da.cloud/healthz`
-   - [ ] Response body should be JSON:
+   - [x] Response body should be JSON:
      ```json
      {
        "status": "healthy"
