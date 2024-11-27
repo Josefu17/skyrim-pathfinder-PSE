@@ -25,17 +25,17 @@
 ## CI/CD and Operation
 
 - [ ] Pipeline to build the application
-- [ ] Deployment of application to a server
-- [ ] Trigger automated releases via GitLab
+- [x] Deployment of application to a server + [**Documentation**](../ci.md#deployment-of-application-to-a-server)
+- [x] Trigger automated releases via GitLab + [**Documentation**](../ci.md#trigger-automated-releases-via-gitlab)
 - [ ] Automated tests
   - [x] unit tests for navigation service
   - [x] unit tests for backend
   - [ ] startup test for seperated frontend
-  - [x] Display code coverage in GitLab with an icon + [**Documentation**](../ci.md#Code-coverage-and-displaying-the-badge-in-gitLab)
+  - [x] Display code coverage in GitLab with an icon + [**Documentation**](../ci.md#code-coverage-and-displaying-the-badge-in-gitlab)
 - [x] Linting and formatting
 - [x] dependency proxy usage 
 - [ ] code analysis tools 
-- [ ] application runs on server
+- [x] application runs on server
 - [x] local development with a local database
 - [ ] The production database must never be deleted; only apply migrations **???**
 - [x] No real credentials (e.g. for log in to the container registry) should be on the server, only scoped API
