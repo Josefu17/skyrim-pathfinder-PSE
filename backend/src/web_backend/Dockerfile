@@ -11,10 +11,10 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 
 # Copy the application source code
-COPY /backend/src /app/backend/src
+COPY backend/src /app/backend/src
 
 # Copy environment variables file
-COPY /backend/env/.env /app/backend/env/.env
+COPY backend/env/.env /app/backend/env/.env
 
 # Expose ports for the service
 EXPOSE 4243 5678

@@ -1,7 +1,7 @@
 # Use a lightweight Python base image
 FROM python:3.13-slim
 
-# Set the working directory inside the container
+# Set the working directory inside the container as
 WORKDIR /app
 
 # Copy dependencies file and install them
@@ -10,13 +10,13 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /app/requirements.txt
 
 # Copy the application source code
-COPY /backend/src /app/backend/src
+COPY backend/src /app/backend/src
 
 # Copy Makefile
 COPY Makefile /app/Makefile
 
 # Copy environment variables file
-COPY /backend/env/.env /app/backend/env/.env
+COPY backend/env/.env /app/backend/env/.env
 
 # Install make
 RUN apt update && apt install -y make
