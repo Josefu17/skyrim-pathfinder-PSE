@@ -53,9 +53,9 @@ analyze-job:
 
 deploy-job:
     stage: deploy
-    image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:24.0.6
+    image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:24.0.9
     services:
-      - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:24.0.6-dind
+      - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:24.0.9-dind
         alias: docker
     variables:
       SECURE_FILES_DOWNLOAD_PATH: $SECURE_FILES_PATH
