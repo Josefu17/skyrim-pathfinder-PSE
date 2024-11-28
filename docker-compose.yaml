@@ -1,13 +1,11 @@
-version: '3.1'
-
 services:
   postgres:
     image: postgres:latest
     container_name: group2-postgres-1
     environment:
-      POSTGRES_USER: pg-2
-      POSTGRES_PASSWORD: pg-2
-      POSTGRES_DB: navigation
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_DB: $DB_DATABASE
     ports:
       - "5433:5432"
     volumes:
@@ -15,14 +13,14 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U pg-2 -d navigation"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_DATABASE}"]
       interval: 10s
       retries: 5
 
   navigation-service:
     build:
       context: .
-      dockerfile: /backend/src/navigation_service/Dockerfile
+      dockerfile: backend/src/navigation_service/Dockerfile
     image: registry.code.fbi.h-da.de/bpse-wise2425/group2/navigation-service:latest
     container_name: group2-navigation-service-1
     ports:
@@ -37,7 +35,9 @@ services:
   web-backend:
     build:
       context: .
-      dockerfile: /backend/src/web_backend/Dockerfile
+      dockerfile: backend/src/web_backend/Dockerfile
+    env_file:
+      - backend/env/.env
     image: registry.code.fbi.h-da.de/bpse-wise2425/group2/web-backend:latest
     container_name: group2-web-backend-1
     depends_on:
@@ -50,19 +50,8 @@ services:
       - "5679:5678"
     networks:
       - app-network
-
-  db-init:
-    build:
-      context: .
-      dockerfile: /backend/src/database/Dockerfile
-    image: registry.code.fbi.h-da.de/bpse-wise2425/group2/db-init:latest
-    container_name: db-init
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - app-network
-
+    environment:
+      RUNNING_IN_CONTAINER: "true"
 
 volumes:
   postgres_data:

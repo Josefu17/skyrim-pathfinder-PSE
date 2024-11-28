@@ -8,3 +8,4 @@ docs/API_access.txt
 .coverage
 venv
 backend/env
+/**/*.env

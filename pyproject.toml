@@ -1,2 +1,7 @@
 [tool.black]
 line-length = 88
+exclude = '''
+/(
+    migrations           # Exclude migrations folder
+)/
+'''

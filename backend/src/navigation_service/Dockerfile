@@ -15,14 +15,14 @@ COPY backend/src /app/backend/src
 # Copy Makefile
 COPY Makefile /app/Makefile
 
-# Copy environment variables file
-COPY backend/env/.env /app/backend/env/.env
-
 # Install make
 RUN apt update && apt install -y make
 
 # Expose ports for the service
 EXPOSE 8000 5678
 
-# Run the server and keep the container running
-CMD sh -c "export PYTHONPATH=$(pwd) && python -m backend.src.rpc_api.server && tail -f /dev/null"
+# Specify python path
+ENV PYTHONPATH=backend/
+
+# Run the server
+CMD ["python", "-m", "backend.src.rpc_api.server"]

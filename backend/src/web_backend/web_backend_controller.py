@@ -68,17 +68,23 @@ def calculate_route():
     logger.info("Route calculated successfully.")
     return jsonify(route_result), 200
 
+
 @app.route("/healthz", methods=["GET"])
 def health_check():
     """checks the health status of the application"""
     criteria_status = check_all_criteria()
 
-    if all(status is True for status in criteria_status.values() if isinstance(status, bool)):
+    if all(
+        status is True
+        for status in criteria_status.values()
+        if isinstance(status, bool)
+    ):
         logger.info("All criteria passed")
         return jsonify({"status": "healthy", "details": criteria_status}), 200
 
     logger.error("Some criteria failed")
     return jsonify({"status": "unhealthy", "details": criteria_status}), 503
+
 
 def main():
     """Main function to initialize the backend"""
@@ -87,6 +93,7 @@ def main():
         fetch_and_store_map_data_if_needed(session=db_session)
 
     app.run(debug=True, host="0.0.0.0", port=4243)
+
 
 if __name__ == "__main__":
     main()
