@@ -13,11 +13,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy the application source code
 COPY backend/src /app/backend/src
 
-# Copy environment variables file
-COPY backend/env/.env /app/backend/env/.env
-
 # Expose ports for the service
 EXPOSE 4243 5678
 
-# Run the backend controller and keep the container running
-CMD sh -c "export PYTHONPATH=$(pwd) && python -m backend.src.web_backend.web_backend_controller && tail -f /dev/null"
+# Specify python path
+ENV PYTHONPATH=backend/
+
+# Run the backend controller
+CMD ["python", "-m", "backend.src.web_backend.web_backend_controller"]

@@ -3,17 +3,27 @@
 import os
 from contextlib import contextmanager
 
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
 from backend.src.logging_config import get_logging_configuration
 
-# Load environment variables from the .env file
-dotenv_path = os.path.join(os.path.dirname(__file__), "../../env/.env")
-load_dotenv(dotenv_path)
-
 logger = get_logging_configuration()
+
+if (
+    os.getenv("RUNNING_IN_CONTAINER") is None
+):  # Only for local dev and without containers
+    from dotenv import load_dotenv
+
+    dotenv_path = os.path.join(os.path.dirname(__file__), "../../env/.env")
+    if os.path.exists(dotenv_path):
+        load_dotenv(dotenv_path)
+        logger.info("Loaded .env from %s", dotenv_path)
+    else:
+        logger.warning(
+            ".env file not found at %s; ensure environment variables are set manually",
+            dotenv_path,
+        )
 
 
 class DatabaseConnection:
@@ -29,7 +39,8 @@ class DatabaseConnection:
                 "port": os.getenv("DB_PORT"),
                 "database": os.getenv("DB_DATABASE"),
             }
-        # Use the provided values or fallback to environment variables
+        # Use the provided values if they are completely or partially provided
+        # or fallback to environment variables
         self.user = config.get("user") or os.getenv("DB_USER")
         self.password = config.get("password") or os.getenv("DB_PASSWORD")
         self.host = config.get("host") or os.getenv("DB_HOST")

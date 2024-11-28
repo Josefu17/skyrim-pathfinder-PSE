@@ -2,10 +2,9 @@
 checks all criteria for the health status of the application
 """
 
+import requests
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
-
-import requests
 
 from backend.src.database.db_connection import get_db_session
 from backend.src.logging_config import get_logging_configuration
@@ -22,7 +21,10 @@ def check_database_connection():
             result = session.execute(text("SELECT 1")).fetchone()
             if not result:
                 logger.error("Health check: Database connection failed")
-                return {"database_connection": False, "message": "Database connection failed"}
+                return {
+                    "database_connection": False,
+                    "message": "Database connection failed",
+                }
             logger.info("Database connection successful")
             return {"database_connection": True}
     except SQLAlchemyError as e:
@@ -42,16 +44,21 @@ def check_map_service_connection():
             logger.info("Connection to map service successful")
             return {"map_service_connection": True}
         logger.error("Request to map service failed")
-        return {"map_service_connection": False, "message": "Request to map service failed"}
+        return {
+            "map_service_connection": False,
+            "message": "Request to map service failed",
+        }
     except requests.exceptions.RequestException as e:
-        logger.error("Health check: Map service connection failed with error: %s", str(e))
+        logger.error(
+            "Health check: Map service connection failed with error: %s", str(e)
+        )
         return {"map_service_connection": False, "message": str(e)}
 
 
 def check_navigation_service_connection():
     """
-        verify that the connection to the navigation service is healthy
-        """
+    verify that the connection to the navigation service is healthy
+    """
     start_point = "Markarth"
     end_point = "Karthwasten"
 
@@ -64,10 +71,14 @@ def check_navigation_service_connection():
             logger.info("Connection to navigation service successful")
             return {"navigation_service_connection": True}
         logger.error("Request to navigation service failed")
-        return {"navigation_service_connection": False,
-                "message": "Request to navigation service failed"}
+        return {
+            "navigation_service_connection": False,
+            "message": "Request to navigation service failed",
+        }
     except requests.exceptions.RequestException as e:
-        logger.error("Health check: Navigation service connection failed with error: %s", str(e))
+        logger.error(
+            "Health check: Navigation service connection failed with error: %s", str(e)
+        )
         return {"navigation_service_connection": False, "message": str(e)}
 
 

@@ -16,10 +16,12 @@ MAP_URL = "https://maps.proxy.devops-pse.users.h-da.cloud/map?name=skyrim"
 def fetch_and_store_map_data_if_needed(session):
     """fetch data from service and save in database if needed"""
     try:
+        logger.info("Fetching map data.")
+
         response = requests.get(MAP_URL, timeout=10)
         response.raise_for_status()
 
-        logger.info("Map data fetched successfully")
+        logger.info("Map data fetched successfully.")
 
         data = response.json()
 

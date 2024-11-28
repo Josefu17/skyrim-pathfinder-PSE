@@ -12,7 +12,7 @@ remove:
 # Docker management
 build:
 	docker build -t registry.code.fbi.h-da.de/bpse-wise2425/group2/web-frontend:latest .
-	docker-compose build
+	docker compose --env-file backend/env/.env build
 
 build-ci:
 	docker build -t registry.code.fbi.h-da.de/bpse-wise2425/group2/web-frontend:latest .
@@ -24,16 +24,16 @@ push:
 	docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/web-frontend:latest
 	docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/navigation-service:latest
 	docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/web-backend:latest
-	docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/db-init:latest
 
 start: build
-	docker-compose up -d
+	docker compose --env-file backend/env/.env up -d
+
 
 login:
 	docker login registry.code.fbi.h-da.de
 
 stop:
-	docker-compose down
+	docker compose --env-file backend/env/.env down
 
 restart: stop start
 
@@ -53,6 +53,9 @@ nav-enter:
 
 nav-test:
 	python -m pytest ./backend/src/tests/
+
+backend-enter:
+	docker exec -it group2-web-backend-1 bash
 
 # Database management
 connect-to-database:
