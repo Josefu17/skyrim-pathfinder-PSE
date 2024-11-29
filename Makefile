@@ -18,7 +18,6 @@ build-ci:
 	docker build -t registry.code.fbi.h-da.de/bpse-wise2425/group2/web-frontend:latest .
 	docker build -t registry.code.fbi.h-da.de/bpse-wise2425/group2/navigation-service:latest -f ./backend/src/navigation_service/Dockerfile .
 	docker build -t registry.code.fbi.h-da.de/bpse-wise2425/group2/web-backend:latest -f ./backend/src/web_backend/Dockerfile .
-	docker build -t registry.code.fbi.h-da.de/bpse-wise2425/group2/db-init:latest -f ./backend/src/database/Dockerfile .
 
 push:
 	docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/web-frontend:latest
