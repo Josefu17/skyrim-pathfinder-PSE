@@ -15,9 +15,6 @@ COPY backend/src /app/backend/src
 # Copy Makefile
 COPY Makefile /app/Makefile
 
-# Copy environment variables file
-COPY backend/env/.env /app/backend/env/.env
-
 # Install make
 RUN apt update && apt install -y make
 
