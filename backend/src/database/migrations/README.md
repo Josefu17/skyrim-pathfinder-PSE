@@ -39,7 +39,7 @@ set DB_DATABASE=postgres
 Once your environment variables are set, follow these steps to detect changes in your models and create the necessary migration scripts.
 
 ### **Step 1: Autogenerate the Migration Script**
-Run the following command in the same terminal where your `alembic.ini` file is located (usually in the project's root directory):
+Run the following command in the same terminal where your `alembic.ini` file is located (in our case in /backend/):
 
 ```bash
 alembic revision --autogenerate -m "<your-migration-message-here>"

@@ -2,13 +2,27 @@ import os
 from logging.config import fileConfig
 
 from alembic import context
+from dotenv import load_dotenv
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from backend.src.database.schema.base import Base
 from backend.src.database.schema.models import register_models
+from backend.src.logging_config import get_logging_configuration
+
+logger = get_logging_configuration()
 
 register_models()
+
+dotenv_path = os.path.join(os.getcwd(), ".env")
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path)
+    logger.info("Loaded .env from %s", dotenv_path)
+else:
+    logger.warning(
+        ".env file not found at %s; ensure environment variables are set manually",
+        dotenv_path,
+    )
 
 DB_NAME = os.getenv("DB_DATABASE")
 DB_USER = os.getenv("DB_USER")

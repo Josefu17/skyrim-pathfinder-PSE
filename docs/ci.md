@@ -132,7 +132,7 @@ every Python file in the `src` folder. The analyze-job fails if the code does no
 
 ```
 before_script:
-  - pip install -r requirements.txt
+  - pip install -r backend/requirements.txt
 script:
   - python -m pylint src/*.py
   - python -m black src/*.py

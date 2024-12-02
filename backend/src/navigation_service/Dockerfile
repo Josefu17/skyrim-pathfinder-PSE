@@ -5,9 +5,9 @@ FROM python:3.13-slim
 WORKDIR /app
 
 # Copy dependencies file and install them
-COPY requirements.txt /app/requirements.txt
+COPY backend/requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /app/requirements.txt
+    pip install --no-cache-dir -r /app/backend/requirements.txt
 
 # Copy the application source code
 COPY backend/src /app/backend/src
@@ -22,7 +22,7 @@ RUN apt update && apt install -y make
 EXPOSE 8000 5678
 
 # Specify python path
-ENV PYTHONPATH=backend/
+ENV PYTHONPATH=/app
 
 # Run the server
 CMD ["python", "-m", "backend.src.rpc_api.server"]

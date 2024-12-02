@@ -5,21 +5,26 @@ FROM python:3.13-slim
 WORKDIR /app
 
 # Copy dependencies file and install them
-COPY requirements.txt /app/requirements.txt
+COPY backend/requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r /app/requirements.txt
+    pip install --no-cache-dir -r /app/backend/requirements.txt
 
 # Copy the application source code
 COPY backend/src /app/backend/src
 
+# Copy alembic.ini for database migration
+COPY backend/alembic.ini /app/backend/alembic.ini
+
 # Copy environment variables file
-COPY backend/env/.env /app/backend/env/.env
+COPY .env /app/.env
 
 # Expose ports for the service
 EXPOSE 4243 5678
 
 # Specify python path
-ENV PYTHONPATH=backend/
+ENV PYTHONPATH=/app
 
-# Run the backend controller
-CMD ["python", "-m", "backend.src.web_backend.web_backend_controller"]
+# Run migrate db first by running alembic upgrade and then start the web backend controller
+CMD ["sh", "-c", "\
+    alembic -c backend/alembic.ini upgrade head && \
+    python -m backend.src.web_backend.web_backend_controller"]
