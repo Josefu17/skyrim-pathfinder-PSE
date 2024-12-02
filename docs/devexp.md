@@ -39,8 +39,22 @@ Create a file .vscode/launch.json in the root directory.
 ```
 Remote Attach: so that VS Code can attach to a running Python application on a remote system
 
-#### Setup for pycharm
-// TODO
+#### Setup for PyCharm
+
+**Configure the Python Interpreter**
+1. Navigate to **File > Settings**.
+2. Select **Project: *project_name***.
+3. Click on **Python Interpreter** and then **Add Interpreter**.
+4. Choose **Docker-Compose** as the interpreter type.
+5. Set the **Service** to `web-backend` and confirm with **Apply**.
+
+**Create a Run/Debug Configuration**
+1. Navigate to **Run > Edit Configuration**.
+2. Click on the **plus icon** and select **Python** as the configuration type.
+3. Set the **Interpreter** to the previously configured remote debugger.
+4. Select `web_backend_controller.py` as the **Script**.
+5. Specify the path to the `.env` file to ensure environment variables are loaded correctly, and confirm with **Apply**.
+
 
 ## One-Click installation
 [back to top](#DevExp)
