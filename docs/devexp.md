@@ -145,15 +145,15 @@ Both tools are configured to run locally and in the CI pipeline with the same se
 
 2. **Run Linter and Formatter**:
    ```bash
-   python -m pylint --rcfile=.pylintrc src/*.py
+   python -m pylint --rcfile=backend/.pylintrc src/*.py
    python -m black --config pyproject.toml src/*.py
    ```
 
 3. **Run Inside Docker**:
    ```bash
    docker exec -it <container-name> sh -c "
-      python -m pylint --rcfile=.pylintrc src/*.py &&
-      python -m black --config pyproject.toml src/*.py
+      python -m pylint --rcfile=backend/.pylintrc src/*.py &&
+      python -m black --config backend/pyproject.toml src/*.py
    "
    ```
 
@@ -165,15 +165,15 @@ Both tools are configured to run locally and in the CI pipeline with the same se
    The `analyze-job` in the CI pipeline installs the tools:
    ```yaml
    before_script:
-     - pip install -r requirements.txt
+     - pip install -r backend/requirements.txt
    ```
 
 2. **Run Linter and Formatter**:
    The CI pipeline validates code with:
    ```yaml
    script:
-     - python -m pylint --rcfile=.pylintrc src/*.py
-     - python -m black --config pyproject.toml src/*.py
+     - python -m pylint --rcfile=backend/.pylintrc src/*.py
+     - python -m black --config backend/pyproject.toml src/*.py
    ```
 
 ---
