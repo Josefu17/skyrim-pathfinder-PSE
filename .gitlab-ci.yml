@@ -4,6 +4,7 @@ stages:
   - analyze
   - deploy
 
+
 ci-build-job:
   stage: build
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:latest
@@ -35,6 +36,7 @@ test-job:
     - ci-build-job
   coverage: '/TOTAL\s+\d+\s+\d+\s+(\d+)%/'
 
+
 dependency_scan-job:
   stage: test
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.13-slim
@@ -61,8 +63,6 @@ dependency_scan-job:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
   needs:
     - test-job
-
-
 
 
 analyze-job:
@@ -101,8 +101,6 @@ deploy-job:
       - docker info # Tests the docker connection
     script:
       - echo "Deploying to production server"
-      # copy secure .env for db-connection
-      - cp $SECURE_FILES_PATH/.env .
       # establish ssh connection
       - chmod +x ./scripts/establish_ssh_connection.sh
       - ./scripts/establish_ssh_connection.sh
@@ -110,6 +108,7 @@ deploy-job:
       - ssh -v -i ~/.ssh/ci_ssh debian@group2.osnet.h-da.cloud "make update && echo 'Successfully deployed' && exit"
     needs:
       - test-job
+      - dependency_scan-job
       - analyze-job
     only: # execute only when pushed on following branches
       - main
