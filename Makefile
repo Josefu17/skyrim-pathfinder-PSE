@@ -64,6 +64,16 @@ coverage:
 coverage-open-windows: coverage
 	 start backend\htmlcov\index.html
 
+run-tests:
+# instrument the code for coverage
+#	@python ./frontend/src/tests/instrument_code.py
+# Execute the PowerShell script to start the server, open the tests, and stop the server after the tests
+	@powershell -File ./scripts/run_tests.ps1
+
+run-test-server:
+	@python -m http.server 7777
+
+# Navigation service management
 lint:
 	python -m pylint --rcfile=backend/.pylintrc backend/src
 

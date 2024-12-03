@@ -12,10 +12,11 @@ body {
     color: wheat;
     background-color: darkgray;
     font: 1.3rem Arial;
-    text-shadow: -0.1rem -0.1rem 1rem black,
-    0.1rem -0.1rem 1.5rem black,
-    -0.1rem 0.1rem 1.5rem black,
-    0.1rem 0.1rem 1.5rem black;
+    text-shadow:
+        -0.1rem -0.1rem 1rem black,
+        0.1rem -0.1rem 1.5rem black,
+        -0.1rem 0.1rem 1.5rem black,
+        0.1rem 0.1rem 1.5rem black;
     text-align: center;
 
     /* Allows text selection */
@@ -38,11 +39,14 @@ ul {
 select {
     color: wheat;
     background-color: #234875;
-    font: 1.2rem Arial, serif;
-    text-shadow: -0.1rem -0.1rem 1rem black,
-    0.1rem -0.1rem 0.5rem black,
-    -0.1rem 0.1rem 0.5rem black,
-    0.1rem 0.1rem 0.5rem black;
+    font:
+        1.2rem Arial,
+        serif;
+    text-shadow:
+        -0.1rem -0.1rem 1rem black,
+        0.1rem -0.1rem 0.5rem black,
+        -0.1rem 0.1rem 0.5rem black,
+        0.1rem 0.1rem 0.5rem black;
     width: max-content;
     border-radius: 1rem;
     text-align: center;
@@ -51,7 +55,9 @@ select {
 /* Adjusts footer element*/
 footer {
     position: relative; /* Position relative to control margin on the page */
-    width: calc(99% - 10%); /*;  99% of window width minus 2x 5% margin. 100% could let appear a scrollbar*/
+    width: calc(
+        99% - 10%
+    ); /*;  99% of window width minus 2x 5% margin. 100% could let appear a scrollbar*/
     margin: 1.5%; /* 5% margin on both sides */
     padding: 0.5%;
 }
@@ -100,10 +106,11 @@ footer {
     color: wheat;
     background-color: #234875;
     font: 1.3rem Arial;
-    text-shadow: -0.1rem -0.1rem 1rem black,
-    0.1rem -0.1rem 0.5rem black,
-    -0.1rem 0.1rem 0.5rem black,
-    0.1rem 0.1rem 0.5rem black;
+    text-shadow:
+        -0.1rem -0.1rem 1rem black,
+        0.1rem -0.1rem 0.5rem black,
+        -0.1rem 0.1rem 0.5rem black,
+        0.1rem 0.1rem 0.5rem black;
     margin: 0.5rem;
     border-radius: 1rem;
 }
@@ -178,11 +185,12 @@ footer {
     flex-direction: row;
     column-gap: 0.5rem;
     row-gap: 0.5rem;
-    width: calc(99% - 10%); /* 99% of window width minus 2x 5% margin. 100% could let appear a scrollbar*/
+    width: calc(
+        99% - 10%
+    ); /* 99% of window width minus 2x 5% margin. 100% could let appear a scrollbar*/
     /* 5% margin on both sides */
     margin-right: 5%;
     margin-left: 5%;
-
 }
 
 /* All direct child elements of endpoint_list */
@@ -198,11 +206,12 @@ footer {
 #endpoint_list > *:nth-child(even) {
     flex: 0 2 calc(3%); /* each element has 3% of its parent's container for itself */
     text-align: center;
-    color: #B3CAF5;
+    color: #b3caf5;
 }
 
 /* Response settings*/
-#route_p, #distance_p {
+#route_p,
+#distance_p {
     display: inline-block; /* Makes the element behave like a block-level element with inline behavior. */
     text-align: left;
     white-space: pre-wrap; /* Preserves line breaks and allows wrapping */
@@ -215,7 +224,6 @@ footer {
 
 /* Media query for desktops */
 @media only screen and (min-width: 1024px) {
-
     /* CLASS */
     /* Adjusts the map image size */
     .map_image {

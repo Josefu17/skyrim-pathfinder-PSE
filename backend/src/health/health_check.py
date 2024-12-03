@@ -3,6 +3,7 @@ checks all criteria for the health status of the application
 """
 
 import requests
+from bs4 import BeautifulSoup
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -82,6 +83,60 @@ def check_navigation_service_connection():
         return {"navigation_service_connection": False, "message": str(e)}
 
 
+def check_frontend_availability():
+    """
+    verify that the connection to the frontend is healthy
+    """
+    url = "http://web-frontend:80/path_finder.html"
+    # url = "http://localhost:80/path_finder.html"
+
+    try:
+        # send a GET request to the main page
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()  # error if HTTP status is not 200
+
+        # Parse the HTML content
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        # Check if the main elements are present
+        required_elements = [
+            {"tag": "h1", "text": "Path finder"},
+            {"tag": "ul", "id": "endpoint_list"},
+            {"tag": "form", "id": "path_points_form"},
+            {"tag": "select", "id": "startpoint"},
+            {"tag": "select", "id": "endpoint"},
+        ]
+
+        all_present = True
+        for element in required_elements:
+            if element.get("text"):
+                # Search for tag with specific text content
+                found = soup.find(element["tag"], string=element["text"])
+            elif element.get("id"):
+                # Search for tag with a specific ID
+                found = soup.find(element["tag"], id=element["id"])
+            else:
+                found = None
+
+            if not found:
+                logger.error("Missing: %s", str(element))
+                all_present = False
+
+        if all_present:
+            logger.info("All elements are present!")
+            return {"frontend_availability": True}
+
+        logger.error("Some elements are missing!")
+        return {
+            "frontend_availability": False,
+            "message": "Elements are missing",
+        }
+
+    except requests.exceptions.RequestException as e:
+        logger.error("Server check failed: %s", str(e))
+        return {"frontend_availability": False, "message": str(e)}
+
+
 def check_all_criteria():
     """
     Dictionary that contains all status for the health check
@@ -90,4 +145,5 @@ def check_all_criteria():
     checks.update(check_database_connection())
     checks.update(check_map_service_connection())
     checks.update(check_navigation_service_connection())
+    checks.update(check_frontend_availability())
     return checks

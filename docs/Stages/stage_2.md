@@ -13,15 +13,15 @@ refer to: [Stage 1](stage_1.md)
 ## New Requirements
 1. **Regularly update dependencies using the Renovate tool.**
 2. **Implement a CI job for dependency vulnerability scanning:**
-   - [ ] Set up vulnerability scanning (e.g., GitLab dependency scanning).
-   - [ ] Schedule this check to run daily on the main branch and deployed version.
-   - [ ] Apply security patches promptly to keep the deployed application secure.
+   - [x] Set up vulnerability scanning (e.g., GitLab dependency scanning).
+   - [x] Schedule this check to run daily on the main branch and deployed version.
+   - [x] Apply security patches promptly to keep the deployed application secure.
 
 3. **Implement basic integration tests (optional, bonus points if implemented correctly):**
-   - [ ] Automate a test that starts all services and performs at least one route calculation.
+   - [ ] Automate a test that starts all services and performs at least one route calculation.(optional)
    - [x] Unit tests for the navigation service logic, with at least 90% code coverage.
    - [x] Unit tests for the Web Backend, ensuring the main flow is tested.
-   - [ ] Ensure the Frontend starts and verify that the main components are present.
+   - [x] Ensure the Frontend starts and verify that the main components are present.
 
 4. **Ensure the application remains continuously running:**
    - [x] Provide a `/healthz` endpoint on the backend that returns the application's health status.
