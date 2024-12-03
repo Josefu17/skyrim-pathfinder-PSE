@@ -12,6 +12,7 @@ from backend.src.health.health_check import (
     check_map_service_connection,
     check_navigation_service_connection,
     check_database_connection,
+    check_frontend_availability,
 )
 
 
@@ -123,3 +124,56 @@ def test_check_navigation_service_connection_non_200():
 
         assert result["navigation_service_connection"] is False
         assert result["message"] == "Request to navigation service failed"
+
+
+def test_check_frontend_availability_success():
+    """
+    Test that `check_frontend_availability` returns a successful response
+    when the frontend is reachable.
+    """
+    with patch("requests.get") as mock_get:
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.text = (
+            '<h1 class="flex_item">Path finder</h1>'
+            '<ul id="endpoint_list"></ul>'
+            '<form id="path_points_form"</form>'
+            '<select id="startpoint"></select>'
+            '<select id="endpoint"></select>'
+        )
+        mock_get.return_value = mock_response
+
+        result = check_frontend_availability()
+
+        assert result == {"frontend_availability": True}
+
+
+def test_check_frontend_availability_connection_failure():
+    """
+    Test that `check_frontend_availability` handles a failed connection to the frontend.
+    """
+    with patch(
+        "requests.get", side_effect=RequestException("Connection error")
+    ) as mock_get:  # pylint: disable=unused-variable # noqa
+        result = check_frontend_availability()
+
+        assert result["frontend_availability"] is False
+        assert "Connection error" in result["message"]
+
+
+def test_check_frontend_availability_missing_elements():
+    """
+    Test that `check_frontend_availability` handles missing elements on the frontend.
+    """
+    with patch("requests.get") as mock_get:
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.text = (
+            '<h1 class="flex_item">Path finder</h1>' + '<ul id="endpoint_list"></ul>'
+        )
+        mock_get.return_value = mock_response
+
+        result = check_frontend_availability()
+
+        assert result["frontend_availability"] is False
+        assert result["message"] == "Elements are missing"

@@ -19,12 +19,12 @@
 - [x] Start the application with "one-click" + [**Documentation**](../devexp.md#one-click-start-for-the-application-localdev)
 - [x] Tests that run locally and in CI + [**Documentation**](../devexp.md#tests-run-locally-and-in-ci)
 - [x] Linter/formatter local and in CI + [**Documentation**](../devexp.md#linter-and-formatter-setup)
-- [ ] Debugger + [**Documentation**](../devexp.md#debugger-debugpy) 
+- [x] Debugger + [**Documentation**](../devexp.md#debugger-debugpy) 
 - [ ] Project's setup process + Major design decision + [**Documentation**](../devexp.md#projects-setup-process-and-major-design-decisions)
 
 ## CI/CD and Operation
 
-- [ ] Pipeline to build the application
+- [x] Pipeline to build the application
 - [x] Deployment of application to a server + [**Documentation**](../ci.md#deployment-of-application-to-a-server)
 - [x] Trigger automated releases via GitLab + [**Documentation**](../ci.md#trigger-automated-releases-via-gitlab)
 - [ ] Automated tests
@@ -37,7 +37,7 @@
 - [ ] code analysis tools 
 - [x] application runs on server
 - [x] local development with a local database
-- [ ] The production database must never be deleted; only apply migrations **???**
+- [x] The production database must never be deleted; only apply migrations
 - [x] No real credentials (e.g. for log in to the container registry) should be on the server, only scoped API
 tokens
 

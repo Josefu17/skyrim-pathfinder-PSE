@@ -1,5 +1,4 @@
-body
-{
+body {
     background-image: url('../../assets/images/app_background.png');
     background-size: 100% 100%; /* Stretches the image both horizontally and vertically */
     background-position: top left; /* Aligns the image to the top-left corner */
@@ -8,11 +7,14 @@ body
 
     color: wheat;
     background-color: darkgray;
-    font: 1.3rem Arial, Verdana;
-    text-shadow: -0.1rem -0.1rem 2rem black,
-    0.1rem -0.1rem 2rem black,
-    -0.1rem 0.1rem 2rem black,
-    0.1rem 0.1rem 2rem black;
+    font:
+        1.3rem Arial,
+        Verdana;
+    text-shadow:
+        -0.1rem -0.1rem 2rem black,
+        0.1rem -0.1rem 2rem black,
+        -0.1rem 0.1rem 2rem black,
+        0.1rem 0.1rem 2rem black;
 
     /* Allows text selection */
     -webkit-user-select: text; /* Safari */
@@ -30,8 +32,7 @@ a {
     color: wheat;
 }
 
-.flex1_container
-{
+.flex1_container {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;

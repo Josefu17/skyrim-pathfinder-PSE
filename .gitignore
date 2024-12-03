@@ -7,5 +7,7 @@ docs/API_access.txt
 # created by coverage.py automatically to create coverage report
 .coverage
 venv
-backend/env
+env
+*.env
+frontend/.coverage
 /**/*.env

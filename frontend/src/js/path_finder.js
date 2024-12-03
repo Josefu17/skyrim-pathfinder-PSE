@@ -1,4 +1,4 @@
-document.getElementsByTagName("body")[0].onload = Init;
+document.getElementsByTagName('body')[0].onload = Init;
 
 /** Defines the log levels in the order of severity */
 const LEVELS = ['debug', 'info', 'warn', 'error', 'none'];
@@ -18,9 +18,8 @@ const LEVELS = ['debug', 'info', 'warn', 'error', 'none'];
 const LOG_LEVEL = 'none'; // Default value
 const TEST = LOG_LEVEL !== 'none'; // LOG_LEVEL == 'none' deactivates test()
 
-
 function Init() {
-    "use strict";
+    'use strict';
     c_log('info', '[Path_finder:global](Init)');
 
     try {
@@ -28,7 +27,7 @@ function Init() {
         document.getElementById('noscript').remove();
         document.getElementById('script').remove();
     } catch (e) {
-        c_log('error', "[Path_finder:global](Init): ", e);
+        c_log('error', '[Path_finder:global](Init): ', e);
     }
 
     // Object is necessary for the functionality of the page
@@ -51,7 +50,7 @@ function Init() {
  * @param {string} [extra3] - Another optional extra message, defaults to an empty string.
  */
 function c_log(level, message, extra1, extra2, extra3) {
-    "use strict";
+    'use strict';
     if (!extra1) {
         extra1 = '';
         extra2 = '';
@@ -86,12 +85,13 @@ function c_log(level, message, extra1, extra2, extra3) {
  * @returns {boolean} Returns `true` if the string is valid JSON, otherwise `false`.
  */
 function is_valid_json(string) {
-    "use strict";
+    'use strict';
     c_log('info', '[Path_finder:global](is_valid_json)');
 
     try {
         JSON.parse(string);
         return true; // if there is no exception, its valid JSON
+        // noinspection JSUnusedLocalSymbols
     } catch (e) {
         return false; // if there is an exception its invalid JSON
     }
@@ -108,7 +108,7 @@ function is_valid_json(string) {
  *                    and `false` if the string is compact (single-line).
  */
 function is_formatted_json(jsonString) {
-    "use strict";
+    'use strict';
     c_log('info', '[Path_finder:global](is_formatted_json)');
 
     return jsonString.includes('\n') && jsonString.includes('  ');
@@ -120,7 +120,7 @@ function is_formatted_json(jsonString) {
  * @returns {string} The formatted JSON string with indentation for readability.
  */
 function format_json(string) {
-    "use strict";
+    'use strict';
     c_log('info', '[Path_finder:global](format_json)');
 
     if (is_valid_json(string)) {
@@ -146,7 +146,6 @@ function format_json(string) {
  */
 // noinspection JSUnusedGlobalSymbols
 class Path_finder {
-
     // private class attributes
     /** Current disabled option of <select> endpoint
      *
@@ -166,7 +165,7 @@ class Path_finder {
      * contains further configurations for class path_finder.
      */
     constructor() {
-        "use strict";
+        'use strict';
         c_log('info', '[Path_finder](constructor)');
 
         try {
@@ -174,7 +173,8 @@ class Path_finder {
             this.load_cities();
 
             // check completion of form with every change
-            document.getElementById('path_points_form').oninput = this.check_form_completion.bind(this);
+            document.getElementById('path_points_form').oninput =
+                this.check_form_completion.bind(this);
             // initial check of form completion
             this.check_form_completion();
 
@@ -185,7 +185,8 @@ class Path_finder {
             document.getElementById('path_points_form').setAttribute('onsubmit', 'return false;');
 
             // process form data with a method instead of directly sending the form request
-            document.getElementById('path_points_submit_button').onclick = this.process_form_data.bind(this);
+            document.getElementById('path_points_submit_button').onclick =
+                this.process_form_data.bind(this);
         } catch (e) {
             c_log('error', '[Path_finder](constructor): ', e);
         }
@@ -198,7 +199,7 @@ class Path_finder {
      * @returns {City} `City` if city exists; otherwise `null`
      * */
     get_city_by_name(name) {
-        "use strict";
+        'use strict';
         c_log('info', '[Path_finder](get_city_by_name)');
 
         for (let city of this.#cities) {
@@ -217,7 +218,7 @@ class Path_finder {
      * @returns {City} `City` if city exists; otherwise `null`
      * */
     get_city_by_coordinates(position_x, position_y) {
-        "use strict";
+        'use strict';
         c_log('info', '[Path_finder](get_city_by_coordinates)');
 
         for (let city of this.#cities) {
@@ -233,20 +234,22 @@ class Path_finder {
      * @returns {string} -  A JSON string with only the names of the loaded cities
      */
     load_cities() {
-        "use strict";
+        'use strict';
         c_log('info', '[Path_finder](load_cities)');
 
         /* Fetches the cities from the backend API.
          * response structure: map{"cities": [{...}, ...], "connections": [{...}, ...], "mapname": "..." }
          */
         fetch('https://api.group2.proxy.devops-pse.users.h-da.cloud/cities')
-            .then(response => {
+            .then((response) => {
                 if (!response.ok) {
-                    throw new Error('[Path_finder](load_cities): Network problems: ' + response.statusText);
+                    throw new Error(
+                        '[Path_finder](load_cities): Network problems: ' + response.statusText
+                    );
                 }
                 return response.json();
             })
-            .then(map => {
+            .then((map) => {
                 if (map.cities !== undefined) {
                     c_log('debug', '[Path_finder](load_cities) response: ', format_json(map));
                     const endpoint_list = document.getElementById('endpoint_list');
@@ -275,13 +278,15 @@ class Path_finder {
                     }
                 } else throw '[Path_finder](load_cities): Cities undefined';
             })
-            .catch(error => c_log('error', '[Path_finder](load_cities): Error fetching cities: ', error));
+            .catch((error) =>
+                c_log('error', '[Path_finder](load_cities): Error fetching cities: ', error)
+            );
     }
 
     /** Disables the city selected as startpoint for the endpoint selection
      */
     disable_endpoint() {
-        "use strict";
+        'use strict';
         c_log('info', '[Path_finder](disable_endpoint)');
 
         let to_be_disabled = 0;
@@ -289,7 +294,12 @@ class Path_finder {
         let startpoint = document.getElementById('startpoint');
         for (let child of startpoint.children) {
             if (child.selected) {
-                c_log('debug', '[Path_finder](disable_endpoint): startpoint set to ', child.getAttribute('value'), child.innerText);
+                c_log(
+                    'debug',
+                    '[Path_finder](disable_endpoint): startpoint set to ',
+                    child.getAttribute('value'),
+                    child.innerText
+                );
                 to_be_disabled = parseInt(child.value);
                 break;
             }
@@ -297,12 +307,9 @@ class Path_finder {
         let endpoint = document.getElementById('endpoint');
 
         if (to_be_disabled === 0) {
-
             endpoint.children.item(this.#currently_disabled).disabled = false;
             endpoint.children.item(0).disabled = false;
-
         } else if (to_be_disabled !== this.#currently_disabled) {
-
             endpoint.children.item(this.#currently_disabled).disabled = false;
 
             if (endpoint.children.item(to_be_disabled).selected) {
@@ -323,14 +330,20 @@ class Path_finder {
      * otherwise, the button is disabled.
      */
     check_form_completion() {
-        "use strict";
+        'use strict';
         c_log('info', '[Path_finder](check_form_completion)');
 
         try {
-            let listItems = document.getElementById("path_points_form").childElementCount;
-            let startpoint_is_set = !(document.getElementById("startpoint").value === "0" || document.getElementById("startpoint").value === "");
-            let endpoint_is_set = !(document.getElementById("endpoint").value === "0" || document.getElementById("startpoint").value === "");
-            let button = document.getElementById("path_points_submit_button");
+            let listItems = document.getElementById('path_points_form').childElementCount;
+            let startpoint_is_set = !(
+                document.getElementById('startpoint').value === '0' ||
+                document.getElementById('startpoint').value === ''
+            );
+            let endpoint_is_set = !(
+                document.getElementById('endpoint').value === '0' ||
+                document.getElementById('startpoint').value === ''
+            );
+            let button = document.getElementById('path_points_submit_button');
             button.disabled = !(listItems > 1 && startpoint_is_set && endpoint_is_set);
         } catch (e) {
             c_log('error', '[Path_finder](check_form_completion): ', e);
@@ -347,7 +360,7 @@ class Path_finder {
      * @async Due to Server communication.
      */
     async process_form_data() {
-        "use strict";
+        'use strict';
         c_log('info', '[Path_finder](process_form_data)');
 
         let form_data = this.retrieve_form_data();
@@ -385,7 +398,7 @@ class Path_finder {
      * @returns {string} A JSON string representing the selected `startpoint` and `endpoint` values.
      */
     retrieve_form_data() {
-        "use strict";
+        'use strict';
         c_log('info', '[Path_finder](retrieve_form_data)');
 
         let form_data = {};
@@ -394,14 +407,26 @@ class Path_finder {
         let startpoint = document.getElementById('startpoint');
         for (let child of startpoint.children) {
             if (child.selected) {
-                c_log('debug', '[Path_finder](retrieve_form_data): ', child.getAttribute('value'), ' ', child.innerText);
+                c_log(
+                    'debug',
+                    '[Path_finder](retrieve_form_data): ',
+                    child.getAttribute('value'),
+                    ' ',
+                    child.innerText
+                );
                 form_data.startpoint = child.innerText;
             }
         }
         let endpoint = document.getElementById('endpoint');
         for (let child of endpoint.children) {
             if (child.selected) {
-                c_log('debug', '[Path_finder](retrieve_form_data): ', child.getAttribute('value'), ' ', child.innerText);
+                c_log(
+                    'debug',
+                    '[Path_finder](retrieve_form_data): ',
+                    child.getAttribute('value'),
+                    ' ',
+                    child.innerText
+                );
                 form_data.endpoint = child.innerText;
             }
         }
@@ -409,7 +434,10 @@ class Path_finder {
         if (form_data.startpoint === undefined || form_data.endpoint === undefined) {
             return '';
         } else if (form_data.startpoint === form_data.endpoint) {
-            c_log("error", "[Path_finder](retrieve_form_data): Startpoint and endpoint are the same.");
+            c_log(
+                'error',
+                '[Path_finder](retrieve_form_data): Startpoint and endpoint are the same.'
+            );
             return '';
         }
         return format_json(form_data);
@@ -437,12 +465,12 @@ class Path_finder {
      * @returns {string} A JSON string representing "route" and "distance" for given "startpoint" and "endpoint".
      */
     async get_route(request_body) {
-        "use strict";
+        'use strict';
         c_log('info', '[Path_finder](get_route)');
 
         // Format the incoming request body if needed (you didn't provide the `format_json` function)
 
-        let request_body_json = format_json(request_body)
+        let request_body_json = format_json(request_body);
         c_log('debug', '[Path_finder](get_route): request_body: ', request_body_json);
 
         let request_body_obj = JSON.parse(request_body_json);
@@ -453,14 +481,18 @@ class Path_finder {
         let route = '';
 
         // Fetch the route from the API using the startpoint and endpoint from the request body
-        await fetch(`https://api.group2.proxy.devops-pse.users.h-da.cloud/cities/route?startpoint=${startpoint}&endpoint=${endpoint}`)
-            .then(response => {
+        await fetch(
+            `https://api.group2.proxy.devops-pse.users.h-da.cloud/cities/route?startpoint=${startpoint}&endpoint=${endpoint}`
+        )
+            .then((response) => {
                 if (!response.ok) {
-                    throw new Error('[Path_finder](get_route): Network problems: ' + response.statusText);
+                    throw new Error(
+                        '[Path_finder](get_route): Network problems: ' + response.statusText
+                    );
                 }
                 return response.json();
             })
-            .then(data => {
+            .then((data) => {
                 if (data.route !== undefined) {
                     // Loop through the route array to build the route string
                     for (let i = 0; data.route[i.toString()]; i++) {
@@ -468,21 +500,24 @@ class Path_finder {
                         route += data.route[i.toString()] + ' => ';
                     }
                     // Remove the last ' => ' from the route string
-                    route = route.substring(0, (route.length - ' => '.length));
+                    route = route.substring(0, route.length - ' => '.length);
 
                     // Construct the response data
-                    response_data.route = 'Route from ' + startpoint + ' to ' + endpoint + ': ' + route + '.';
-                    response_data.distance = 'The distance is ' + (parseFloat(data.distance).toFixed(2)).toString() + ' [units of length].';
+                    response_data.route =
+                        'Route from ' + startpoint + ' to ' + endpoint + ': ' + route + '.';
+                    response_data.distance =
+                        'The distance is ' +
+                        parseFloat(data.distance).toFixed(2).toString() +
+                        ' [units of length].';
                 } else throw '[Path_finder](get_route): Route undefined';
             })
-            .catch(error => {
+            .catch((error) => {
                 c_log('error', '[Path_finder](get_route): Error fetching route: ', error);
                 response_data.error = 'Failed to fetch route data.';
             });
 
         return format_json(response_data);
     }
-
 
     /** Updates the HTML response section with the provided data.
      *
@@ -492,40 +527,40 @@ class Path_finder {
      * @param {string} data - The data to be displayed in the response section.
      */
     update_response_section(data) {
-        "use strict";
+        'use strict';
         c_log('info', '[Path_finder](update_response_section)');
 
         data = format_json(data);
         c_log('debug', '[Path_finder](update_response_section): ', data);
         let response_data = JSON.parse(data);
 
-        if (document.getElementById("response_article") == null) {
+        if (document.getElementById('response_article') == null) {
             // Create section for response_article
             let section = document.createElement('section');
-            section.id = "response_section";
-            section.className = "flex_item";
+            section.id = 'response_section';
+            section.className = 'flex_item';
 
             document.getElementsByTagName('main')[0].appendChild(section);
 
             // Create an article for response paragraphs
             let article = document.createElement('article');
-            article.id = "response_article";
-            article.className = "flex6_container";
+            article.id = 'response_article';
+            article.className = 'flex6_container';
 
             section.appendChild(article);
 
             // Create a paragraph for the route
             let route_p = document.createElement('p');
-            route_p.id = "route_p";
-            route_p.className = "flex_item";
+            route_p.id = 'route_p';
+            route_p.className = 'flex_item';
             route_p.innerText = response_data.route;
 
             article.appendChild(route_p);
 
             // Create a paragraph for the distance
             let distance_p = document.createElement('p');
-            distance_p.id = "distance_p";
-            distance_p.className = "flex_item";
+            distance_p.id = 'distance_p';
+            distance_p.className = 'flex_item';
             distance_p.innerText = response_data.distance;
 
             article.appendChild(distance_p);
@@ -543,7 +578,6 @@ class Path_finder {
  */
 // noinspection JSUnusedGlobalSymbols
 class City {
-
     // private class attributes
     /** Name of the city
      * @default ''
@@ -566,7 +600,7 @@ class City {
      *
      */
     constructor(name, position_x, position_y) {
-        "use strict";
+        'use strict';
         c_log('info', '[City](constructor)');
 
         this.#name = name;
@@ -578,7 +612,7 @@ class City {
      * @returns {string} name
      */
     get_name() {
-        "use strict";
+        'use strict';
         c_log('info', '[City](get_name)');
 
         return this.#name;
@@ -588,7 +622,7 @@ class City {
      * @returns {number} position_x
      */
     get_position_x() {
-        "use strict";
+        'use strict';
         c_log('info', '[City](get_position_x)');
 
         return this.#position_x;
@@ -598,7 +632,7 @@ class City {
      * @returns {number} position_y
      */
     get_position_y() {
-        "use strict";
+        'use strict';
         c_log('info', '[City](get_position_y)');
 
         return this.#position_y;
@@ -608,7 +642,7 @@ class City {
      * @returns {string} - JSON formatted
      */
     to_json_string() {
-        "use strict";
+        'use strict';
         c_log('info', '[City](to_json_string)');
 
         return JSON.stringify(this.to_json());
@@ -618,7 +652,7 @@ class City {
      * @returns {string} - JSON formatted
      */
     to_formatted_json_string() {
-        "use strict";
+        'use strict';
         c_log('info', '[City](to_formatted_json_string)');
 
         return format_json(this.to_json());
@@ -628,7 +662,7 @@ class City {
      * @returns {Object} - JSON object
      */
     to_json() {
-        "use strict";
+        'use strict';
         c_log('info', '[City](to_json)');
 
         let self = {};
