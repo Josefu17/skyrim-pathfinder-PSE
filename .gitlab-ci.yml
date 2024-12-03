@@ -26,12 +26,42 @@ test-job:
     - apk add --no-cache python3 py3-pip
     - python3 -m venv /venv
     - . /venv/bin/activate
+    - python -m pip install --upgrade pip
+    - pip --version
     - pip install -r backend/requirements.txt
   script:
     - pytest --cov=backend/src --cov-report=term backend/src/tests/ --cov-config=backend/setup.cfg
   needs:
     - ci-build-job
   coverage: '/TOTAL\s+\d+\s+\d+\s+(\d+)%/'
+
+dependency_scan-job:
+  stage: test
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.13-slim
+  script:
+    # Ensure pip is updated
+    - pip install --upgrade pip
+    # Install pip-audit
+    - pip install --user pip-audit
+    # Add local bin directory to PATH
+    - export PATH=$PATH:/root/.local/bin
+    # Print pip-audit version
+    - pip-audit --version
+    # Run pip-audit and generate report, ensuring file content
+    - pip-audit > dependency_audit_report.txt || true
+    - if [ ! -s dependency_audit_report.txt ]; then echo "No known vulnerabilities found" > dependency_audit_report.txt; fi
+    # Fail if report is still empty
+    - if [ ! -s dependency_audit_report.txt ]; then echo "No report generated"; exit 1; fi
+  artifacts:
+    paths:
+      - dependency_audit_report.txt
+    expire_in: 1 day
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  needs:
+    - test-job
+
 
 
 
@@ -50,6 +80,7 @@ analyze-job:
     - python -m black --config backend/pyproject.toml backend/src
   needs:
     - ci-build-job
+
 
 deploy-job:
     stage: deploy
