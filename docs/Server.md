@@ -2,6 +2,11 @@
 
 Each server is accessed in its own way. This documents the method for accessing each respective server.
 
+## Table of Contents
+1. [Map-Server](#map-server)
+2. [Deployment-Server](#deployment-server)
+3. [Postgres-Server](#postgres-server)
+
 ## Map-Server
 
 Requesting the server:
@@ -28,9 +33,10 @@ ssh debian@group2.devops-pse.users.h-da.cloud
 - Add a user to the server by appending the public SSH key to the ``.ssh/authorized_keys`` file
 
 Deployment-Server links (with TLS):
-- [API](https://api.group2.proxy.devops-pse.users.h-da.cloud/): &emsp; &emsp; &emsp; ```https://api.group2.proxy.devops-pse.users.h-da.cloud/```
+- [API](https://api.group2.proxy.devops-pse.users.h-da.cloud/healthz): &emsp; &emsp; &emsp; ```https://api.group2.proxy.devops-pse.users.h-da.cloud/```
 - [Frontend](https://group2.proxy.devops-pse.users.h-da.cloud/): &emsp; ```https://group2.proxy.devops-pse.users.h-da.cloud/```
 
+[back to top](#server)
 ## Postgres-Server
 
 [Postgres-UI](https://postgres.group2.proxy.devops-pse.users.h-da.cloud/): ```https://postgres.group2.proxy.devops-pse.users.h-da.cloud/```
@@ -57,3 +63,5 @@ Postgres-Backend: ```sre-backend.devops-pse.users.h-da.cloud``` (Only available 
   export POSTGRES_PASSWORD=<PASSWORD>
   export POSTGRES_DB=navigation
   ```
+
+[back to top](#server)

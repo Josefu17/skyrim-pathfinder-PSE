@@ -1,6 +1,13 @@
 # DevExp
-Refer to the [DevExp Todo](Stages/stage_1.md#devexp) for an overview of related tasks and their current progress status. 
-The following is a detailed explanation for them.
+
+## Table of Contents
+1. [Debugger (debugpy)](#debugger-debugpy)
+2. [One-Click installation](#one-click-installation)
+3. [One-Click Start for the Application (localdev)](#one-click-start-for-the-application-localdev)
+4. [Tests run locally and in CI](#tests-run-locally-and-in-ci)
+5. [Linter and Formatter Setup](#linter-and-formatter-setup)
+6. [Project's setup process and major design decisions](#projects-setup-process-and-major-design-decisions)
+
 ## Debugger (debugpy)
 - Add debugpy to requirements.txt
 - Each Python service has the following entry under `ports`:
@@ -14,7 +21,7 @@ This maps the container's debugpy port (`5678`) to the host machine, enabling re
 #### Setup for Vs Code
 Create a file .vscode/launch.json in the root directory.
 
-```
+```json
 {
   "version": "0.2.0",
   "configurations": [
@@ -55,9 +62,9 @@ Remote Attach: so that VS Code can attach to a running Python application on a r
 4. Select `web_backend_controller.py` as the **Script**.
 5. Specify the path to the `.env` file to ensure environment variables are loaded correctly, and confirm with **Apply**.
 
+[back to top](#devexp)
 
 ## One-Click installation
-[back to top](#DevExp)
 ### Installation and Removal of Dependencies
 Two targets have been added to the ``Makefile``: ``install`` and ``remove``. Depending on the command, they install
 or remove the dependencies.
@@ -73,8 +80,9 @@ make remove
 ```
 These commands provide a "one-click" solution for managing dependencies, ensuring a clean environment.
 
+[back to top](#devexp)
+
 ## One-Click Start for the Application (localdev)
-[back to top](#DevExp)
 
 ### Overview
 The application can be started locally with a single command using the `Makefile`. This command initializes all services (Postgres, Navigation Service, Web Backend) defined in the `docker-compose.yml` file.
@@ -112,9 +120,9 @@ make stop
 ```
 
 
+[back to top](#devexp)
 
 ## Tests run locally and in CI
-[back to top](#DevExp)
 
 With ``pytest``, we have created tests for our features that can be run locally. In the CI, they run in the 'test-job'. Python files starting with 'test' are executed with ``python -m pytest``.
 
@@ -124,7 +132,6 @@ script:
 ```
 
 ## Linter and Formatter Setup
-[back to top](#DevExp)
 
 ### Overview
 We use:
@@ -183,8 +190,8 @@ Both tools are configured to run locally and in the CI pipeline with the same se
   - A note on this: Our configuration files are either pretty much the same as the default or contain minimal differences / configurations,
   we still decided to generate and specify the configuration files explicitly to enforce consistency between local 
   development and CI Pipeline.
-- **Pre-commit Hooks** (Optional): Use `pre-commit` to automate checks locally before committing code.
+
+[back to top](#devexp)
 
 ## Project's setup process and major design decisions
-[back to top](#DevExp)
 // TODO

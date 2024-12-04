@@ -1,24 +1,254 @@
-[![coverage report](https://code.fbi.h-da.de/bpse-wise2425/group2/badges/main/coverage.svg)](https://code.fbi.h-da.de/bpse-wise2425/group2/-/commits/main)
+# Group 2 Navigation System
+
+[![Coverage Report](https://code.fbi.h-da.de/bpse-wise2425/group2/badges/main/coverage.svg)](https://code.fbi.h-da.de/bpse-wise2425/group2/-/commits/main)
+
+## Table of Contents
+1. [Overview](#overview)  
+2. [Core Components](#core-components)  
+3. [Getting Started](#getting-started)  
+4. [Environment Configuration](#environment-configuration)  
+5. [Backend API Overview](#backend-api-overview)  
+6. [Database Overview](#database-overview)  
+7. [Running the Application](#running-the-application)  
+8. [Testing, Linting, and Formatting](#testing-linting-and-formatting)  
+9. [Debugging](#debugging)  
+10. [Postman Collection](#postman-collection)  
+11. [Definition of Done (DoD)](#definition-of-done-dod)  
+12. [Requirements Checklist](#requirements-checklist)
+
+---
+
+## Overview
+
+The navigation system calculates and displays optimal routes between cities. It includes:
+- **Navigation Service**: Stateless service using Dijkstra's algorithm for route calculations, exposed via an XML-RPC API.
+- **Web Backend**: REST API layer interfacing with the navigation service, database, and frontend.
+- **Frontend**: UI for map visualization and user interaction.
+- **PostgreSQL Database**: Stores city and connection data.
+
+---
+
+## Core Components
+
+### Navigation Service
+- Implements route calculation logic.
+- Exposed as an XML-RPC API at `http://navigation-service:8000/`.
+- Communicates with the web backend to calculate routes using city and connection data.
+
+### Web Backend
+- Provides REST endpoints for the frontend.
+- Acts as a bridge between the frontend and the navigation service.
+- Handles database interactions for fetching/storing map data.
+
+### PostgreSQL Database
+- Stores information about cities and their connections.
+- Accessed via SQLAlchemy ORM and a DAO pattern.
+
+---
+
+## Getting Started
+
+**Note**: Commands in this documentation use `make` for brevity. Each `make` command corresponds to a specific sequence of actions, detailed in the Makefile.
+For more details about the commands, please refer to the said Makefile
+
+### Prerequisites
+- **Python** (>= 3.8)
+- **pip**
+- **Docker & Docker Compose**
+- **make** (optional but recommended for ease of use)
+
+### Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://code.fbi.h-da.de/bpse-wise2425/group2.git
+   cd group2
+   ```
+
+2. Create a virtual environment (optional but recommended):
+   ```bash
+   python3 -m venv .venv  # Or use `make create-venv`
+   source .venv/bin/activate  # Windows: .venv\Scripts\activate
+   ```
+    In case of problems, refer to the official Python [documentation](https://docs.python.org/3/library/venv.html) on virtual environments.
+
+3. Install dependencies:
+   ```bash
+   pip install -r backend/requirements.txt  # Or use `make install`
+   ```
+
+[back to top](#table-of-contents)
+
+---
+
+## Environment Configuration
+
+A `.env` file in the root directory is required for local development. Example:
+
+```dotenv
+DB_USER=<your_db_user>
+DB_PASSWORD=<your_db_password>
+DB_HOST=postgres
+DB_PORT=5432
+DB_DATABASE=<your-db-name>
+```
+
+Replace sensitive placeholders with appropriate values. This configuration is used by Docker and the backend.
+
+---
+
+## Backend API Overview
+
+For a more detailed explanation of the API, see the [API Documentation](docs/API.md).
+
+Following is a more concise overview of the API.
+
+### Endpoints
+
+- **`GET /maps`**: Fetch all map data (cities and connections).
+- **`GET /cities`**: Fetch city data.
+- **`GET /cities/route?startpoint=<city>&endpoint=<city>`**: Calculate the shortest route between two cities.
+- **`GET /healthz`**: Check the application's health status.
 
 
-# Documentation Project System Development
-**Developers: Yusuf Birdane | Tarik-Cemal Atis | Arian Farzad**
+### Example Workflow
+1. Frontend requests a route using `/cities/route`.
+2. Web backend fetches data from the database and calls the navigation service.
+3. Navigation service calculates the route and returns it to the backend.
+4. Backend returns the response to the frontend.
 
-In this section, you can find general information about the project.
-- [Code styling](/docs/code_styling.md)
-- [Server](/docs/server.md)
-- [Database](/docs/database.md)
-- [Docker](/docs/docker.md)
-- [Make](/docs/make.md)
-  
-## Stage #1 - Documentation
-In stage 1, we established a structure for the project. The frontend runs in a docker container on a server. The web 
-backend fetches the map data from the map server and stores it in the database. The navigation service retrieves the 
-data from the database, calculates the shortest route, and makes it available through an RPC API. 
-The web backend api provides this route to the frontend, allowing the user to view the calculated route.
+[back to top](#table-of-contents)
 
-- [Project Management](/docs/management.md)
-- [DevExp](/docs/devexp.md)
-- [CI/CD Operation](/docs/ci.md)
-- [Application](/docs/app.md)
-- [Stage Overview](/docs/Stages/stage_1.md)
+---
+
+## Database Overview
+
+### Entities
+
+#### `City`
+- Represents a city with `id`, `name`, `position_x`, and `position_y`.
+
+#### `Connection`
+- Represents a connection between two cities with `parent_city_id` and `child_city_id`.
+
+### Migrations
+
+Database migrations are managed with **Alembic**. Follow these steps:
+
+1. **Modify Database Models**: Make any necessary changes in the database models under `backend/src/database/schema/`.
+2. **Generate a New Migration**:
+   ```bash
+   alembic revision --autogenerate -m "Description of migration"
+   ```
+3. **Apply Migrations**:
+   - Migrations are automatically applied when the backend container starts.
+   - To apply them manually, run:
+     ```bash
+     alembic upgrade head
+     ```
+
+---
+
+## Running the Application
+
+### Using Docker
+
+1. Build and start all services:
+   ```bash
+   docker compose up -d  # Or use `make start`
+   ```
+
+2. Stop services:
+   ```bash
+   docker compose down  # Or use `make stop`
+   ```
+
+3. Restart services:
+   ```bash
+   docker compose down && docker compose up -d  # Or use `make restart`
+   ```
+
+### Local Development
+1. Start the database:
+   ```bash
+   docker compose up -d postgres
+   ```
+
+2. Run the servers locally:
+   ```bash
+   python backend/src/rpc_api/server.py
+   python backend/src/web_backend/web_backend_controller.py
+   ```
+
+3. Access the application:
+   - Web Backend: [http://localhost:4243](http://localhost:4243)
+
+[back to top](#table-of-contents)
+
+---
+
+## Testing, Linting, and Formatting
+
+### Testing and Coverage
+
+Run tests locally:
+```bash
+python -m pytest backend/src/tests/  # Or use `make test`
+```
+
+Generate and view a coverage report:
+```bash
+pytest --cov=backend/src --cov-report=html:backend/htmlcov backend/src/tests/  # Or use `make coverage`
+
+xdg-open backend/htmlcov/index.html  # Open coverage report (Linux)
+start backend\htmlcov\index.html  # Open coverage report (Windows)
+```
+
+### Linting and Formatting
+- **Linter**: `pylint`
+- **Formatter**: `black`
+
+Run linting:
+```bash
+pylint backend/src/**/*.py  # Or use `make lint`
+```
+
+Run formatting:
+```bash
+black backend/src/**/*.py  # Or use `make format`
+```
+
+[back to top](#table-of-contents)
+
+---
+
+## Debugging
+
+We use `debugpy` for debugging. For configuration instructions, please refer to the [DevExp documentation](docs/DevExp.md).
+
+---
+
+## Postman Collection
+
+A Postman collection is available under the `docs/Postman` directory to test the API endpoints quickly and easily. The collection includes:
+- **Maps Endpoint**: Fetch map data.
+- **Cities Endpoint**: Fetch city data.
+- **Route Calculation**: Example for calculating a route between `Whiterun` and `Riften`.
+- **Health Check**: Verify the application's health.
+
+To use the collection, import the file into Postman. Ensure the `base_url` variable matches your local or deployed backend.
+
+## Definition of Done (DoD)
+
+A task or feature is complete when it fulfills requirements for code quality, testing, functionality, and collaboration.  
+For detailed criteria, kindly refer to the [DoD Documentation](docs/DoD.md).
+
+---
+
+## Requirements Checklist
+
+Dear lecturers, as much as we tried to keep our README realistic, we wanted to make life a bit easier for you during 
+the evaluation. We provide detailed checklists for individual stages, referencing specific documentation where 
+requirements are addressed. [Requirements Checklists(Stage 1)](docs/Stages/stage_1.md)
+
+[back to top](#table-of-contents)

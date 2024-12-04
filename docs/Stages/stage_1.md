@@ -1,55 +1,76 @@
 # Stage 1 Overview (Deadline 20.11.2024)
 
 ## Table of Contents
-- [Requirements of Stage 1](#requirements-of-stage-1)
-- [Retrospective Summary](#stage-1-retrospective-summary)
+1. [Requirements of Stage 1](#stage-1-requirements)
+2. [Retrospective Summary](#stage-1-retrospective-summary)
+3. [Other Stages](#other-stages)
 
-# Requirements of Stage 1
+# **Stage 1 Requirements**
 
-## Project Management
+## **Project Management**
+- **[Merge Request Definition](../DoD.md#definition-of-done-dod)**  
+  ✅ Completed  
+- **[Set Issue Workflow](../team-practices.md#issue-workflow-stages)**  
+  ✅ Completed  
+- **Primary Communication Platform:**  
+  ✅ **Discord**  
+- **[Collaboration Best Practices](../team-practices.md#collaboration-best-practices)**  
+  ✅ Completed  
 
-- [x] Merge request Definition [**Documentation**](../management.md#Merge-Request-Definition-of-Done)
-- [x] Set issue workflow [**Documentation**](../management.md#Issue-Workflow-Stages-in-GitLab)
-- [x] Primary communication plattform: **Discord**
-- [x] Collaboration best practises + [**Documentation**](../management.md#collaboration-best-practices)
+## **DevExp**
+- **[Installation of Dependencies](../DevExp.md#one-click-installation)**  
+  ✅ Completed  
+- **[One-Click Start for Application](../DevExp.md#one-click-start-for-the-application-localdev):**  
+  ✅ Completed  
+- **[Tests Run Locally and in CI](../DevExp.md#tests-run-locally-and-in-ci):**  
+  ✅ Completed  
+- **[Linter and Formatter Setup](../DevExp.md#linter-and-formatter-setup):**  
+  ✅ Completed  
+- **[Debugger Setup](../DevExp.md#debugger-debugpy):**  
+  ✅ Completed  
+- **[Project's Setup Process + Major Design Decisions](../DevExp.md#projects-setup-process-and-major-design-decisions):**  
+  ❌ In Progress  
 
-## DevExp
+---
 
-- [x] Installation of dependencies with a "one-click" + [**Documentation**](../devexp.md#one-click-installation)
-- [x] Start the application with "one-click" + [**Documentation**](../devexp.md#one-click-start-for-the-application-localdev)
-- [x] Tests that run locally and in CI + [**Documentation**](../devexp.md#tests-run-locally-and-in-ci)
-- [x] Linter/formatter local and in CI + [**Documentation**](../devexp.md#linter-and-formatter-setup)
-- [x] Debugger + [**Documentation**](../devexp.md#debugger-debugpy) 
-- [ ] Project's setup process + Major design decision + [**Documentation**](../devexp.md#projects-setup-process-and-major-design-decisions)
+## **CI/CD and Operation**
+- **[Pipeline to Build Application](../../.gitlab-ci.yml)**  
+  ✅ Completed  
+- **[Deployment of Application to Server](../ci.md#deployment-of-application-to-a-server):**  
+  ✅ Completed  
+- **[Trigger Automated Releases via GitLab](../ci.md#trigger-automated-releases-via-gitlab):**  
+  ✅ Completed  
+- **[Automated Tests](../ci.md#automated-tests):**  
+  - **[Unit Tests for Navigation Service](../../backend/src/tests/unit):** ✅ Completed  
+  - **[Unit Tests for Backend](../../backend/src/tests/unit):** ✅ Completed  
+  - **[Startup Test for Separated Frontend]():** ❌ Pending  
+  - **[Display Code Coverage in GitLab](../ci.md#code-coverage-and-displaying-the-badge-in-gitlab):** ✅ Completed  
+- **[Linting and Formatting](../ci.md#linting-and-formatting):**  
+  ✅ Completed  
+- **[Dependency Proxy Usage](../ci.md#dependency-proxy-usage):**  
+  ✅ Completed  
+- **[Code Analysis Tools](../ci.md#code-analysis-tools):**  
+  ❌ Pending  
+- **[Application Runs on Server](../ci.md#making-sure-application-runs-on-server):**  
+  ✅ Completed  
+- **[Local Development with Local Database](../../README.md#running-the-application)**: Our docker compose setup explained [here](../../README.md#running-the-application) allows this.  
+  ✅ Completed  
+- **[Database Migration Practices](../../README.md#migrations):**  
+  - **Production Database Never Deleted, Only Migrations Applied:** ✅ Completed  
+- **[Scoped API Tokens Instead of Real Credentials](../ci.md#scoped-api-tokens):**  
+  ✅ Completed  
 
-## CI/CD and Operation
+---
 
-- [x] Pipeline to build the application
-- [x] Deployment of application to a server + [**Documentation**](../ci.md#deployment-of-application-to-a-server)
-- [x] Trigger automated releases via GitLab + [**Documentation**](../ci.md#trigger-automated-releases-via-gitlab)
-- [ ] Automated tests
-  - [x] unit tests for navigation service
-  - [x] unit tests for backend
-  - [ ] startup test for seperated frontend
-  - [x] Display code coverage in GitLab with an icon + [**Documentation**](../ci.md#code-coverage-and-displaying-the-badge-in-gitlab)
-- [x] Linting and formatting
-- [x] dependency proxy usage 
-- [ ] code analysis tools 
-- [x] application runs on server
-- [x] local development with a local database
-- [x] The production database must never be deleted; only apply migrations
-- [x] No real credentials (e.g. for log in to the container registry) should be on the server, only scoped API
-tokens
-
-## Application
-- [x] [Stateless navigation service](../app.md#stateless-navigation-service)
-  - [x] Expose the route calculation functionality via an [RPC-API](../app.md#rpc-api) to the Web Backend
-- [x] Backend
-  - [x] Fetch map and store it in database
-  - [x] API endpoints for the frontend
-- [x] Frontend
-  - [x] Fetch and display map
-  - [x] User interaction
+## **Application**
+- **[Stateless Navigation Service](../App.md#stateless-navigation-service):**  
+  - **[Expose Route Calculation via RPC-API to Web Backend](../App.md#rpc-api):** ✅ Completed  
+- **[Backend](../App.md#backend):**  
+  - **[Fetch Map and Store in Database](../App.md#fetch-and-store-map):** ✅ Completed  
+  - **[API Endpoints for Frontend](../API.md):** ✅ Completed  
+- **[Frontend](../App.md#frontend):**  
+  - **[Fetch and Display Map](../App.md#fetch-and-display-maps):** ✅ Completed  
+  - **[Enable User Interaction](../App.md#user-interaction):** ✅ Completed  
 
 
 # Stage 1 Retrospective Summary
@@ -66,7 +87,7 @@ To improve our processes and address current challenges, the following action po
 5. **Complete Stage 1**: Finish the pending tasks for Stage 1 as soon as possible.
 
 To refer to our complete list of collaboration best practices, please refer to: 
-[Collaboration Best Practices](../management.md#collaboration-best-practices)
+[Collaboration Best Practices](../team-practices.md#collaboration-best-practices)
 
 ### Summary of Team Sentiments
 - **Challenges Faced**: Recurring issues with the database setup and Python import errors led to frustration and wasted time.
@@ -78,4 +99,5 @@ Quick review times and strong support from teammates were especially appreciated
 The focus should be on tackling the action points above, particularly around prioritizing issues and increasing code 
 coverage. Let’s aim to complete Stage 1 thoroughly and efficiently, while keeping our great team dynamic intact!
 
-
+# Other Stages
+- [Stage 2](stage_2.md)

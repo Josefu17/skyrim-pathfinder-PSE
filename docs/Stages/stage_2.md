@@ -1,8 +1,9 @@
 # Stage 2 Overview (Deadline 04.12.2024)
 
 ## Table of Contents
-- [Requirements of Stage 2](#requirements-of-stage-2)
-- [Retrospective Summary](#stage-2-retrospective-summary)
+1. [Requirements of Stage 2](#requirements-of-stage-2)
+2. [Retrospective Summary](#stage-2-retrospective-summary)
+3. [Other Stages](#other-stages)
 
 # Requirements of Stage 2
 
@@ -41,3 +42,7 @@ refer to: [Stage 1](stage_1.md)
 # Stage 2 Retrospective Summary
 // TBD
 
+# Other Stages
+- [Stage 1](stage_1.md)
+
+[back to top](stage_2.md#table-of-contents)
