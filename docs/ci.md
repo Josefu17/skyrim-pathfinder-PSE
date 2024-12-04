@@ -4,6 +4,16 @@ Refer to the [CI/CD Operation Todo](Stages/stage_1.md#cicd-and-operation) for an
 current progress status.
 The following is a detailed explanation for them.
 
+## Table of Contents
+1. [Pipeline to build the application](#pipeline-to-build-the-application)
+2. [Deployment of application to a server](#deployment-of-application-to-a-server)
+3. [Trigger automated releases via GitLab](#trigger-automated-releases-via-gitlab)
+4. [Linting and formatting](#linting-and-formatting)
+5. [dependency proxy usage](#dependency-proxy-usage)
+6. [code analysis tools](#code-analysis-tools)
+7. [making sure application runs on server](#making-sure-application-runs-on-server)
+8. [Scoped API tokens](#scoped-api-tokens)
+
 ## Pipeline to build the application
 
 ## Deployment of application to a server
@@ -11,7 +21,8 @@ The following is a detailed explanation for them.
 The application runs successfully on the production server, with all changes deployed seamlessly from the local
 environment. Executing make update in the git root directory builds and pushes the Docker image to the container
 registry. On the deployment server, running make update updates and restarts the container, completing the deployment
-process. For detailed steps, see [Update Docker Container (from local to server)](docker.md#update-docker-container-from-local-to-server).
+process. For detailed steps,
+see [Update Docker Container (from local to server)](Docker.md#update-docker-container-from-local-to-server).
 
 ## Trigger automated releases via GitLab
 
@@ -28,17 +39,35 @@ server using SSH. The script connects securely to the server via the `ci_ssh` ke
 ensuring the application is deployed and confirmed with a success message. This setup combines Docker and SSH to enable
 efficient, automated, and reliable deployments.
 
-## Automated tests
+### Automated Tests
 
-### unit tests for navigation service
+The CI pipeline includes automated tests to ensure the application functions correctly before deployment. The tests cover:
+- **Unit Tests**: Validate individual components like the navigation service and backend.
+- **Code Coverage**: Verified as part of the pipeline, and a badge is displayed in the repository.
 
-### unit tests for backend
+Here’s a sample configuration for running tests in the pipeline:
+
+```yaml
+test-job:
+  stage: test
+  script:
+    - pytest --cov=backend/src --cov-report=term backend/src/tests/ --cov-config=backend/setup.cfg
+  coverage: '/TOTAL\s+\d+\s+\d+\s+(\d+)%/'
+
+```
+
+For detailed test implementations, refer to the corresponding service test files:
+- **Navigation Service**: [Navigation Service Tests](../backend/src/tests)
+- **Backend**: [Backend Tests](../backend/src/tests)
+
 
 ### startup test for seperated frontend
+// TODO
+
+[back to top](#cicd-and-operation)
 
 ### Code Coverage and Displaying the Badge in GitLab
 
-[back to top](#cicd-and-operation)
 This part provides an overview of how to manage code coverage for the project, including running it locally,
 configuring the coverage tool, integrating it in the CI pipeline, and displaying a badge in GitLab.
 
@@ -125,6 +154,7 @@ To display a code coverage badge in GitLab:
 - **CI Integration**: Coverage is tested as part of the CI pipeline, storing `coverage.xml` as an artifact.
 - **Badge**: Display a coverage badge in the GitLab repository to track overall test coverage.
 
+[back to top](#cicd-and-operation)
 ## Linting and formatting
 
 We use Pylint as the linter and Black as the formatter. In the CI pipeline, we install the libraries and apply them to
@@ -134,38 +164,90 @@ every Python file in the `src` folder. The analyze-job fails if the code does no
 before_script:
   - pip install -r backend/requirements.txt
 script:
-  - python -m pylint src/*.py
-  - python -m black src/*.py
+  - python -m pylint --rcfile=backend/.pylintrc backend/src
+  - python -m black --config backend/pyproject.toml backend/src
 ```
 
 ## dependency proxy usage
 
+We use the provided dependency proxy to use cache the images in the proxy so that they aren't pulled anew everytime
+we run our pipeline. Here is a snippet from our gitlab-ci.yml file. The build job builds an image for other jobs in the
+pipeline to use.
+
+```yaml
+ci-build-job:
+  stage: build
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:latest
+  services:
+    - name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:latest
+      alias: docker
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}" --build-arg "GITLAB_PROXY=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/" .
+    - docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}"
+
+
+test-job:
+  stage: test
+  image: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}
+```
+
 ## code analysis tools
+// TODO
 
-## application runs on server
+[back to top](#cicd-and-operation)
+## making sure application runs on server
 
-## local development with a local database
+### Monitoring Application Health
 
-The Postgres image is running locally in the following Docker container:
+To confirm the application remains operational, the following steps are recommended:
 
-```
-postgres:
-  image: postgres:latest
-  environment:
-    POSTGRES_USER: pg-2
-    POSTGRES_PASSWORD: pg-2
-    POSTGRES_DB: navigation
-  ports:
-    - "5433:5432"
-  volumes:
-    - postgres_data:/var/lib/postgresql/data
-  networks:
-    - app-network
-```
+1. **Automated Monitoring**:
+   In real-world systems, automated monitoring tools like **Pingdom** (for external uptime checks) or **Prometheus with Alertmanager** (for internal health monitoring) would be used to periodically check the `/healthz` endpoint and send alerts in case of failures.
 
-## The production database must never be deleted; only apply migrations **???**
+   As a simplified alternative, we provide an example of setting up a cronjob on the production server to periodically check the `/healthz` endpoint and send an email if the health check fails. Below is the example script:
 
-## No real credentials (e.g. for log in to the container registry) should be on the server, only scoped API tokens
+   ```bash
+   #!/bin/bash
+
+   # URL of the health check endpoint
+   HEALTH_URL="https://localhost:4243/healthz"
+
+   # Email to notify in case of failure
+   NOTIFY_EMAIL="test@example.com"
+
+   # Run the health check
+   RESPONSE=$(curl -s -w "\n%{http_code}" "$HEALTH_URL")
+   BODY=$(echo "$RESPONSE" | head -n -1)
+   STATUS=$(echo "$RESPONSE" | tail -n 1)
+
+   # Write body to a temporary file for grep
+   echo "$BODY" > /tmp/health_check_response.json
+
+   # Check HTTP status and health response
+   if [[ "$STATUS" != "200" ]] || ! echo "$BODY" | grep -q '"status": "healthy"'; then
+       echo "Health check failed for $HEALTH_URL at $(date)" | mail -s "!!! SOUND THE BELLS, PROD IS DOWN !!!" "$NOTIFY_EMAIL"
+   else
+       echo "Health check passed for $HEALTH_URL at $(date)"
+   fi
+
+   echo "Script ran at $(date)"
+   ```
+
+   #### Scheduling the Script:
+   - Use a cronjob to schedule this script. For example, to run it daily:
+     ```bash
+     0 0 * * * /path/to/healthz-check-cronjob.sh >> /var/log/healthz-check.log 2>&1
+     ```
+
+   #### Notes:
+   - The script is designed for use within the deployment server environment, where the `/healthz` endpoint is accessible locally.
+   - **This script is not currently set up in our project** but is included for demonstration purposes, showcasing a lightweight approach to monitoring service health.
+
+## Scoped API tokens
+
+**No real credentials (e.g. for log in to the container registry) should be on the server, only scoped API tokens are used**
 
 An access token is created on GitLab via **Settings &rightarrow; Access Tokens**. The token must have at least the *
 *Developer** role and the **read_registry** scope.
@@ -175,3 +257,5 @@ It is used to log into the Docker registry of the server.
 ```
 docker login registry.code.fbi.h-da.de
 ```
+
+[back to top](#cicd-and-operation)

@@ -2,6 +2,13 @@
 
 We use Docker and a Dockerfile to create an NGINX image, which we push to the server's registry. The frontend runs on this server accordingly.
 
+## Table of Contents
+1. [Makefile to deploy the application with only one command](#makefile-to-deploy-the-application-with-only-one-command)
+2. [Useful docker commands](#useful-docker-commands)
+3. [Docker on local computer](#docker-on-local-computer)
+4. [Docker on deployment server](#docker-on-deployment-server)
+5. [Update docker container (from local to server)](#update-docker-container-from-local-to-server)
+
 ## Makefile to deploy the application with only one command
 // TODO
 
@@ -32,6 +39,7 @@ this runs:
 
 ```@docker rmi registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application```[*command note](#command-notes)
 
+[back to top](#docker)
 ## Useful docker commands
 Displays all images
 
@@ -78,6 +86,7 @@ this runs:
 docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application:latest
 ```
 
+[back to top](#docker)
 ## Docker on deployment server
 
 ### Log into the docker registry
@@ -118,6 +127,7 @@ Follow these steps to generate a personal access token in GitLab:
 
 ---
 
+[back to top](#docker)
 ### Using the Token
 - **In Code**: Access the token via environment variables:
   ```python
@@ -137,7 +147,7 @@ Follow these steps to generate a personal access token in GitLab:
 
 
 ## Update docker container (from local to server)
-[back to top](#Docker)
+[back to top](#docker)
 
 After saving your changes run the following command in git root-directory:
 
@@ -151,7 +161,7 @@ make build
 make push 
 ```
 
-Then connect to the [server](./server.md#deployment-server) and run the following command on the standard directory "debian@group2:~$":
+Then connect to the [server](./Server.md#deployment-server) and run the following command on the standard directory "debian@group2:~$":
 
 ```make update```
 
@@ -168,3 +178,5 @@ make start
 - @ prevents the echoing of the executed command
 - ( ) executes command in a subshell. 
 This allows you to jump back to your original location after executing the command.
+
+[back to top](#docker)

@@ -4,6 +4,12 @@
 ## Overview
 This job scans Python dependencies for known vulnerabilities using `pip-audit` and generates a report.
 
+## Table of Contents
+1. [Job Configuration](#job-configuration)
+2. [Features](#features)
+3. [When Does the Job Run?](#when-does-the-job-run)
+4. [Output](#output)
+
 ---
 
 ## Job Configuration
@@ -32,6 +38,7 @@ dependency_scan-job:
 
 ---
 
+[Back to Top](#dependency-scan-job-documentation)
 ## Features
 - **Dependency Vulnerability Scan**  
   Runs `pip-audit` to check Python dependencies for vulnerabilities.
@@ -59,3 +66,5 @@ dependency_scan-job:
 The job outputs a `dependency_audit_report.txt` file containing:
 - Detected vulnerabilities (if any).
 - `No known vulnerabilities found` if no issues exist.
+
+[Back to Top](#dependency-scan-job-documentation)
