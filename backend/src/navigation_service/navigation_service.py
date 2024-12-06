@@ -10,8 +10,7 @@ logger = get_logging_configuration()
 
 
 def get_route(start_city_name, end_city_name, data):
-    """calculates the shortest route and returns a dict containing the route as well as the
-    total distance"""
+    """Calculates the route and returns the results."""
     logger.info("Calculating route from %s to %s.", start_city_name, end_city_name)
     cities = data["cities"]
 
@@ -21,28 +20,43 @@ def get_route(start_city_name, end_city_name, data):
 
     if not start_city or not end_city:
         logger.error(
-            "One of the cities not found: %s, %s.", start_city_name, end_city_name
+            "One of the cities was not found: %s, %s.", start_city_name, end_city_name
         )
         return {
-            "error": f"One of the cities not found: {start_city_name}, {end_city_name}"
+            "error": f"One of the cities was not found: {start_city_name}, {end_city_name}"
         }
 
     graph = create_graph(data)
     try:
-        path, distance = dijkstra(graph, start_city["id"], end_city["id"])
+        path, distance, second_path, second_distance = dijkstra(
+            graph, start_city["id"], end_city["id"]
+        )
         if distance == float("inf"):
             logger.warning(
-                "No connection between %s and %s.", start_city_name, end_city_name
+                "No connection found between %s and %s.", start_city_name, end_city_name
             )
             return {
-                "error": f"No connection between {start_city_name} and {end_city_name}"
+                "error": f"No connection found between {start_city_name} and {end_city_name}"
             }
 
+        # Convert paths to city names
         path_names = {
             str(index): get_city_by_id(cities, city_id)["name"]
             for index, city_id in enumerate(path)
         }
-        result = {"route": path_names, "distance": round(distance, 2)}
+        second_path_names = {}
+        if second_path:
+            second_path_names = {
+                str(index): get_city_by_id(cities, city_id)["name"]
+                for index, city_id in enumerate(second_path)
+            }
+
+        result = {
+            "route": path_names,
+            "distance": round(distance, 2),
+            "alternative_route": second_path_names,
+            "alternative_distance": round(second_distance, 2),
+        }
 
         logger.info(
             "Route calculated successfully from %s to %s.",
@@ -52,11 +66,11 @@ def get_route(start_city_name, end_city_name, data):
         return result
 
     except KeyError as e:
-        logger.error("Error by route calculation: Missing key %s.", e)
-        return {"error": f"Error by route calculation: Missing key {e}"}
+        logger.error("Error during route calculation: Missing key %s.", e)
+        return {"error": f"Error during route calculation: Missing key {e}"}
     except ValueError as e:
-        logger.error("Error by route calculation: Invalid value %s.", e)
-        return {"error": f"Error by route calculation: {e}"}
+        logger.error("Error during route calculation: Invalid value %s.", e)
+        return {"error": f"Error during route calculation: {e}"}
 
 
 def create_graph(data):
@@ -85,40 +99,62 @@ def create_graph(data):
 
 
 def dijkstra(graph, start_city_id, end_city_id):
-    """calculates the shortest route"""
+    """Calculates the shortest and second shortest routes."""
     logger.info(
-        "Calculating shortest path from city %s to city %s.", start_city_id, end_city_id
+        "Calculating shortest and second shortest routes from city %s to city %s.",
+        start_city_id,
+        end_city_id,
     )
-    min_heap = [(0, start_city_id)]
+
+    if start_city_id == end_city_id:
+        return [start_city_id], 0, [start_city_id], 0
+
+    min_heap = [(0, start_city_id, [])]  # Priority queue
     distances = {city_id: float("inf") for city_id in graph}
     distances[start_city_id] = 0
-    previous_nodes = {city_id: None for city_id in graph}
+    second_distances = {city_id: float("inf") for city_id in graph}
+    path = []
+    second_path = []
 
     while min_heap:
-        current_distance, current_city = heapq.heappop(min_heap)
+        current_distance, current_city, current_path = heapq.heappop(min_heap)
+        current_path = current_path + [current_city]
 
         if current_city == end_city_id:
-            break
+            if not path:
+                path = current_path
+            elif not second_path:
+                second_path = current_path
+                break
 
+        # Explore neighbors of the current city
         for distance, neighbor in graph[current_city]:
             new_distance = current_distance + distance
 
+            # Update shortest path
             if new_distance < distances[neighbor]:
+                second_distances[neighbor] = distances[neighbor]  # Save old distance
                 distances[neighbor] = new_distance
-                previous_nodes[neighbor] = current_city
-                heapq.heappush(min_heap, (new_distance, neighbor))
+                heapq.heappush(min_heap, (new_distance, neighbor, current_path))
+            # Update second shortest path
+            elif distances[neighbor] < new_distance < second_distances[neighbor]:
+                second_distances[neighbor] = new_distance
+                heapq.heappush(min_heap, (new_distance, neighbor, current_path))
 
-    path = []
-    city = end_city_id
-    while city is not None:
-        path.append(city)
-        city = previous_nodes[city]
-    path = path[::-1]
+    # Check if paths were found
+    if not path or distances[end_city_id] == float("inf"):
+        logger.warning(
+            "No connection found between %s and %s.", start_city_id, end_city_id
+        )
+        return [], float("inf"), [], float("inf")
 
-    logger.info(
-        "Shortest path calculated: %s with distance %s.", path, distances[end_city_id]
-    )
-    return path, distances[end_city_id]
+    if not second_path or second_distances[end_city_id] == float("inf"):
+        logger.warning(
+            "No alternative route found between %s and %s.", start_city_id, end_city_id
+        )
+        second_path = []
+
+    return path, distances[end_city_id], second_path, second_distances[end_city_id]
 
 
 def calculate_distance(city_1, city_2):
