@@ -11,26 +11,25 @@ The Navigation Service uses the Dijkstra algorithm to calculate the best route b
 
 ### Algorithm Details
 - **Initialization**:
-  - **min_heap**: A priority queue that sorts cities by the shortest known distance. It starts with the start city and a distance of 0.
+  - **min\_heap**: A priority queue that sorts cities by the shortest known distance. It starts with the start city and a distance of 0.
   - **distances**: Stores the shortest known distance to each city. Initially, all distances are infinity, except for the start city, which is 0.
-  - **previous_nodes**: Tracks the city from which each other city is reached, enabling path reconstruction.
+  - **second\_distances**: Stores the second shortest known distance to each city. Initially, all distances are infinity.
+  - **path**: Stores the shortest path found.
+  - **second\_path**: Stores the second shortest path found.
 
 - **Main Logic**:
   - Repeatedly extracts the city with the lowest distance from `min_heap`.
   - Stops if the current city is the destination city.
   - Updates distances for neighboring cities if a shorter path is found, adding them back to `min_heap`.
-
-- **Path Reconstruction**:
-  - Starts from the destination city and traces back to the start city using `previous_nodes`.
-  - Reverses the path to get the correct order.
+  - Also updates the second shortest path if a new second shortest path is found.
 
 ### Method
 - `get_route(start_city_name, end_city_name, data)`:
-  - Calculates the shortest route and total distance between two cities.
+  - Calculates the shortest and second shortest routes and total distances between two cities.
   - `data`: A Python dictionary containing all city and connection information.
   - **Returns**:
-    - The reconstructed path as a list.
-    - The total distance to the destination city.
+    - The reconstructed paths as lists.
+    - The total distances to the destination city.
     - The result is returned as a dictionary and converted to JSON for the frontend.
 
 ---
