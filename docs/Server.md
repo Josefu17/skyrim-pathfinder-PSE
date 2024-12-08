@@ -2,6 +2,8 @@
 
 Each server is accessed in its own way. This documents the method for accessing each respective server.
 
+---
+
 ## Table of Contents
 1. [Map-Server](#map-server)
 2. [Deployment-Server](#deployment-server)
@@ -9,7 +11,7 @@ Each server is accessed in its own way. This documents the method for accessing 
 
 ## Map-Server
 
-Requesting the server:
+Requesting the map data:
 
 ```
 curl https://maps.proxy.devops-pse.users.h-da.cloud/map?name=skyrim
@@ -51,7 +53,7 @@ Postgres-Backend: ```sre-backend.devops-pse.users.h-da.cloud``` (Only available 
 | **Username** | `<USERNAME>` |
 | **Password** | `<PASSWORD>` |
 | **Host**     | `postgres`   |
-| **Database** | `navigation` |
+| **Database** | `<DATABASE>` |
 
 
 ### Notes:
@@ -61,7 +63,7 @@ Postgres-Backend: ```sre-backend.devops-pse.users.h-da.cloud``` (Only available 
   ```bash
   export POSTGRES_USER=<USERNAME>
   export POSTGRES_PASSWORD=<PASSWORD>
-  export POSTGRES_DB=navigation
+  export POSTGRES_DB=<DATABASE>
   ```
 
 [back to top](#server)

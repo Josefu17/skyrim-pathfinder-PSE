@@ -1,16 +1,23 @@
 # Development and Collaboration Guidelines
 
-## Table of Contents
-1. [Code Styling](#code-styling)
-2. [Project Management](#project-management)
-3. [Collaboration Best Practices](#collaboration-best-practices)
-4. [Rules](#rules)
+This document provides guidelines for development and collaboration, including code styling conventions, project 
+management workflows, and issue naming standards. It aims to support efficient task tracking, clear communication, and 
+consistent code quality.
 
-## Code Styling
+---
+
+## Table of Contents
+1. [Tech Stack and Styling Conventions](#tech-stack-and-code-styling)
+2. [Project Management](#project-management)
+3. [Issue Naming and Classification Convention](#issue-naming-and-classification)
+4. [Collaboration Best Practices](#collaboration-best-practices)
+5. [Rules](#rules)
+
+## Tech Stack and Code Styling
 
 ### Designated Languages
-- **Backend**: Python
-- **Navigation Service**: XML-RPC
+- **Backend**: Python (Flask-based REST API)
+- **Navigation Service**: Python (XML-RPC service for route calculations)
 - **Database**: PostgreSQL
 - **Frontend**: HTML/JavaScript/CSS
 
@@ -41,11 +48,42 @@ Milestones categorize issues into key application components:
 
 ### Developer Responsibilities
 - Update issue statuses promptly.
-- Use GitLab features like `#closes <issue-id>` to automate updates.
+- Use GitLab features like `#Closes <issue-id>` to automate updates.
 - Adhere to naming conventions and meaningful commit messages:
   - Examples: `ADD`, `FIX`, `DELETE`, `ADJUST`, `INIT`
 
 [Back to Top](#development-and-collaboration-guidelines)
+
+---
+
+## **Issue Naming and Classification**
+
+### **Task Domains**
+Classify issues based on their type of work:
+- **Bug**: Errors in code or functionality causing unexpected behavior.
+- **Feature**: New functionalities or extensions to be added to the system.
+- **Enhancement**: Improvements or optimizations to existing features.
+- **Task**: General tasks that support the development process but do not directly impact functionality.
+- **Test**: Creating or executing tests for features or bug fixes.
+- **Documentation**: Creating or updating project documentation.
+
+### **Project Domains**
+Categorize issues by the relevant project area:
+- **Backend**
+- **Navigation**
+- **Frontend**
+
+### **Issue Naming Convention**
+Follow this naming format for issues:
+`[Project-DOMAIN]TASK-DOMAIN: Description of the issue`
+
+#### **Examples**
+- `[Backend]Bug: Fix login timeout error`
+- `[Frontend]Feature: Add search bar to the UI`
+- `[Navigation]Enhancement: Optimize route calculation algorithm`
+
+---
+
 ## Collaboration Best Practices
 
 ### Tools

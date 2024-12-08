@@ -99,7 +99,7 @@ def create_graph(data):
 
 
 def dijkstra(graph, start_city_id, end_city_id):
-    """Calculates the shortest and second shortest routes."""
+    """Calculates the shortest and second-shortest routes."""
     logger.info(
         "Calculating shortest and second shortest routes from city %s to city %s.",
         start_city_id,
@@ -131,12 +131,12 @@ def dijkstra(graph, start_city_id, end_city_id):
         for distance, neighbor in graph[current_city]:
             new_distance = current_distance + distance
 
-            # Update shortest path
+            # Update the shortest path
             if new_distance < distances[neighbor]:
                 second_distances[neighbor] = distances[neighbor]  # Save old distance
                 distances[neighbor] = new_distance
                 heapq.heappush(min_heap, (new_distance, neighbor, current_path))
-            # Update second shortest path
+            # Update second-shortest path
             elif distances[neighbor] < new_distance < second_distances[neighbor]:
                 second_distances[neighbor] = new_distance
                 heapq.heappush(min_heap, (new_distance, neighbor, current_path))

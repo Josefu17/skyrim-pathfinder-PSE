@@ -10,7 +10,7 @@
 5. [Backend API Overview](#backend-api-overview)  
 6. [Database Overview](#database-overview)  
 7. [Running the Application](#running-the-application)  
-8. [Testing, Linting, and Formatting](#testing-linting-and-formatting)  
+8. [Testing, Linting, and Formatting](#testing-and-code-quality)  
 9. [Debugging](#debugging)  
 10. [Postman Collection](#postman-collection)  
 11. [Definition of Done (DoD)](#definition-of-done-dod)  
@@ -174,20 +174,29 @@ Database migrations are managed with **Alembic**. Follow these steps:
    docker compose up -d postgres
    ```
 
-2. Run the servers locally:
+2. Run the servers locally (in different tabs/terminals):
+   - Beforehand, make sure that you adjust the env variables accordingly:
+     - DB_PORT to the value exposed by the db container
+     - DB_HOST to localhost since local running backend will be communicating with the db via localhost
+   
    ```bash
-   python backend/src/rpc_api/server.py
-   python backend/src/web_backend/web_backend_controller.py
+         python -m backend.src.rpc_api.server
+      
+         python -m backend.src.web_backend.web_backend_controller
    ```
-
 3. Access the application:
-   - Web Backend: [http://localhost:4243](http://localhost:4243)
+   - access the backend via `curl` requests or with the help of a tool like `postman`
+   - example curl commands:
+     - `curl -X GET http://localhost:4243/maps`
+     - `curl -X GET http://localhost:4243/cities`
+   - For our postman collection please refer to [Postman Collection](docs/Postman/PSE.postman_collection.json)
+   or [Documentation.](#postman-collection)
 
 [back to top](#table-of-contents)
 
 ---
 
-## Testing, Linting, and Formatting
+## Testing and Code Quality
 
 ### Testing and Coverage
 
@@ -198,24 +207,28 @@ python -m pytest backend/src/tests/  # Or use `make test`
 
 Generate and view a coverage report:
 ```bash
-pytest --cov=backend/src --cov-report=html:backend/htmlcov backend/src/tests/  # Or use `make coverage`
+# Or use `make coverage`
+pytest --cov=backend/src --cov-report=html:backend/htmlcov backend/src/tests/  
+
 
 xdg-open backend/htmlcov/index.html  # Open coverage report (Linux)
 start backend\htmlcov\index.html  # Open coverage report (Windows)
 ```
+## Linting and Formatting
+The pipeline enforces code quality using Pylint (linter) and Black (formatter). Both are applied to all Python files in
+the `src` directory, and the pipeline fails if the code does not meet the required standards.
 
-### Linting and Formatting
 - **Linter**: `pylint`
 - **Formatter**: `black`
 
 Run linting:
 ```bash
-pylint backend/src/**/*.py  # Or use `make lint`
+pylint backend/src/**/*.py --rcfile=backend/.pylintrc # Or use `make lint`
 ```
 
 Run formatting:
 ```bash
-black backend/src/**/*.py  # Or use `make format`
+black backend/src/**/*.py --config backend/pyproject.toml # Or use `make format`
 ```
 
 [back to top](#table-of-contents)
@@ -224,7 +237,7 @@ black backend/src/**/*.py  # Or use `make format`
 
 ## Debugging
 
-We use `debugpy` for debugging. For configuration instructions, please refer to the [DevExp documentation](docs/DevExp.md).
+We use `debugpy` for debugging. For configuration instructions, please refer to the [Debugger documentation](docs/DevExp.md#debugger-debugpy).
 
 ---
 
@@ -249,6 +262,10 @@ For detailed criteria, kindly refer to the [DoD Documentation](docs/DoD.md).
 
 Dear lecturers, as much as we tried to keep our README realistic, we wanted to make life a bit easier for you during 
 the evaluation. We provide detailed checklists for individual stages, referencing specific documentation where 
-requirements are addressed. [Requirements Checklists(Stage 1)](docs/Stages/stage_1.md)
+requirements are addressed. 
+
+[Requirement Checklists](docs/Stages/stages_overview.md)
+
+---
 
 [back to top](#table-of-contents)

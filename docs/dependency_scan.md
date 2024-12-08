@@ -1,8 +1,9 @@
 
 # Dependency Scan Job Documentation
 
-## Overview
 This job scans Python dependencies for known vulnerabilities using `pip-audit` and generates a report.
+
+---
 
 ## Table of Contents
 1. [Job Configuration](#job-configuration)

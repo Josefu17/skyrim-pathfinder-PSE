@@ -38,6 +38,7 @@ class DatabaseConnection:
         }
 
         final_config = update_config_with_parameter_values(config, env_config)
+        logger.debug("Final config: %s", final_config)
 
         # Assign final values to instance variables
         self.user = final_config["user"]
@@ -54,8 +55,6 @@ class DatabaseConnection:
             f"{self.port}/{self.database}"
         )
         self.session_local = sessionmaker(bind=self.engine)
-
-        logger.info("Database connection initialized for database: %s", self.database)
 
     def _check_missing_parameters(self):
         """Helper method to check and raise an error if any parameters are missing"""

@@ -1,5 +1,11 @@
 # Application
 
+This document provides an overview of the application's architecture and functionality, detailing components like the 
+Stateless Navigation Service, RPC-API, Backend, and Frontend. It includes explanations of algorithms, API usage, and 
+user interaction flows.
+
+---
+
 ## Table of Contents
 1. [Stateless Navigation Service](#stateless-navigation-service)
 2. [RPC-API](#rpc-api)
@@ -11,21 +17,21 @@ The Navigation Service uses the Dijkstra algorithm to calculate the best route b
 
 ### Algorithm Details
 - **Initialization**:
-  - **min\_heap**: A priority queue that sorts cities by the shortest known distance. It starts with the start city and a distance of 0.
+  - **min_heap**: A priority queue that sorts cities by the shortest known distance. It starts with the start city and a distance of 0.
   - **distances**: Stores the shortest known distance to each city. Initially, all distances are infinity, except for the start city, which is 0.
   - **second\_distances**: Stores the second shortest known distance to each city. Initially, all distances are infinity.
   - **path**: Stores the shortest path found.
-  - **second\_path**: Stores the second shortest path found.
+  - **second\_path**: Stores the second-shortest path found.
 
 - **Main Logic**:
   - Repeatedly extracts the city with the lowest distance from `min_heap`.
-  - Stops if the current city is the destination city.
+  - Terminates once the destination city is reached, as by definition the shortest path to that city has been determined.
   - Updates distances for neighboring cities if a shorter path is found, adding them back to `min_heap`.
-  - Also updates the second shortest path if a new second shortest path is found.
+  - Also updates the second-shortest path if a new second-shortest path is found.
 
 ### Method
 - `get_route(start_city_name, end_city_name, data)`:
-  - Calculates the shortest and second shortest routes and total distances between two cities.
+  - Calculates the shortest and second-shortest routes and total distances between two cities.
   - `data`: A Python dictionary containing all city and connection information.
   - **Returns**:
     - The reconstructed paths as lists.
