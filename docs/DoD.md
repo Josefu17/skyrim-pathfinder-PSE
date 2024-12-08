@@ -2,6 +2,8 @@
 
 This document outlines the criteria for considering a feature or task complete.
 
+---
+
 ## Table of Contents
 1. [Code Quality](#code-quality)
 2. [Testing](#testing)

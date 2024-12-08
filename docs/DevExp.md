@@ -1,5 +1,11 @@
 # DevExp
 
+This document focuses on the developer experience, covering setup processes, debugging tools, one-click commands for 
+installation and application startup, and automated dependency updates. It aims to simplify development workflows and 
+enforce consistent practices.
+
+---
+
 ## Table of Contents
 1. [Debugger (debugpy)](#debugger-debugpy)
 2. [One-Click installation](#one-click-installation)
@@ -84,8 +90,8 @@ These commands provide a "one-click" solution for managing dependencies, ensurin
 
 ## One-Click Start for the Application (localdev)
 
-### Overview
-The application can be started locally with a single command using the `Makefile`. This command initializes all services (Postgres, Navigation Service, Web Backend) defined in the `docker-compose.yml` file.
+The application can be started locally with a single command using the `Makefile`. This command initializes all services
+(Postgres, Navigation Service, Web Backend) defined in the `docker-compose.yml` file.
 
 ### Prerequisites
 1. Ensure you have Docker and Docker Compose installed on your machine.
@@ -124,21 +130,46 @@ make stop
 
 ## Tests run locally and in CI
 
-With ``pytest``, we have created tests for our features that can be run locally. In the CI, they run in the 'test-job'. Python files starting with 'test' are executed with ``python -m pytest``.
+With `pytest`, we have created tests for our features that can be run locally. In the CI, they run in the 'test-job'. 
+Python files starting with 'test' are executed with `python -m pytest`.
 
+From the root folder:
 ```
 script:
-    - python -m pytest ./src/test*.py --verbose
+    pytest ./backend/src/tests # or use `make test`
+    # with coverage:
+    pytest --cov=backend/src --cov-report=html:backend/htmlcov 
+        backend/src/tests/ --cov-config=backend/setup.cfg # or use `make coverage`
+
 ```
+
+## Automated Dependency Updates with Renovate
+
+We use **Renovate** to automate dependency updates, ensuring our project stays secure and up-to-date with minimal 
+effort. Renovate scans our project for outdated dependencies and creates merge requests (MRs) with the necessary updates.
+
+### Key Features
+- **Automatic Updates**: Checks `requirements.txt` and `pyproject.toml` for outdated packages.
+- **Merge Requests**: Creates MRs for each update with changelogs when available.
+- **Customizable**: Configuration in `renovate.json` allows grouping updates (e.g., minor/major) and setting automerge rules.
+
+### Workflow
+1. **MR Creation**: Renovate opens MRs with dependency updates.
+2. **Review and Testing**: Review the MR changelog and ensure the pipeline passes, make additional checks like running
+the application locally and testing if things are working depending on the change from Renovate.
+3. **Merge**: Merge the MR to apply updates.
+
+---
 
 ## Linter and Formatter Setup
 
-### Overview
 We use:
 - **Linter**: `pylint` (configuration in `.pylintrc`)
 - **Formatter**: `black` (configuration in `pyproject.toml`)
 
 Both tools are configured to run locally and in the CI pipeline with the same settings to ensure consistent code quality.
+
+For more detail on those, please refer to [here.](../README.md#linting-and-formatting)
 
 ---
 
@@ -152,16 +183,8 @@ Both tools are configured to run locally and in the CI pipeline with the same se
 
 2. **Run Linter and Formatter**:
    ```bash
-   python -m pylint --rcfile=backend/.pylintrc src/*.py
-   python -m black --config pyproject.toml src/*.py
-   ```
-
-3. **Run Inside Docker**:
-   ```bash
-   docker exec -it <container-name> sh -c "
-      python -m pylint --rcfile=backend/.pylintrc src/*.py &&
-      python -m black --config backend/pyproject.toml src/*.py
-   "
+   python -m pylint --rcfile=backend/.pylintrc src/*.py # or use `make lint`
+   python -m black --config pyproject.toml src/*.py # or use `make format`
    ```
 
 ---
@@ -194,4 +217,23 @@ Both tools are configured to run locally and in the CI pipeline with the same se
 [back to top](#devexp)
 
 ## Project's setup process and major design decisions
-// TODO
+
+### Setup Process  
+To simplify the setup process for developers, we created a `Makefile` with commands for installing dependencies 
+(`make install`), starting services (`make start`), and cleaning the environment (`make remove`). This ensures a 
+consistent setup process across different development environments. We use Python virtual environments for local 
+development, while Docker Compose manages dependencies like the PostgreSQL database.
+
+Debugging is enabled using `debugpy`, with configurations provided for both PyCharm and VS Code. This allows developers 
+to debug containerized services seamlessly by attaching their IDE to the running services.
+---
+### Major Design Decisions  
+**Architecture:** The project follows a microservices architecture to separate concerns. The Navigation Service is stateless and uses 
+Dijkstra's algorithm to calculate routes, exposed via an XML-RPC API. The Web Backend serves as a REST API layer that 
+interfaces with the database and frontend. This separation allows for independent scaling and modular development.
+
+**DB Choice and Migrations:** PostgreSQL was chosen for its reliability and compatibility with spatial data. SQLAlchemy provides ORM capabilities, 
+and Alembic is used for managing database migrations. These tools ensure schema consistency and ease of schema evolution.
+
+**Code Quality:** To enforce code quality, we integrated `pylint` and `black`, with configurations consistent across local development 
+and the CI pipeline. All tests are written using pytest and are executed locally and in the CI pipeline to catch issues early.
