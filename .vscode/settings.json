@@ -1,0 +1,6 @@
+{
+    "sonarlint.connectedMode.project": {
+        "connectionId": "hochschule-darmstadt",
+        "projectKey": "hochschule-darmstadt_pse-web-application-ws-24-25"
+    }
+}

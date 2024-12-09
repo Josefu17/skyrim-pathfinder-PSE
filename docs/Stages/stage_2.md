@@ -1,7 +1,3 @@
-Here's the revised `stage_2.md` checklist structure, aligned with the format of `stage_1.md`:
-
----
-
 # Stage 2 Overview (Deadline 04.12.2024)
 
 ## Table of Contents

@@ -3,6 +3,12 @@
 
 This job scans Python dependencies for known vulnerabilities using `pip-audit` and generates a report.
 
+## Table of Contents
+1. [Job Configuration](#job-configuration)
+2. [Features](#features)
+3. [When Does the Job Run?](#when-does-the-job-run)
+4. [Output](#output)
+
 ---
 
 ## Table of Contents

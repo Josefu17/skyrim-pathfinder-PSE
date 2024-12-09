@@ -18,10 +18,12 @@ create-venv:
 
 install:
 	pip install -r backend/requirements.txt
+	cd frontend && npm ci
 	@echo "Dependencies installed."
 
 remove:
 	pip uninstall -y -r backend/requirements.txt
+	cd frontend && npm uninstall
 	@echo "Dependencies removed."
 
 # Docker management
@@ -39,9 +41,13 @@ push:
 	docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/navigation-service:latest
 	docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/web-backend:latest
 
-start: build
+start:build start-frontend
 	docker compose up -d
+	make dev
 
+start-frontend:
+	docker build -t web-frontend:latest .
+	docker rm -f web-frontend && docker run -p 4242:80 --name web-frontend -d web-frontend:latest
 
 login:
 	docker login registry.code.fbi.h-da.de
@@ -69,20 +75,16 @@ sonar: coverage
 	sonar-scanner
 
 run-tests:
-# instrument the code for coverage
-#	@python ./frontend/src/tests/instrument_code.py
-# Execute the PowerShell script to start the server, open the tests, and stop the server after the tests
-	@powershell -File ./scripts/run_tests.ps1
-
-run-test-server:
-	@python -m http.server 7777
+	@echo "TODO: Implement tests for frontend"
 
 # Navigation service management
 lint:
 	python -m pylint --rcfile=backend/.pylintrc backend/src
+	@make npm run=lint
 
 format:
 	python -m black --config backend/pyproject.toml backend/src
+	@make npm run=format
 
 # Services management
 nav-enter:
@@ -92,11 +94,22 @@ backend-enter:
 	docker exec -it group2-web-backend-1 bash
 
 # Database management
+migrate:
+	alembic -c backend/alembic.ini upgrade head
+
 connect-to-database:
-	docker exec -it group2-postgres-1 psql -U pg-2 -d navigation
+	docker exec -it group2-postgres-1 psql -U pg-2 -d pg-2
 
-pre-commit: test format lint
+pre-commit: test format lint coverage
 
+# npm management
+run ?= format
+
+npm:
+	@cd frontend && npm run $(run)
+
+dev:
+	@cd frontend && npm run dev
 
 # Linux / Unix specific commands:
 unix-coverage-open: coverage
