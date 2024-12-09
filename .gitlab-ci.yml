@@ -1,10 +1,8 @@
-
 stages:
 - build
 - test
 - analyze
 - deploy
-
 
 ci-build-job:
   stage: build
@@ -128,4 +126,3 @@ deploy-job:
   - analyze-job
   only:
   - main
-

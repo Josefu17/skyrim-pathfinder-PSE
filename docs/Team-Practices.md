@@ -19,14 +19,14 @@ consistent code quality.
 - **Backend**: Python (Flask-based REST API)
 - **Navigation Service**: Python (XML-RPC service for route calculations)
 - **Database**: PostgreSQL
-- **Frontend**: HTML/JavaScript/CSS
+- **Frontend**: Typescript/Node.js(vite)
 
 ### Styling Conventions
 - Use **snake_case** for variables, functions, and file names (e.g., `example_name`).
 - All code and comments must be in **English**.
-- Indentation: Use **4 spaces** for Python.
-- **Linter**: `pylint`
-- **Formatter**: `black`
+- Indentation: Use **4 spaces** for Python and Typescript.
+- **Linter**: `pylint` / `ESLint`
+- **Formatter**: `black` / `Prettier`
 
 ## Project Management
 

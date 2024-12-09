@@ -122,6 +122,7 @@ Verifies the application's health status by checking critical services.
 {
   "details": {
     "database_connection": true,
+    "frontend_availability": true,
     "map_service_connection": true,
     "navigation_service_connection": true
   },
@@ -133,10 +134,17 @@ Verifies the application's health status by checking critical services.
 ```json
 {
   "details": {
-    "database_connection": false,
+    "database_connection": true,
     "map_service_connection": true,
-    "message": "500 Server Error: INTERNAL SERVER ERROR for url: http://localhost:4243/cities/route?startpoint=Markarth&endpoint=Karthwasten",
-    "navigation_service_connection": false
+    "frontend_availability": false,
+    "message": "Elements are missing",
+    "missing_elements": [
+      {
+        "id": "root",
+        "tag": "div"
+      }
+    ],
+    "navigation_service_connection": true
   },
   "status": "unhealthy"
 }

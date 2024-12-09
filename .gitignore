@@ -3,10 +3,14 @@
 *.pytest_cache
 .idea
 %SystemDrive%
+# created by coverage.py automatically to create coverage report
+.coverage
+venv
 env
+*.env**
 frontend/.coverage
 /**/*.env
+.venv
 .scannerwork
 .sonarlint
-.coverage
 /backend/coverage-reports/coverage.xml

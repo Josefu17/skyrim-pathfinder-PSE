@@ -87,8 +87,7 @@ def check_frontend_availability():
     """
     verify that the connection to the frontend is healthy
     """
-    url = "http://web-frontend:80/path_finder.html"
-    # url = "http://localhost:80/path_finder.html"
+    url = "http://web-frontend:80/"
 
     try:
         # send a GET request to the main page
@@ -100,12 +99,10 @@ def check_frontend_availability():
 
         # Check if the main elements are present
         required_elements = [
-            {"tag": "h1", "text": "Path finder"},
-            {"tag": "ul", "id": "endpoint_list"},
-            {"tag": "form", "id": "path_points_form"},
-            {"tag": "select", "id": "startpoint"},
-            {"tag": "select", "id": "endpoint"},
+            {"tag": "div", "id": "root"},
         ]
+
+        missing_elements = []
 
         all_present = True
         for element in required_elements:
@@ -120,6 +117,7 @@ def check_frontend_availability():
 
             if not found:
                 logger.error("Missing: %s", str(element))
+                missing_elements.append(element)
                 all_present = False
 
         if all_present:
@@ -130,6 +128,7 @@ def check_frontend_availability():
         return {
             "frontend_availability": False,
             "message": "Elements are missing",
+            "missing_elements": missing_elements,
         }
 
     except requests.exceptions.RequestException as e:

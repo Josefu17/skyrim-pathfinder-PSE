@@ -193,10 +193,15 @@ the application locally and testing if things are working depending on the chang
 ## Linter and Formatter Setup
 
 We use:
-- **Linter**: `pylint` (configuration in `.pylintrc`)
-- **Formatter**: `black` (configuration in `pyproject.toml`)
+- **Linter**: 
+  - `pylint` (configuration in `.pylintrc`)
+  - `ESLint` (configuration in `.eslintrc.js`)
+- **Formatter**: 
+  - `black` (configuration in `pyproject.toml`)
+  - `Prettier` (configurations in `.prettierrc` and `.prettierignore`)
 
-Both tools are configured to run locally and in the CI pipeline with the same settings to ensure consistent code quality.
+`pylint` and `black` are configured to run locally and in the CI pipeline with the same settings to ensure consistent code quality.
+`ESLint` and `Prettier` have yet to get set up in the Ci pipeline.
 
 For more detail on those, please refer to [here.](../README.md#linting-and-formatting)
 
@@ -211,9 +216,29 @@ For more detail on those, please refer to [here.](../README.md#linting-and-forma
    ```
 
 2. **Run Linter and Formatter**:
+    for Python and TypeScript:
+    ```bash
+    make lint
+    make format
+    ```
+    for Python only:
+    ```bash
+    python -m pylint --rcfile=backend/.pylintrc src/*.py
+    python -m black --config pyproject.toml src/*.py
+    ```
+    for TypeScript only:
+    ```bash
+    make npm run=lint
+    make npm run=format
+    ```
+
+
+3. **Run Inside Docker**:
    ```bash
-   python -m pylint --rcfile=backend/.pylintrc src/*.py # or use `make lint`
-   python -m black --config pyproject.toml src/*.py # or use `make format`
+   docker exec -it <container-name> sh -c "
+      python -m pylint --rcfile=backend/.pylintrc src/*.py &&
+      python -m black --config backend/pyproject.toml src/*.py
+   "
    ```
 
 ---

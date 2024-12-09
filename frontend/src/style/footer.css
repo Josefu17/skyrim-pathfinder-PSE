@@ -1,0 +1,17 @@
+footer {
+    width: 100%;
+    text-align: center;
+    margin-top: 0.5rem;
+    margin-bottom: 0rem;
+}
+
+footer * {
+    margin: 0rem 0rem 0rem 0rem;
+    padding: 0rem 0rem 0rem 0rem;
+}
+
+#developers {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}

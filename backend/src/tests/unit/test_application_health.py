@@ -130,13 +130,7 @@ def test_check_frontend_availability_success():
     with patch("requests.get") as mock_get:
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.text = (
-            '<h1 class="flex_item">Path finder</h1>'
-            '<ul id="endpoint_list"></ul>'
-            '<form id="path_points_form"</form>'
-            '<select id="startpoint"></select>'
-            '<select id="endpoint"></select>'
-        )
+        mock_response.text = '<div id="root"></div>'
         mock_get.return_value = mock_response
 
         result = check_frontend_availability()
@@ -162,9 +156,7 @@ def test_check_frontend_availability_missing_elements():
     with patch("requests.get") as mock_get:
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.text = (
-            '<h1 class="flex_item">Path finder</h1>' + '<ul id="endpoint_list"></ul>'
-        )
+        mock_response.text = ""
         mock_get.return_value = mock_response
 
         result = check_frontend_availability()

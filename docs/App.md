@@ -24,15 +24,15 @@ The Navigation Service uses the Dijkstra algorithm to calculate the best route b
 
 ### Algorithm Details
 - **Initialization**:
-  - **min_heap**: A priority queue that sorts cities by the shortest known distance. It starts with the start city and a distance of 0.
+  - **min\_heap**: A priority queue that sorts cities by the shortest known distance. It starts with the start city and a distance of 0.
   - **distances**: Stores the shortest known distance to each city. Initially, all distances are infinity, except for the start city, which is 0.
-  - **second\_distances**: Stores the second shortest known distance to each city. Initially, all distances are infinity.
+  - **second\_distances**: Stores the second-shortest known distance to each city. Initially, all distances are infinity.
   - **path**: Stores the shortest path found.
   - **second\_path**: Stores the second-shortest path found.
 
 - **Main Logic**:
   - Repeatedly extracts the city with the lowest distance from `min_heap`.
-  - Terminates once the destination city is reached, as by definition the shortest path to that city has been determined.
+  - Terminates only after all cities were visited. Since all possible paths are checked, the shortest possible route is found.
   - Updates distances for neighboring cities if a shorter path is found, adding them back to `min_heap`.
   - Also updates the second-shortest path if a new second-shortest path is found.
 
@@ -102,8 +102,8 @@ The backend fetches map data (cities and connections) from an external source an
 ### API Endpoints for Frontend
 The backend exposes RESTful endpoints for the frontend:
 - **GET `/maps`**: Returns all cities and connections.
-- **GET `/cities`**: Returns city details.
-- **GET `/cities/route`**: Accepts `startpoint` and `endpoint` query parameters and returns the optimal route and distance.
+- **GET `/cities`**: Returns all cities.
+- **GET `/cities/route`**: Accepts startpoint and endpoint query parameters, then returns the optimal route along with its distance. Additionally, provides an alternative route and its corresponding distance.
 
 These endpoints serve as the bridge between the frontend, database, and navigation service.
 
@@ -113,16 +113,16 @@ These endpoints serve as the bridge between the frontend, database, and navigati
 ## Frontend
 
 ### Fetch and Display Maps
-The `load_cities()` function fetches all cities with their x and y positions from the backend (`/cities` endpoint). The frontend processes the JSON response and creates DOM elements to visually display the cities on the map.
+The `fetchMapData()` function fetches all cities with their positions and connections from the backend (`/maps` endpoint). The frontend processes the JSON response and creates DOM elements to visually display the cities on the map.
 
 ### User Interaction
 Users can:
-- Select a starting city and a destination city from dropdown menus.
-- Receive the optimal route and distance based on their selection.
-- Ensure valid input with restrictions preventing duplicate or invalid city selections.
+- Select a starting city and a destination city from the interactive map.
+- Receive the optimal(and alternative) route and distance based on their selection.
+- TODO: Ensure valid input with restrictions preventing duplicate or invalid city selections.
 
 ### Displaying the Route
-Once a route is calculated, the backend sends the route and distance back to the frontend. The frontend updates the DOM to visually highlight the route and display the distance in a user-friendly format.
+Once a route is calculated, the backend sends the route and distance back to the frontend. The frontend updates the relevant DOM to visually highlight the route and display the distance in a user-friendly format.
 
 
 
