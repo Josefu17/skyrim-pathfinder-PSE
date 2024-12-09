@@ -1,5 +1,7 @@
 """Unit tests for the web backend controller."""
 
+import math
+from typing import Generator
 from unittest.mock import patch, MagicMock
 
 import pytest
@@ -10,7 +12,7 @@ from backend.src.web_backend.web_backend_controller import main
 
 
 @pytest.fixture(name="client")
-def flask() -> FlaskClient:
+def flask() -> Generator[FlaskClient, None, None]:
     """Fixture to create a test client for the Flask app"""
     app.config["TESTING"] = True
     with app.test_client() as client:
@@ -122,7 +124,7 @@ def test_calculate_route(mock_fetch_route, mock_get_db_session, client: FlaskCli
     assert response.status_code == 200
     data = response.get_json()
     assert "route" in data and "distance" in data
-    assert data["distance"] == 321.12
+    assert math.isclose(data["distance"], 321.12, rel_tol=1e-9)  # relative tolerance
     assert response.json == {
         "route": {"0": "Markarth", "1": "Riften"},
         "distance": 321.12,

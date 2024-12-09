@@ -9,8 +9,8 @@ from backend.src.logging_config import get_logging_configuration
 from backend.src.map_service.map_service import fetch_and_store_map_data_if_needed
 from backend.src.web_backend.web_backend_service import (
     fetch_route_from_navigation_service,
-    service_get_map_data,
     service_get_cities_data,
+    service_get_map_data,
 )
 
 logger = get_logging_configuration()
@@ -19,8 +19,6 @@ app = Flask(__name__)
 CORS(app)
 
 
-# TODO is not in use right now, might become relevant later to
-#  return entire map information, 17-11-2024, yb
 @app.route("/maps", methods=["GET"])
 def get_map_data():
     """Fetch and return map data including cities and connections."""
@@ -55,17 +53,18 @@ def calculate_route():
         )
         return jsonify({"error": "Start and end cities are required"}), 400
 
-    logger.info("Calculating route from %s to %s.", start_city_name, end_city_name)
+    logger.info("Calculating route between two endpoints")
+
     with get_db_session() as session:
         route_result = fetch_route_from_navigation_service(
             start_city_name, end_city_name, session
         )
 
     if "error" in route_result:
-        logger.error("Error calculating route: %s", route_result["error"])
+        logger.error("Error occurred during route calculation.")
         return jsonify(route_result), 400
 
-    logger.info("Route calculated successfully.")
+    logger.info("Route calculation succeeded.")
     return jsonify(route_result), 200
 
 

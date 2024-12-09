@@ -6,13 +6,42 @@ enforce consistent practices.
 
 ---
 
-## Table of Contents
-1. [Debugger (debugpy)](#debugger-debugpy)
-2. [One-Click installation](#one-click-installation)
-3. [One-Click Start for the Application (localdev)](#one-click-start-for-the-application-localdev)
-4. [Tests run locally and in CI](#tests-run-locally-and-in-ci)
-5. [Linter and Formatter Setup](#linter-and-formatter-setup)
-6. [Project's setup process and major design decisions](#projects-setup-process-and-major-design-decisions)
+
+## **Table of Contents**
+
+1. [Debugger (debugpy)](#debugger-debugpy)  
+   - Quick setup for remote debugging with VS Code and PyCharm
+
+2. [One-Click Installation](#one-click-installation)  
+   - Managing dependencies (install/remove) via Makefile  
+
+3. [One-Click Start for the Application (localdev)](#one-click-start-for-the-application-localdev)  
+   - Prerequisites for Docker and Makefile  
+   - Starting and stopping all services with a single command  
+
+4. [Tests Run Locally and in CI](#tests-run-locally-and-in-ci)  
+   - Running `pytest` locally and in CI pipelines  
+   - Coverage reports for Python tests  
+
+5. [Automated Dependency Updates with Renovate](#automated-dependency-updates-with-renovate)  
+   - MR workflows for dependency updates  
+   - Grouping updates by type (e.g., minor, major)  
+
+6. [Linter and Formatter Setup](#linter-and-formatter-setup)  
+   - Local setup and running `pylint`/`black`  
+   - Integrating linting/formatting in CI pipelines  
+
+7. [Static Code Analysis (SonarQube)](#static-code-analysis-sonarqube)  
+   - Local setup for Windows/Linux with SonarScanner  
+   - IDE integration (VS Code and PyCharm)  
+   - Configuration for SonarCloud in CI  
+
+8. [Project Setup Process and Major Design Decisions](#projects-setup-process-and-major-design-decisions)  
+   - Simplified environment setup with Makefile and Docker Compose  
+   - Key architectural choices (e.g., microservices, PostgreSQL)  
+   - Debugging tools and schema migration setup  
+
+---
 
 ## Debugger (debugpy)
 - Add debugpy to requirements.txt
@@ -189,7 +218,7 @@ For more detail on those, please refer to [here.](../README.md#linting-and-forma
 
 ---
 
-### CI Pipeline
+### Linting and formatting in the CI Pipeline
 
 1. **Install Dependencies**:
    The `analyze-job` in the CI pipeline installs the tools:
@@ -215,6 +244,118 @@ For more detail on those, please refer to [here.](../README.md#linting-and-forma
   development and CI Pipeline.
 
 [back to top](#devexp)
+
+## **Static Code Analysis (SonarQube)**
+
+### **Overview**  
+SonarQube ensures adherence to code quality standards both locally and in CI. This section covers local setups for 
+Windows and Linux, IDE integrations, and configuration in CI pipelines.
+
+---
+
+### **1. Local Setup**  
+SonarScanner can be run locally for analysis before pushing changes.
+
+#### **For Windows**  
+1. Download and extract [SonarScanner](https://docs.sonarsource.com/sonarqube-server/9.9/analyzing-source-code/scanners/sonarscanner/).  
+2. Add the `bin` directory to your system’s `PATH` environment variable.  
+
+   Example:  
+   ```powershell
+   setx PATH "%PATH%;C:\path\to\sonar-scanner\bin"
+   ```
+
+3. Set the `SONAR_TOKEN` (authentication):  
+   - **Per Session (Temporary)**:  
+     ```powershell
+     set SONAR_TOKEN=<your_sonar_token>
+     ```  
+   - **Global Setup (Persistent)**:  
+     Edit the scanner properties file at:  
+     ```plaintext
+     <INSTALL_DIRECTORY>\conf\sonar-scanner.properties
+     ```
+     Add this line:  
+     ```plaintext
+     sonar.token=<your_sonar_token>
+     ```
+
+4. Generate a test Coverage report in XML format:
+    ```bash
+      	python -m pytest --cov=backend/src --cov-config=backend/setup.cfg --cov-report=xml:backend/coverage-reports/coverage.xml backend/src/tests/
+        # or run make coverage 
+   ```
+
+5. Run the scanner:
+   ```bash
+   sonar-scanner
+   ```
+
+**Tip:** Steps **4** & **5** can be streamlined with the make target `make sonar`
+
+---
+
+#### **For Linux/Unix**  
+1. Download and install SonarScanner:  
+   ```bash
+   mkdir -p ~/.sonar
+   curl -sSLo ~/.sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux.zip
+   unzip ~/.sonar/sonar-scanner.zip -d ~/.sonar/
+   export PATH=~/.sonar/sonar-scanner-6.2.1.4610-linux/bin:$PATH
+   ```
+
+2. Provide the `SONAR_TOKEN`:
+   - **Per Session (Temporary)**:  
+     ```bash
+     export SONAR_TOKEN=<your_sonar_token>
+     ```  
+   - **Global Setup (Persistent)**:  
+     Edit the scanner properties file at:  
+     ```plaintext
+     ~/.sonar/sonar-scanner-6.2.1.4610-linux/conf/sonar-scanner.properties
+     ```
+     Add this line:  
+     ```plaintext
+     sonar.token=<your_sonar_token>
+     ```
+
+3. Generate a test Coverage report in XML format:
+    ```bash
+      	python -m pytest --cov=backend/src --cov-config=backend/setup.cfg --cov-report=xml:backend/coverage-reports/coverage.xml backend/src/tests/
+        # or run make coverage 
+   ```
+
+4. Run the scanner:
+   ```bash
+   sonar-scanner
+   ```
+
+**Tip:** Steps **3** & **4** can be streamlined with the make target `make sonar`
+
+---
+
+### **2. IDE Integration**
+
+#### **VS Code**  
+1. Install the **SonarQube for IDE** extension from the VS Code Marketplace.  
+2. Add your SonarCloud account and project details in the extension settings.  
+
+#### **PyCharm**  
+1. Install the **SonarQube for IDE** plugin from the JetBrains Marketplace.  
+2. Configure the plugin:  
+   - Go to **File > Settings > Tools > SonarQube for IDE**.  
+   - Add your SonarCloud token and project details.  
+
+---
+
+### **3. CI Configuration**  
+SonarScanner is integrated into the CI pipeline for automatic analysis. Key settings include:  
+- Coverage reports collected from the `test-backend` job.  
+- The `sonar-project.properties` file for project-specific configurations.  
+
+Refer to the [CI pipeline file](../.gitlab-ci.yml) for more details on the `sonarqube-scan` job.
+
+---
 
 ## Project's setup process and major design decisions
 

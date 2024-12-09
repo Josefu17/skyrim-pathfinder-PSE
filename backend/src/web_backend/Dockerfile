@@ -4,6 +4,9 @@ FROM python:3.13-slim
 # Set the working directory inside the container
 WORKDIR /app
 
+# Add a non-root user
+RUN useradd --create-home appuser
+
 # Copy dependencies file and install them
 COPY backend/requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
@@ -17,6 +20,9 @@ COPY backend/alembic.ini /app/backend/alembic.ini
 
 # Copy environment variables file
 COPY .env /app/.env
+
+# Switch to newly created non-root user for better security
+USER appuser
 
 # Expose ports for the service
 EXPOSE 4243 5678

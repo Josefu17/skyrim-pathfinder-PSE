@@ -6,21 +6,36 @@ and dependency management. It also touches on the topic of ensuring application 
 ---
 
 ## Table of Contents
-1. [Pipeline to build the application](#pipeline-to-build-the-application)
-2. [Trigger automated releases via GitLab](#trigger-automated-releases-via-gitlab)
-3. [Deployment of application to a server](#deployment-of-application-to-a-server)
-4. [Automated Tests](#automated-tests)
-5. [Code Coverage and Displaying the Badge in GitLab](#code-coverage-and-displaying-the-badge-in-gitlab)
-6. [Dependency proxy usage](#dependency-proxy-usage)
-7. [Static Code Analysis (TODO)](#static-code-analysis)
-8. [Ensuring application availability](#ensuring-application-availability)
-9. [Scoped API tokens](#scoped-api-tokens)
 
----
+1. [Pipeline to Build the Application](#pipeline-to-build-the-application)  
+
+2. [Trigger Automated Releases via GitLab](#trigger-automated-releases-via-gitlab)  
+   - Using the `deploy` job for automated releases  
+
+3. [Deployment of Application to a Server](#deployment-of-application-to-a-server)  
+   - Automated deployment using Docker and SSH  
+   - Manual deployment as a fallback  
+
+4. [Automated Tests](#automated-tests)  
+   - Unit tests and code coverage in the CI pipeline  
+
+5. [Code Coverage and Displaying the Badge in GitLab](#code-coverage-and-displaying-the-badge-in-gitlab)  
+   - Local checks, CI integration, and badge display setup  
+
+6. [Dependency Proxy Usage](#dependency-proxy-usage)  
+   - Using GitLab’s dependency proxy for faster pipelines  
+
+7. [Ensuring Application Availability](#ensuring-application-availability)  
+   - Health monitoring with `/healthz`  
+
+8. [Scoped API Tokens](#scoped-api-tokens)  
+   - Secure authentication for CI/CD processes  
+
 
 ## Pipeline to Build the Application
 
-The pipeline builds and tests the application, ensuring it meets the required standards for deployment. This includes linting, formatting, unit tests, and code coverage analysis.
+The pipeline builds and tests the application, ensuring it meets the required standards for deployment. 
+This includes linting, formatting, unit tests, and code coverage analysis.
 
 ---
 
@@ -34,56 +49,45 @@ tokens and SSH keys.
 ## Deployment of Application to a Server
 
 ### Automated Deployment
+The `deploy` job in the CI pipeline integrates Docker and SSH to deploy the application on the production server.
 
-Automated deployment is the primary method for deploying the application to the production server. It integrates Docker and SSH with GitLab CI/CD to build, push, and deploy Docker images.
-
-1. **Building and Pushing Docker Images**:
-   - The pipeline builds the Docker image using `make update` and pushes it to the registry:
-     ```
+1. **Build and Push Docker Images**:  
+   The pipeline builds the Docker image and pushes it to the registry:  
+   ```bash
      docker build -t registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application:latest .
      docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/test-application:latest
-     ```
+   ```
 
-2. **Deployment on the Server**:
-   - The `deploy` job runs remote commands via SSH using a secure API token to restart the application:
-     ```bash
-     ssh -i ci_ssh debian@group2 "cd ~/app && make update"
-     ```
-     The `make update` command performs the following:
-     ```
-     make login
-     make stop
-     make remove
-     make start
-     ```
+2. **Deploy on Server**:  
+   The `deploy` job runs remote commands via SSH:  
+   ```bash
+   ssh -i ci_ssh debian@group2 "cd ~/app && make update"
+   ```  
+   The `make update` command:  
+   - Logs into the registry.  
+   - Stops and removes the old container.  
+   - Starts the latest image.
 
 ---
 
-### Manual Deployment (Fallback Method)
+### Manual Deployment (Fallback)
+In case of pipeline failures, manual deployment is a backup option.
 
-In case of pipeline failures or emergencies, manual deployment can be used. This involves running the deployment commands directly on the deployment server.
-
-1. **Push the images:**
-    - push the images to the deployment server from the local with:
-   ```bash 
+1. **Push Images Locally**:
+   ```bash
    make update
    ```
 
 2. **Log into the Server**:
    ```bash
-   ssh -i path/to/your/key debian@group2.devops-pse.users.h-da.cloud     
+   ssh -i path/to/key debian@group2.server.com
    ```
 
-3. **Update the Container**:
+3. **Deploy the Latest Image**:
    Navigate to the deployment directory and run:
    ```bash
    make update
    ```
-   This command sequence performs the following:
-   - Logs into the Docker registry.
-   - Stops the current container.
-   - Removes the old Docker image.
-   - Pulls and starts the latest image.
 
 ---
 
@@ -144,10 +148,6 @@ ci-build-job:
     - docker build -t "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}" .
     - docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}"
 ```
-
-## Static Code analysis
-
-// TODO
 
 ---
 

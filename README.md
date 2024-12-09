@@ -10,7 +10,7 @@
 5. [Backend API Overview](#backend-api-overview)  
 6. [Database Overview](#database-overview)  
 7. [Running the Application](#running-the-application)  
-8. [Testing, Linting, and Formatting](#testing-and-code-quality)  
+8. [Testing and Code Quality](#testing-and-code-quality)  
 9. [Debugging](#debugging)  
 10. [Postman Collection](#postman-collection)  
 11. [Definition of Done (DoD)](#definition-of-done-dod)  
@@ -214,7 +214,7 @@ pytest --cov=backend/src --cov-report=html:backend/htmlcov backend/src/tests/
 xdg-open backend/htmlcov/index.html  # Open coverage report (Linux)
 start backend\htmlcov\index.html  # Open coverage report (Windows)
 ```
-## Linting and Formatting
+### Linting and Formatting
 The pipeline enforces code quality using Pylint (linter) and Black (formatter). Both are applied to all Python files in
 the `src` directory, and the pipeline fails if the code does not meet the required standards.
 
@@ -230,6 +230,15 @@ Run formatting:
 ```bash
 black backend/src/**/*.py --config backend/pyproject.toml # Or use `make format`
 ```
+
+### Code Analysis with SonarQube
+The **SonarQube** integration ensures continuous static code analysis to maintain high code quality and security 
+standards. It is integrated both in the CI pipeline and for local usage.
+
+- **Static Code Analysis**: Run with [SonarCloud](https://sonarcloud.io/) for code quality checks, including identifying
+code smells, bugs, and security vulnerabilities.
+- **Configuration**: The analysis is automatically triggered in the pipeline for each branch. For details on local usage
+and advanced setup, refer to [Static Code Analysis Documentation](docs/DevExp.md#static-code-analysis-sonarqube).
 
 [back to top](#table-of-contents)
 

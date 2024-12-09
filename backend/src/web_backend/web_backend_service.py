@@ -37,16 +37,12 @@ def fetch_route_from_navigation_service(start_city_name, end_city_name, session)
             result = proxy.get_route(start_city_name, end_city_name, data)
 
             if result:
-                logger.info(
-                    "Route fetched successfully from %s and %s.",
-                    start_city_name,
-                    end_city_name,
-                )
+                logger.info("Route fetched successfully between the two endpoints.")
                 return result
             logger.error(
-                "Error calculating route from %s to %s.", start_city_name, end_city_name
+                "Error occurred while calculation the route between endpoints."
             )
-            return {"error": "Error by Route Calculation"}
+            return {"error": "Error during Route Calculation"}
 
     except xmlrpc.client.Error as e:
         logger.error("XML-RPC error: %s", e)
