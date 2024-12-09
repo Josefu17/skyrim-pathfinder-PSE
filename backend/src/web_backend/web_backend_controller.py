@@ -17,6 +17,7 @@ logger = get_logging_configuration()
 
 app = Flask(__name__)
 CORS(app)
+app.json.sort_keys = False
 
 
 @app.route("/maps", methods=["GET"])
@@ -24,10 +25,12 @@ def get_map_data():
     """Fetch and return map data including cities and connections."""
     logger.info("Fetching map data.")
     with get_db_session() as session:
-        cities_data, connections_data = service_get_map_data(session)
+        map_data, cities_data, connections_data = service_get_map_data(session)
 
     logger.info("Map data fetched successfully.")
-    return jsonify({"cities": cities_data, "connections": connections_data})
+    return jsonify(
+        {"meta_data": map_data, "cities": cities_data, "connections": connections_data}
+    )
 
 
 @app.route("/cities", methods=["GET"])

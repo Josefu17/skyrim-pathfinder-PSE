@@ -31,8 +31,8 @@ def mock_map_service_response():
 
 
 @patch("backend.src.map_service.map_service.requests.get")
-@patch("backend.src.map_service.map_service.CityDAO")
-@patch("backend.src.map_service.map_service.ConnectionDAO")
+@patch("backend.src.map_service.map_service.CityDao")
+@patch("backend.src.map_service.map_service.ConnectionDao")
 def test_fetch_and_store_map_data_success(
     connection_dao_mock,
     city_dao_mock,
@@ -82,8 +82,8 @@ def test_fetch_and_store_map_data_success(
 
 
 @patch("backend.src.map_service.map_service.requests.get")
-@patch("backend.src.map_service.map_service.CityDAO")
-@patch("backend.src.map_service.map_service.ConnectionDAO")
+@patch("backend.src.map_service.map_service.CityDao")
+@patch("backend.src.map_service.map_service.ConnectionDao")
 def test_fetch_and_store_existing_data(
     connection_dao_mock,
     city_dao_mock,
@@ -141,7 +141,7 @@ def test_fetch_and_store_map_data_http_error(requests_mock, session_mock):
 
 
 @patch("backend.src.map_service.map_service.requests.get")
-@patch("backend.src.map_service.map_service.CityDAO")
+@patch("backend.src.map_service.map_service.CityDao")
 def test_partial_city_data_handling(city_dao_mock, requests_mock, session_mock):
     """Test handling of incomplete city data."""
     # Mock HTTP response with missing city fields

@@ -131,21 +131,33 @@ Following is a more concise overview of the API.
 #### `Connection`
 - Represents a connection between two cities with `parent_city_id` and `child_city_id`.
 
+#### `Map`
+- Contains metadata like `size_x`, `size_y` and `mapname` about a specific map
+
+#### `User`
+- Represents a user with their `id` and `username`
+
 ### Migrations
 
 Database migrations are managed with **Alembic**. Follow these steps:
 
-1. **Modify Database Models**: Make any necessary changes in the database models under `backend/src/database/schema/`.
-2. **Generate a New Migration**:
+### Database Migrations with Alembic
+
+1. **Modify Database Models**  
+   Make necessary changes in the database models located under `backend/src/database/schema/`.
+
+2. **Register New Tables**  
+   Add new tables to `backend/src/database/models.py`. This file is used to register all database tables.
+
+3. **Generate a New Migration**  
+   To create a migration script, temporarily override the `DB_HOST` and `DB_PORT` environment variables so Alembic can connect to the database directly from the host machine:
    ```bash
-   alembic revision --autogenerate -m "Description of migration"
+   DB_HOST=localhost DB_PORT=<your-host-db-port> alembic -c /path/to/alembic.ini --autogenerate -m "Description of migration"
    ```
-3. **Apply Migrations**:
-   - Migrations are automatically applied when the backend container starts.
-   - To apply them manually, run:
-     ```bash
-     alembic upgrade head
-     ```
+   - The `DB_HOST` should be `localhost`, and the `DB_PORT` should match the port exposed on the host by `docker-compose` (e.g., `5433`).
+
+4. **Apply Migrations:**  
+   Migrations are automatically applied when the backend container starts.
 
 ---
 

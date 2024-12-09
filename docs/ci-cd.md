@@ -164,4 +164,3 @@ For an explanation for this, please refer to our `/healthz` endpoint implementat
 Scoped API tokens are used for authentication in CI/CD processes, ensuring no personal credentials are stored on the 
 server. Tokens can be created in GitLab under **Settings > Access Tokens** with the required scopes (`read_registry` 
 and `write_registry`).
-

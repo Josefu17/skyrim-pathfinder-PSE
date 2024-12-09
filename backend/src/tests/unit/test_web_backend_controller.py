@@ -30,8 +30,14 @@ def test_get_map_data(
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
 
-    # Mock service data
+    # Mock service data to return map, cities and connections
     mock_service_get_map_data.return_value = (
+        {
+            "id": 1,
+            "name": "Skyrim",
+            "size_x": 3066,
+            "size_y": 2326,
+        },
         [
             {
                 "id": 1,

@@ -1,6 +1,6 @@
 """integration tests for Connection and ConnectionDao"""
 
-from backend.src.database.dao.connection_dao import ConnectionDAO
+from backend.src.database.dao.connection_dao import ConnectionDao
 from backend.src.database.schema.city import City
 from backend.src.database.schema.connection import Connection
 
@@ -17,8 +17,8 @@ def test_save_and_get_connection(db):
 
     # Act
     connection = Connection(parent_city_id=city1.id, child_city_id=city2.id)
-    ConnectionDAO.save_connection(connection, db)
-    retrieved_connection = ConnectionDAO.get_connection_by_parent_and_child(
+    ConnectionDao.save_connection(connection, db)
+    retrieved_connection = ConnectionDao.get_connection_by_parent_and_child(
         city1.id, city2.id, db
     )
 
@@ -39,11 +39,11 @@ def test_get_all_connections(db):
 
     connection1 = Connection(parent_city_id=city1.id, child_city_id=city2.id)
     connection2 = Connection(parent_city_id=city2.id, child_city_id=city1.id)
-    ConnectionDAO.save_connection(connection1, db)
-    ConnectionDAO.save_connection(connection2, db)
+    ConnectionDao.save_connection(connection1, db)
+    ConnectionDao.save_connection(connection2, db)
 
     # Act
-    connections = ConnectionDAO.get_all_connections(db)
+    connections = ConnectionDao.get_all_connections(db)
 
     # Assert
     assert len(connections) == 2
@@ -71,8 +71,8 @@ def test_save_connections_bulk(db):
     connections = [connection1, connection2]
 
     # Act
-    ConnectionDAO.save_connections_bulk(connections, db)
-    retrieved_connections = ConnectionDAO.get_all_connections(db)
+    ConnectionDao.save_connections_bulk(connections, db)
+    retrieved_connections = ConnectionDao.get_all_connections(db)
 
     # Assert
     assert len(retrieved_connections) == 2
@@ -96,11 +96,11 @@ def test_delete_connection(db):
     db.flush()
 
     connection = Connection(parent_city_id=city1.id, child_city_id=city2.id)
-    ConnectionDAO.save_connection(connection, db)
+    ConnectionDao.save_connection(connection, db)
     connection_id = connection.id
 
     # Act
-    ConnectionDAO.delete_connection(connection_id, db)
+    ConnectionDao.delete_connection(connection_id, db)
     deleted_connection = db.get(Connection, connection_id)
 
     # Assert

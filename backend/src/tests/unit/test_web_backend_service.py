@@ -14,8 +14,8 @@ from backend.src.web_backend.web_backend_service import (
 
 
 @patch("backend.src.web_backend.web_backend_service.xmlrpc.client.ServerProxy")
-@patch("backend.src.web_backend.web_backend_service.CityDAO")
-@patch("backend.src.web_backend.web_backend_service.ConnectionDAO")
+@patch("backend.src.web_backend.web_backend_service.CityDao")
+@patch("backend.src.web_backend.web_backend_service.ConnectionDao")
 def test_fetch_route_success(mock_connection_dao, mock_city_dao, mock_server_proxy):
     """Test the scenario where a route is successfully fetched from the navigation service."""
     # Create a mock SQLAlchemy session
@@ -38,8 +38,8 @@ def test_fetch_route_success(mock_connection_dao, mock_city_dao, mock_server_pro
 
 
 @patch("backend.src.web_backend.web_backend_service.xmlrpc.client.ServerProxy")
-@patch("backend.src.web_backend.web_backend_service.CityDAO")
-@patch("backend.src.web_backend.web_backend_service.ConnectionDAO")
+@patch("backend.src.web_backend.web_backend_service.CityDao")
+@patch("backend.src.web_backend.web_backend_service.ConnectionDao")
 def test_fetch_route_error_by_route_calculation(
     mock_connection_dao, mock_city_dao, mock_server_proxy
 ):
@@ -61,8 +61,8 @@ def test_fetch_route_error_by_route_calculation(
 
 
 @patch("backend.src.web_backend.web_backend_service.xmlrpc.client.ServerProxy")
-@patch("backend.src.web_backend.web_backend_service.CityDAO")
-@patch("backend.src.web_backend.web_backend_service.ConnectionDAO")
+@patch("backend.src.web_backend.web_backend_service.CityDao")
+@patch("backend.src.web_backend.web_backend_service.ConnectionDao")
 def test_fetch_route_xmlrpc_error(
     mock_connection_dao, mock_city_dao, mock_server_proxy
 ):
@@ -84,8 +84,8 @@ def test_fetch_route_xmlrpc_error(
 
 
 @patch("backend.src.web_backend.web_backend_service.xmlrpc.client.ServerProxy")
-@patch("backend.src.web_backend.web_backend_service.CityDAO")
-@patch("backend.src.web_backend.web_backend_service.ConnectionDAO")
+@patch("backend.src.web_backend.web_backend_service.CityDao")
+@patch("backend.src.web_backend.web_backend_service.ConnectionDao")
 def test_fetch_route_network_error(
     mock_connection_dao, mock_city_dao, mock_server_proxy
 ):
@@ -104,7 +104,7 @@ def test_fetch_route_network_error(
     assert result == "Connection error: A network error occurred"
 
 
-@patch("backend.src.web_backend.web_backend_service.CityDAO")
+@patch("backend.src.web_backend.web_backend_service.CityDao")
 def test_fetch_cities_as_dicts(mock_city_dao):
     """Test fetching cities as dictionaries."""
     # Create a mock SQLAlchemy session
@@ -126,9 +126,10 @@ def test_fetch_cities_as_dicts(mock_city_dao):
     ]
 
 
-@patch("backend.src.web_backend.web_backend_service.CityDAO")
-@patch("backend.src.web_backend.web_backend_service.ConnectionDAO")
-def test_service_get_map_data(mock_connection_dao, mock_city_dao):
+@patch("backend.src.web_backend.web_backend_service.CityDao")
+@patch("backend.src.web_backend.web_backend_service.ConnectionDao")
+@patch("backend.src.web_backend.web_backend_service.MapDao")
+def test_service_get_map_data(mock_map_dao, mock_connection_dao, mock_city_dao):
     """Test fetching map data."""
     # Create a mock SQLAlchemy session
     mock_session = MagicMock(spec=Session)
@@ -136,10 +137,22 @@ def test_service_get_map_data(mock_connection_dao, mock_city_dao):
     # Mock data for cities and connections
     mock_city_and_connection_daos(mock_city_dao, mock_connection_dao)
 
-    # Call the function with mock session
-    cities_data, connections_data = service_get_map_data(mock_session)
+    # Mock map data
+    mock_map = create_mock_map("Skyrim", 3066, 2326, map_id=1)
+    mock_map_dao.get_map.return_value = mock_map
 
-    # Assert results
+    # Call the function with mock session
+    map_data, cities_data, connections_data = service_get_map_data(mock_session)
+
+    # Assert map_data results
+    assert map_data == {
+        "id": 1,
+        "name": "Skyrim",
+        "size_x": 3066,
+        "size_y": 2326,
+    }
+
+    # Assert cities_data results
     assert cities_data == [
         {"id": 1, "name": "Markarth", "position_x": 100, "position_y": 200},
         {"id": 2, "name": "Riften", "position_x": 300, "position_y": 400},
@@ -147,7 +160,7 @@ def test_service_get_map_data(mock_connection_dao, mock_city_dao):
     assert connections_data == [{"parent_city_id": 1, "child_city_id": 2}]
 
 
-@patch("backend.src.web_backend.web_backend_service.CityDAO")
+@patch("backend.src.web_backend.web_backend_service.CityDao")
 def test_service_get_cities_data(mock_city_dao):
     """Test fetching cities data."""
     # Create a mock SQLAlchemy session
@@ -204,3 +217,19 @@ def mock_city_and_connection_daos(mock_city_dao, mock_connection_dao):
     mock_connection_dao.get_all_connections.return_value = [
         create_mock_connection(1, 2)
     ]
+
+
+def create_mock_map(name, size_x, size_y, map_id=None):
+    """Helper to mock general map information"""
+    map_obj = MagicMock()
+    map_obj.name = name
+    map_obj.size_x = size_x
+    map_obj.size_y = size_y
+    map_obj.id = map_id
+    map_obj.to_dict = lambda: {
+        "id": map_id,
+        "name": name,
+        "size_x": size_x,
+        "size_y": size_y,
+    }
+    return map_obj

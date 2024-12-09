@@ -4,7 +4,7 @@ from backend.src.database.schema.connection import Connection
 
 
 # Connections dao
-class ConnectionDAO:
+class ConnectionDao:
     """Data Access Object for Connections."""
 
     @staticmethod
