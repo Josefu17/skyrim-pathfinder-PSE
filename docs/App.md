@@ -6,11 +6,18 @@ user interaction flows.
 
 ---
 
-## Table of Contents
-1. [Stateless Navigation Service](#stateless-navigation-service)
-2. [RPC-API](#rpc-api)
-3. [Backend](#backend)
-4. [Frontend](#frontend)
+## **Table of Contents**
+
+1. [Stateless Navigation Service](#stateless-navigation-service)  
+   - Overview of Dijkstra's algorithm and method details  
+
+2. [RPC-API](#rpc-api)  
+   - Server and client communication via XML-RPC  
+
+3. [Backend](#backend)  
+   - Map data handling and RESTful API endpoints  
+
+4. [Frontend](#frontend)  
 
 ## Stateless Navigation Service
 The Navigation Service uses the Dijkstra algorithm to calculate the best route between two cities. The function receives a graph, the start city, and the destination city as parameters.

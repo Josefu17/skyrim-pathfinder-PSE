@@ -72,9 +72,7 @@ def test_check_map_service_connection_failure():
     """
     Test that `check_map_service_connection` handles a failed connection to the map service.
     """
-    with patch(
-        "requests.get", side_effect=RequestException("Connection error")
-    ) as mock_get:  # pylint: disable=unused-variable # noqa
+    with patch("requests.get", side_effect=RequestException("Connection error")):
         result = check_map_service_connection()
 
         assert result["map_service_connection"] is False
@@ -101,9 +99,7 @@ def test_check_navigation_service_connection_failure():
     Test that `check_navigation_service_connection` handles a failed connection
     to the navigation service.
     """
-    with patch(
-        "requests.get", side_effect=RequestException("Connection error")
-    ) as mock_get:  # pylint: disable=unused-variable # noqa
+    with patch("requests.get", side_effect=RequestException("Connection error")):
         result = check_navigation_service_connection()
 
         assert result["navigation_service_connection"] is False
@@ -152,9 +148,7 @@ def test_check_frontend_availability_connection_failure():
     """
     Test that `check_frontend_availability` handles a failed connection to the frontend.
     """
-    with patch(
-        "requests.get", side_effect=RequestException("Connection error")
-    ) as mock_get:  # pylint: disable=unused-variable # noqa
+    with patch("requests.get", side_effect=RequestException("Connection error")):
         result = check_frontend_availability()
 
         assert result["frontend_availability"] is False

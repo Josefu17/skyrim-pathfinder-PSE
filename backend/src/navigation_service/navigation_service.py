@@ -3,8 +3,22 @@
 import heapq
 import math
 from collections import defaultdict
+from dataclasses import dataclass
+from typing import Dict, List
 
 from backend.src.logging_config import get_logging_configuration
+
+
+@dataclass
+class UpdateData:
+    """helper Data Class to avoid too many parameters"""
+
+    distances: Dict[int, float]
+    second_distances: Dict[int, float]
+    neighbor: int
+    new_distance: float
+    path: List[int]
+
 
 logger = get_logging_configuration()
 
@@ -98,6 +112,48 @@ def create_graph(data):
     return graph
 
 
+def initialize_distances(graph, start_city_id):
+    """helper function for dijkstra distances initialization"""
+    distances = {city_id: float("inf") for city_id in graph}
+    second_distances = {city_id: float("inf") for city_id in graph}
+    distances[start_city_id] = 0
+    return distances, second_distances
+
+
+def update_heap_and_distances(heap, update_data: UpdateData):
+    """helper method to dijkstra to update the heap and the distances"""
+    distances = update_data.distances
+    second_distances = update_data.second_distances
+    neighbor = update_data.neighbor
+    new_distance = update_data.new_distance
+    path = update_data.path
+
+    if new_distance < distances[neighbor]:
+        second_distances[neighbor] = distances[neighbor]
+        distances[neighbor] = new_distance
+        heapq.heappush(heap, (new_distance, neighbor, path))
+    elif distances[neighbor] < new_distance < second_distances[neighbor]:
+        second_distances[neighbor] = new_distance
+        heapq.heappush(heap, (new_distance, neighbor, path))
+
+
+def validate_paths(path, second_path, distances_dict, end_city_id, start_city_id):
+    """helper method to dijkstra to to validate if paths exists between the two cities"""
+    distances = distances_dict["distances"]
+    second_distances = distances_dict["second_distances"]
+    if not path or distances[end_city_id] == float("inf"):
+        logger.warning(
+            "No connection found between %s and %s.", start_city_id, end_city_id
+        )
+        return [], float("inf"), [], float("inf")
+    if not second_path or second_distances[end_city_id] == float("inf"):
+        logger.warning(
+            "No alternative route found between %s and %s.", start_city_id, end_city_id
+        )
+        second_path = []
+    return path, distances[end_city_id], second_path, second_distances[end_city_id]
+
+
 def dijkstra(graph, start_city_id, end_city_id):
     """Calculates the shortest and second-shortest routes."""
     logger.info(
@@ -109,12 +165,9 @@ def dijkstra(graph, start_city_id, end_city_id):
     if start_city_id == end_city_id:
         return [start_city_id], 0, [start_city_id], 0
 
+    distances, second_distances = initialize_distances(graph, start_city_id)
     min_heap = [(0, start_city_id, [])]  # Priority queue
-    distances = {city_id: float("inf") for city_id in graph}
-    distances[start_city_id] = 0
-    second_distances = {city_id: float("inf") for city_id in graph}
-    path = []
-    second_path = []
+    path, second_path = [], []
 
     while min_heap:
         current_distance, current_city, current_path = heapq.heappop(min_heap)
@@ -129,32 +182,17 @@ def dijkstra(graph, start_city_id, end_city_id):
 
         # Explore neighbors of the current city
         for distance, neighbor in graph[current_city]:
-            new_distance = current_distance + distance
+            update_data = UpdateData(
+                distances,
+                second_distances,
+                neighbor,
+                (current_distance + distance),
+                current_path,
+            )
+            update_heap_and_distances(min_heap, update_data)
 
-            # Update the shortest path
-            if new_distance < distances[neighbor]:
-                second_distances[neighbor] = distances[neighbor]  # Save old distance
-                distances[neighbor] = new_distance
-                heapq.heappush(min_heap, (new_distance, neighbor, current_path))
-            # Update second-shortest path
-            elif distances[neighbor] < new_distance < second_distances[neighbor]:
-                second_distances[neighbor] = new_distance
-                heapq.heappush(min_heap, (new_distance, neighbor, current_path))
-
-    # Check if paths were found
-    if not path or distances[end_city_id] == float("inf"):
-        logger.warning(
-            "No connection found between %s and %s.", start_city_id, end_city_id
-        )
-        return [], float("inf"), [], float("inf")
-
-    if not second_path or second_distances[end_city_id] == float("inf"):
-        logger.warning(
-            "No alternative route found between %s and %s.", start_city_id, end_city_id
-        )
-        second_path = []
-
-    return path, distances[end_city_id], second_path, second_distances[end_city_id]
+    distances_dict = {"distances": distances, "second_distances": second_distances}
+    return validate_paths(path, second_path, distances_dict, end_city_id, start_city_id)
 
 
 def calculate_distance(city_1, city_2):

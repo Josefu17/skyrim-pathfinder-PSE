@@ -57,7 +57,7 @@ def test_fetch_route_error_by_route_calculation(
 
     # Call the function with mock session and assert results
     result = fetch_route_from_navigation_service("Markarth", "Riften", mock_session)
-    assert result == {"error": "Error by Route Calculation"}
+    assert result == {"error": "Error during Route Calculation"}
 
 
 @patch("backend.src.web_backend.web_backend_service.xmlrpc.client.ServerProxy")

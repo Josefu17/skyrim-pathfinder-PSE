@@ -8,8 +8,6 @@
 
 ## Remaining Tasks:
 ### [Startup test for frontend](#cicd-and-operation)
-### [Static code analysis tool](#cicd-and-operation)
-
 
 ## **Project Management**
 - **[Merge Request Definition](../DoD.md#definition-of-done-dod)**  
@@ -53,8 +51,8 @@
   ✅ Completed  
 - **[Dependency Proxy Usage](../ci-cd.md#dependency-proxy-usage)**  
   ✅ Completed  
-- **[Code Analysis Tools](../ci-cd.md#static-code-analysis)**  
-  ❌ Pending  
+- **[Code Analysis Tool(s)](../../README.md#code-analysis-with-sonarqube)**  
+  ✅ Completed 
 - **[Application Runs on Server](../ci-cd.md#ensuring-application-availability)**  
   ✅ Completed  
 - **[Local Development with Local Database](../../README.md#running-the-application)** Our docker compose setup explained [here](../../README.md#running-the-application) allows this.  

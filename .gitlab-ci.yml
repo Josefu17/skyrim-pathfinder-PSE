@@ -20,7 +20,7 @@ ci-build-job:
   - docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}"
 
 
-test-job:
+test-backend:
   stage: test
   image: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}"
   variables:
@@ -33,10 +33,15 @@ test-job:
   - pip --version
   - pip install -r backend/requirements.txt
   script:
-  - pytest --cov=backend/src --cov-report=term backend/src/tests/ --cov-config=backend/setup.cfg
+  - pytest --cov=backend/src --cov-report=term --cov-report=xml:backend/coverage-reports/coverage.xml backend/src/tests/ --cov-config=backend/setup.cfg
+  artifacts:
+    paths:
+      - backend/coverage-reports/coverage.xml
+    expire_in: 7 days
+  coverage: "/TOTAL\\s+\\d+\\s+\\d+\\s+(\\d+)%/"
   needs:
   - ci-build-job
-  coverage: "/TOTAL\\s+\\d+\\s+\\d+\\s+(\\d+)%/"
+
 
 dependency_scan-job:
   stage: test
@@ -58,7 +63,7 @@ dependency_scan-job:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "set-dependency-scanning-config-1" || $CI_PIPELINE_SOURCE == "schedule"'
   needs:
-    - test-job
+    - test-backend
 
 analyze-job:
   stage: analyze
@@ -75,6 +80,24 @@ analyze-job:
   - python -m black --config backend/pyproject.toml backend/src
   needs:
   - ci-build-job
+
+sonarqube-scan:
+  stage: analyze
+  image: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/sonarsource/sonar-scanner-cli:latest"
+  dependencies:
+    - test-backend
+  script:
+    # Run sonar-scanner and save logs while printing them to the console
+    - |
+      sonar-scanner | tee sonar-scanner.log
+    # Print a section with warnings and errors
+    - echo -e "\n=== Warnings and Errors ==="
+    - grep -E "(ERROR|WARN)" sonar-scanner.log || echo "No warnings or errors found."
+  artifacts:
+    paths:
+      - sonar-scanner.log
+  needs:
+    - test-backend
 
 
 deploy-job:
@@ -100,7 +123,7 @@ deploy-job:
   - ssh -v -i ~/.ssh/ci_ssh debian@group2.osnet.h-da.cloud "make update && echo 'Successfully
     deployed' && exit"
   needs:
-  - test-job
+  - test-backend
   - dependency_scan-job
   - analyze-job
   only:

@@ -59,10 +59,14 @@ test:
 	python -m pytest ./backend/src/tests/
 
 coverage:
-	python -m pytest --cov=backend/src --cov-report=html:backend/htmlcov backend/src/tests/ --cov-config=backend/setup.cfg
+	python -m pytest --cov=backend/src --cov-report=html:backend/coverage-reports/htmlcov backend/src/tests/ --cov-config=backend/setup.cfg --cov-report=xml:backend/coverage-reports/coverage.xml
 
 coverage-open-windows: coverage
-	 start backend\htmlcov\index.html
+	 start backend\coverage-reports\htmlcov\index.html
+
+# SonarQube management
+sonar: coverage
+	sonar-scanner
 
 run-tests:
 # instrument the code for coverage
@@ -94,3 +98,6 @@ connect-to-database:
 pre-commit: test format lint
 
 
+# Linux / Unix specific commands:
+unix-coverage-open: coverage
+	xdg-open backend/coverage-reports/htmlcov/index.html
