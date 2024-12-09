@@ -1,4 +1,5 @@
-"""contains common fixtures that are detected by other test files automatically"""
+"""contains common fixtures that are detected by other test files automatically
+the database is then passed to the tests automatically"""
 
 import pytest
 from sqlalchemy import create_engine, text

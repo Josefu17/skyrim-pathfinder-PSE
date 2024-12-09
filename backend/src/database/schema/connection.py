@@ -11,7 +11,7 @@ logger = get_logging_configuration()
 class Connection(Base):
     """Database class Connection"""
 
-    __tablename__ = "connection"
+    __tablename__ = "connections"
     id = Column(Integer, primary_key=True, autoincrement=True)
     parent_city_id = Column(Integer, ForeignKey("city.id"), nullable=False)
     child_city_id = Column(Integer, ForeignKey("city.id"), nullable=False)

@@ -2,11 +2,13 @@
 
 import requests
 
-from backend.src.database.dao.city_dao import CityDAO
-from backend.src.database.dao.connection_dao import ConnectionDAO
+from backend.src.database.dao.city_dao import CityDao
+from backend.src.database.dao.connection_dao import ConnectionDao
 from backend.src.database.schema.city import City
 from backend.src.database.schema.connection import Connection
 from backend.src.logging_config import get_logging_configuration
+from backend.src.database.dao.map_dao import MapDao
+from backend.src.database.schema.map import Map
 
 logger = get_logging_configuration()
 
@@ -25,17 +27,25 @@ def fetch_and_store_map_data_if_needed(session):
 
         data = response.json()
 
+        map_info = MapDao.get_map(session)
+        if not map_info:
+            map_info = Map(
+                name=data["mapname"],
+                size_x=data["mapsizeX"],
+                size_y=data["mapsizeY"],
+            )
+            MapDao.save_map(map_info, session)
         city_map = {}
 
         for city in data["cities"]:
-            db_city = CityDAO.get_city_by_name(city["name"], session)
+            db_city = CityDao.get_city_by_name(city["name"], session)
             if not db_city:
                 db_city = City(
                     name=city["name"],
                     position_x=city["positionX"],
                     position_y=city["positionY"],
                 )
-                CityDAO.save_city(db_city, session)
+                CityDao.save_city(db_city, session)
                 logger.info("City %s saved", city["name"])
             city_map[city["name"]] = db_city.id
 
@@ -46,7 +56,7 @@ def fetch_and_store_map_data_if_needed(session):
             child_city_id = city_map.get(connection["child"])
 
             if parent_city_id and child_city_id:
-                db_connection = ConnectionDAO.get_connection_by_parent_and_child(
+                db_connection = ConnectionDao.get_connection_by_parent_and_child(
                     parent_city_id=parent_city_id,
                     child_city_id=child_city_id,
                     session=session,
@@ -63,7 +73,7 @@ def fetch_and_store_map_data_if_needed(session):
                     )
 
         if new_connections:
-            ConnectionDAO.save_connections_bulk(new_connections, session)
+            ConnectionDao.save_connections_bulk(new_connections, session)
             logger.info("New Connections saved successfully")
     except requests.exceptions.RequestException as e:
         logger.error("Error fetching map data: %s", e)

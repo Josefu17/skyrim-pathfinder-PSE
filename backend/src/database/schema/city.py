@@ -13,7 +13,7 @@ class City(Base):
 
     __tablename__ = "city"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
+    name = Column(String(255), nullable=False)
     position_x = Column(Integer, nullable=False)
     position_y = Column(Integer, nullable=False)
 

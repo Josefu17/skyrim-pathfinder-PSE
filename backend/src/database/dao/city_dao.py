@@ -3,8 +3,7 @@
 from backend.src.database.schema.city import City
 
 
-# Cities dao
-class CityDAO:
+class CityDao:
     """Data Access Object for City."""
 
     @staticmethod
