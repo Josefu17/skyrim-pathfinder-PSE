@@ -5,6 +5,7 @@ from backend.src.database.schema.city import City  # noqa
 from backend.src.database.schema.connection import Connection  # noqa
 from backend.src.database.schema.map import Map  # noqa
 from backend.src.database.schema.user import User  # noqa
+from backend.src.database.schema.route import Route  # noqa
 
 
 # Register models by importing them
