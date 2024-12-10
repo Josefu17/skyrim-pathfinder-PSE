@@ -33,4 +33,4 @@ ENV PYTHONPATH=/app
 # Run migrate db first by running alembic upgrade and then start the web backend controller
 CMD ["sh", "-c", "\
     alembic -c backend/alembic.ini upgrade head && \
-    python -m backend.src.web_backend.web_backend_controller"]
+    python -m backend.src.app"]
