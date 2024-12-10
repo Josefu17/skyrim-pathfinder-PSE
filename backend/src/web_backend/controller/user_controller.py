@@ -1,0 +1,42 @@
+"""User controller module for the Flask app."""
+
+from flask import request, jsonify
+
+from backend.src.logging_config import get_logging_configuration
+from backend.src.database.schema.user import User
+from backend.src.database.db_connection import get_db_session
+from backend.src.database.dao.user_dao import UserDao
+
+logger = get_logging_configuration()
+
+
+def init_user_routes(app):
+    """Initialize all routes for the Flask app."""
+
+    @app.route("/auth/register", methods=["POST"])
+    def register_user():
+        """Register a new user."""
+        data = request.get_json()
+        username = data.get("username")
+
+        if not username:
+            return jsonify({"error": "Username is required"}), 400
+
+        with get_db_session() as session:
+            if UserDao.user_exists_by_username(username, session):
+                return jsonify({"error": "Username already exists"}), 400
+
+            user = User(username=username)
+            UserDao.save_user(user, session)
+            session.refresh(user)
+
+        logger.info("Registering new user: %s", username)
+        return (
+            jsonify(
+                {
+                    "message": f"User {username} registered successfully.",
+                    "user": {"username": username, "id": user.id},
+                }
+            ),
+            201,
+        )

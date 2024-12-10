@@ -7,8 +7,10 @@ from unittest.mock import patch, MagicMock
 import pytest
 from flask.testing import FlaskClient
 
-from backend.src.web_backend.web_backend_controller import app
-from backend.src.web_backend.web_backend_controller import main
+from backend.src.app import create_app
+from backend.src.app import main
+
+app = create_app()
 
 
 @pytest.fixture(name="client")
@@ -20,8 +22,8 @@ def flask() -> Generator[FlaskClient, None, None]:
 
 
 # Test for the `/maps` endpoint
-@patch("backend.src.web_backend.web_backend_controller.get_db_session")
-@patch("backend.src.web_backend.web_backend_controller.service_get_map_data")
+@patch("backend.src.web_backend.controller.map_controller.get_db_session")
+@patch("backend.src.web_backend.controller.map_controller.service_get_map_data")
 def test_get_map_data(
     mock_service_get_map_data, mock_get_db_session, client: FlaskClient
 ):
@@ -71,8 +73,8 @@ def test_get_map_data(
 
 
 # Test for the `/cities` endpoint
-@patch("backend.src.web_backend.web_backend_controller.get_db_session")
-@patch("backend.src.web_backend.web_backend_controller.service_get_cities_data")
+@patch("backend.src.web_backend.controller.map_controller.get_db_session")
+@patch("backend.src.web_backend.controller.map_controller.service_get_cities_data")
 def test_get_cities(
     mock_service_get_cities_data, mock_get_db_session, client: FlaskClient
 ):
@@ -107,9 +109,9 @@ def test_get_cities(
 
 
 # Test for the `/cities/route` endpoint
-@patch("backend.src.web_backend.web_backend_controller.get_db_session")
+@patch("backend.src.web_backend.controller.map_controller.get_db_session")
 @patch(
-    "backend.src.web_backend.web_backend_controller.fetch_route_from_navigation_service"
+    "backend.src.web_backend.controller.map_controller.fetch_route_from_navigation_service"
 )
 def test_calculate_route(mock_fetch_route, mock_get_db_session, client: FlaskClient):
     """Test the calculate_route endpoint."""
@@ -138,9 +140,9 @@ def test_calculate_route(mock_fetch_route, mock_get_db_session, client: FlaskCli
 
 
 @patch(
-    "backend.src.web_backend.web_backend_controller.fetch_route_from_navigation_service"
+    "backend.src.web_backend.controller.map_controller.fetch_route_from_navigation_service"
 )
-@patch("backend.src.web_backend.web_backend_controller.get_db_session")
+@patch("backend.src.web_backend.controller.map_controller.get_db_session")
 def test_calculate_route_service_error(
     mock_get_db_session, mock_fetch_route_from_navigation_service, client
 ):
@@ -167,13 +169,15 @@ def test_calculate_route_missing_params(client):
     assert response.json == {"error": "Start and end cities are required"}
 
 
-@patch(
-    "backend.src.web_backend.web_backend_controller.fetch_and_store_map_data_if_needed"
-)
-@patch("backend.src.web_backend.web_backend_controller.get_db_session")
-@patch("backend.src.web_backend.web_backend_controller.app.run")
-def test_main_script(mock_app_run, mock_get_db_session, mock_fetch_and_store_map_data):
+@patch("backend.src.app.fetch_and_store_map_data_if_needed")
+@patch("backend.src.app.get_db_session")
+@patch("backend.src.app.create_app")
+def test_main_script(
+    mock_create_app, mock_get_db_session, mock_fetch_and_store_map_data
+):
     """Test the main script block."""
+    mock_app = MagicMock()
+    mock_create_app.return_value = mock_app
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
 
@@ -181,4 +185,4 @@ def test_main_script(mock_app_run, mock_get_db_session, mock_fetch_and_store_map
 
     # Assertions
     mock_fetch_and_store_map_data.assert_called_once_with(session=mock_session)
-    mock_app_run.assert_called_once_with(debug=True, host="0.0.0.0", port=4243)
+    mock_app.run.assert_called_once_with(debug=True, host="0.0.0.0", port=4243)

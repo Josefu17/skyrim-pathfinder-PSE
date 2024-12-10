@@ -1,100 +1,125 @@
 {
-	"info": {
-		"_postman_id": "5fcf9654-02d5-45c7-9c85-3b4d73b26cac",
-		"name": "PSE",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "39957447"
-	},
-	"item": [
-		{
-			"name": "maps",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{base_url}}/maps",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"maps"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "cities",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
-		},
-		{
-			"name": "cities/route example",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{base_url}}/cities/route?startpoint=Whiterun&endpoint=Riften",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"cities",
-						"route"
-					],
-					"query": [
-						{
-							"key": "startpoint",
-							"value": "Whiterun"
-						},
-						{
-							"key": "endpoint",
-							"value": "Riften"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "healthz",
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "base_url",
-			"value": "localhost:4243",
-			"type": "string"
-		}
-	]
+  "info": {
+    "_postman_id": "12345678-1234-1234-1234-123456789012",
+    "name": "PSE - Path finder",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"example_user\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4243/auth/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4243",
+          "path": [
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Map Data",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4243/maps",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4243",
+          "path": [
+            "maps"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Cities",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4243/cities",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4243",
+          "path": [
+            "cities"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Calculate Route",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4243/cities/route?startpoint=CityA&endpoint=CityB",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4243",
+          "path": [
+            "cities",
+            "route"
+          ],
+          "query": [
+            {
+              "key": "startpoint",
+              "value": "CityA"
+            },
+            {
+              "key": "endpoint",
+              "value": "CityB"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4243/healthz",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4243",
+          "path": [
+            "healthz"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
 }
