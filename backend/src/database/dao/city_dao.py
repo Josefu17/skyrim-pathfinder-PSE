@@ -1,5 +1,7 @@
 """Data Access Object for City."""
 
+from sqlalchemy.orm import Session
+
 from backend.src.database.schema.city import City
 
 
@@ -22,15 +24,18 @@ class CityDao:
         return session.get(City, city_id)
 
     @staticmethod
-    def save_city(city, session):
-        """save city"""
+    def save_city(city: City, session: Session) -> City:
+        """save city and return saved city"""
         session.add(city)
         session.commit()
+        return city
 
     @staticmethod
-    def delete_city(city_id, session):
-        """delete city"""
+    def delete_city(city_id, session) -> bool:
+        """delete city if exists and return True if deleted, else False"""
         city = session.get(City, city_id)
         if city:
             session.delete(city)
             session.commit()
+            return True
+        return False
