@@ -35,6 +35,35 @@
       "response": []
     },
     {
+      "name": "Login User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"example_user\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4243/auth/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4243",
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Get Map Data",
       "request": {
         "method": "GET",

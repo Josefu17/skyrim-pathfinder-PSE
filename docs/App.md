@@ -105,6 +105,7 @@ The backend exposes RESTful endpoints for the frontend:
 - **GET `/cities`**: Returns all cities.
 - **GET `/cities/route`**: Accepts startpoint and endpoint query parameters, then returns the optimal route along with its distance. Additionally, provides an alternative route and its corresponding distance.
 - **POST `/auth/regiser`**: Registers a new user and stores their credentials in the database.
+- **POST `/auth/login`**: Checks if the user exists in the database and returns their username and id.
 These endpoints serve as the bridge between the frontend, database, and navigation service.
 
 ---
