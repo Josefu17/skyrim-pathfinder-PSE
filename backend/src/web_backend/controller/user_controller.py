@@ -40,3 +40,29 @@ def init_user_routes(app):
             ),
             201,
         )
+
+    @app.route("/auth/login", methods=["POST"])
+    def login_user():
+        """Login an existing user."""
+        data = request.get_json()
+        username = data.get("username")
+
+        if not username:
+            return jsonify({"error": "Username is required"}), 400
+
+        with get_db_session() as session:
+            user = UserDao.get_user_by_username(username, session)
+
+            if not user:
+                return jsonify({"error": "User not found"}), 404
+
+        logger.info("Logging in user: %s", username)
+        return (
+            jsonify(
+                {
+                    "message": f"User {username} logged in successfully.",
+                    "user": {"username": username, "id": user.id},
+                }
+            ),
+            200,
+        )
