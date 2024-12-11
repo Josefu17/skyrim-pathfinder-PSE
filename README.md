@@ -67,7 +67,7 @@ For more details about the commands, please refer to the said Makefile
 
 2. Create a virtual environment (optional but recommended):
    ```bash
-   python3 -m venv .venv  # Or use `make create-venv`
+   python3 -m venv .venv
    source .venv/bin/activate  # Windows: .venv\Scripts\activate
    ```
     In case of problems, refer to the official Python [documentation](https://docs.python.org/3/library/venv.html) on virtual environments.
