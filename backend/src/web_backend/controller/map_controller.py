@@ -2,11 +2,10 @@
 This module contains the controller for the web backend service.
 """
 
-from flask import jsonify, request
+from flask import jsonify
 from backend.src.database.db_connection import get_db_session
 from backend.src.logging_config import get_logging_configuration
 from backend.src.web_backend.web_backend_service import (
-    fetch_route_from_navigation_service,
     service_get_map_data,
     service_get_cities_data,
 )
@@ -37,31 +36,6 @@ def init_map_routes(app):
             cities = service_get_cities_data(session)
         logger.info("Cities data fetched successfully.")
         return jsonify({"cities": cities})
-
-    @app.route("/cities/route", methods=["GET"])
-    def calculate_route():
-        """Calculate shortest route for given 2 endpoints"""
-        start_city_name = request.args.get("startpoint")
-        end_city_name = request.args.get("endpoint")
-
-        if not start_city_name or not end_city_name:
-            logger.error(
-                "Start and end cities are required but at least one of them is missing"
-            )
-            return jsonify({"error": "Start and end cities are required"}), 400
-
-        logger.info("Calculating route from %s to %s.", start_city_name, end_city_name)
-        with get_db_session() as session:
-            route_result = fetch_route_from_navigation_service(
-                start_city_name, end_city_name, session
-            )
-
-        if "error" in route_result:
-            logger.error("Error calculating route: %s", route_result["error"])
-            return jsonify(route_result), 400
-
-        logger.info("Route calculated successfully.")
-        return jsonify(route_result), 200
 
     @app.route("/healthz", methods=["GET"])
     def health_check():

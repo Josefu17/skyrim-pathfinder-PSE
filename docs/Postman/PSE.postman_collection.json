@@ -64,6 +64,35 @@
       "response": []
     },
     {
+      "name": "Calculate Route",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"startpoint\": \"CityA\",\n  \"endpoint\": \"CityB\",\n  \"user_id\": 1\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4243/cities/route",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4243",
+          "path": [
+            "cities",
+            "route"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Get Map Data",
       "request": {
         "method": "GET",
@@ -102,36 +131,6 @@
       "response": []
     },
     {
-      "name": "Calculate Route",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:4243/cities/route?startpoint=CityA&endpoint=CityB",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "4243",
-          "path": [
-            "cities",
-            "route"
-          ],
-          "query": [
-            {
-              "key": "startpoint",
-              "value": "CityA"
-            },
-            {
-              "key": "endpoint",
-              "value": "CityB"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
       "name": "Health Check",
       "request": {
         "method": "GET",
@@ -145,6 +144,68 @@
           "port": "4243",
           "path": [
             "healthz"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Route",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4243/cities/route/delete?user_id=1&route_id=1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4243",
+          "path": [
+            "cities",
+            "route",
+            "delete"
+          ],
+          "query": [
+            {
+              "key": "user_id",
+              "value": "1"
+            },
+            {
+              "key": "route_id",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Route",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4243/cities/route/delete?user_id=1&route_id=1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4243",
+          "path": [
+            "cities",
+            "route",
+            "delete"
+          ],
+          "query": [
+            {
+              "key": "user_id",
+              "value": "1"
+            },
+            {
+              "key": "route_id",
+              "value": "1"
+            }
           ]
         }
       },
