@@ -3,28 +3,11 @@ Tests for the user controller.
 """
 
 from unittest.mock import patch, MagicMock
-import pytest
-from flask import Flask
-
-from backend.src.web_backend.controller.user_controller import init_user_routes
-
-
-@pytest.fixture
-def client():
-    """
-    Fixture to create a test client for the Flask app.
-    """
-    app = Flask(__name__)
-    init_user_routes(app)
-    with app.test_client() as client:  # pylint: disable=redefined-outer-name
-        yield client
 
 
 @patch("backend.src.web_backend.controller.user_controller.UserDao")
 @patch("backend.src.web_backend.controller.user_controller.get_db_session")
-def test_register_user_success(
-    mock_get_db_session, mock_user_dao, client
-):  # pylint: disable=redefined-outer-name
+def test_register_user_success(mock_get_db_session, mock_user_dao, client):
     """
     Test registering a new user successfully.
     """
@@ -48,11 +31,9 @@ def test_register_user_success(
 
 
 @patch("backend.src.web_backend.controller.user_controller.UserDao")
-@patch("backend.src.web_backend.controller.user_controller.get_db_session")
 def test_register_user_missing_username(
-    mock_get_db_session,  # pylint: disable=unused-argument
     mock_user_dao,
-    client,  # pylint: disable=redefined-outer-name
+    client,
 ):
     """
     Test registering a new user without a username.
@@ -65,9 +46,7 @@ def test_register_user_missing_username(
 
 @patch("backend.src.web_backend.controller.user_controller.UserDao")
 @patch("backend.src.web_backend.controller.user_controller.get_db_session")
-def test_user_login_success(
-    mock_get_db_session, mock_user_dao, client  # pylint: disable=redefined-outer-name
-):
+def test_user_login_success(mock_get_db_session, mock_user_dao, client):
     """
     Test logging in an existing user successfully.
     """
@@ -89,11 +68,9 @@ def test_user_login_success(
 
 
 @patch("backend.src.web_backend.controller.user_controller.UserDao")
-@patch("backend.src.web_backend.controller.user_controller.get_db_session")
 def test_user_login_missing_username(
-    mock_get_db_session,  # pylint: disable=unused-argument
     mock_user_dao,
-    client,  # pylint: disable=redefined-outer-name
+    client,
 ):
     """
     Test logging in without providing a username.
@@ -106,9 +83,7 @@ def test_user_login_missing_username(
 
 @patch("backend.src.web_backend.controller.user_controller.UserDao")
 @patch("backend.src.web_backend.controller.user_controller.get_db_session")
-def test_user_login_user_not_found(
-    mock_get_db_session, mock_user_dao, client  # pylint: disable=redefined-outer-name
-):
+def test_user_login_user_not_found(mock_get_db_session, mock_user_dao, client):
     """
     Test logging in with a non-existent user.
     """

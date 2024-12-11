@@ -18,7 +18,7 @@
 - **[Regular Updates via Renovate Tool](../DevExp.md#automated-dependency-updates-with-renovate)**  
   ✅ Completed  
 
-- **[Dependency Vulnerability Scanning](../dependency_scan.md#dependency-scan-job-documentation)**  
+- **[Dependency Vulnerability Scanning](../dependency_scan.md#gitlab-dependency-scanning-with-scheduled-pipelines)**  
   - **Set up vulnerability scanning (e.g., GitLab dependency scanning)**  
     ✅ Completed  
   - **Schedule daily scans for main branch and deployed version**  
@@ -86,11 +86,21 @@
 ---
 
 ## **Action Points**
-1. **Complete Stage 1**: Finalize the static code analysis tool.  
-2. **Convert Frontend**: Move the frontend to Node.js for better testing support.  
-3. **Set Up Staging**: Implement a staging environment for pre-production testing.  
-4. **Improve Milestone Management**: Create milestones and issues during the first meeting of each stage.  
+1. **Complete Stage 1**: Finalize the static code analysis tool. 
+    
+    ✅ Completed  
+2. **Convert Frontend**: Move the frontend to Node.js for better testing support.
+    
+   ✅ Completed  
+3. **Set Up Staging**: Implement a staging environment for pre-production testing.
+
+    ❌ Pending 
+4. **Improve Milestone Management**: Create milestones and issues during the first meeting of each stage.
+
+   ✅ Implemented
 5. **Enhance Issue Tracking**: Add charts and explore tasks and epics for better organization.  
+    
+    ✅ Noted
 
 ---
 

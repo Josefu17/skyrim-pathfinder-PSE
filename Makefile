@@ -83,8 +83,8 @@ format-frontend:
 format: format-backend format-frontend
 
 # Pre commit
-pre-commit-backend: test-backend lint-backend format-backend
-pre-commit-frontend: test-frontend lint-frontend format-frontend
+pre-commit-backend: test-backend format-backend lint-backend
+pre-commit-frontend: test-frontend format-frontend lint-frontend
 pre-commit: pre-commit-backend pre-commit-frontend
 
 # Services management

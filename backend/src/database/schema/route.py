@@ -1,5 +1,6 @@
 """Python file for database class Route"""
 
+import dataclasses
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Optional
@@ -48,6 +49,16 @@ class Route(Base):
 
 
 @dataclass
+class OptionalRouteFilters:
+    """Encapsulate optional filtering parameters for routes."""
+
+    from_date: Optional[datetime] = None
+    to_date: Optional[datetime] = None
+    startpoint: Optional[str] = None
+    endpoint: Optional[str] = None
+
+
+@dataclass
 class RouteFilter:
     """Data class to store filtering information for Routes to be used in RouteDao"""
 
@@ -55,7 +66,9 @@ class RouteFilter:
     field: str = "created_at"
     limit: int = 10
     descending: bool = True
-    optional_filters: Optional[dict] = None
+    optional_filters: OptionalRouteFilters = dataclasses.field(
+        default_factory=OptionalRouteFilters
+    )
 
     def __post_init__(self):
         # Ensure optional_filters is a dictionary
@@ -68,8 +81,8 @@ class RouteFilter:
             self.field,
             self.limit,
             self.descending,
-            self.optional_filters.get("from_date"),
-            self.optional_filters.get("to_date"),
-            self.optional_filters.get("startpoint"),
-            self.optional_filters.get("endpoint"),
+            self.optional_filters.from_date,
+            self.optional_filters.to_date,
+            self.optional_filters.startpoint,
+            self.optional_filters.endpoint,
         )

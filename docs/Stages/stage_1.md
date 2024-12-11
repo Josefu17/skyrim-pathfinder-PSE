@@ -83,10 +83,20 @@
 To improve our processes and address current challenges, the following action points were identified:
 
 1. **Set Priorities for Issues**: Ensure issues are prioritized clearly to avoid wasting time on less critical tasks.
+
+   ✅ Completed  
 2. **Branches Must be Based on Main**: All new branches should always use the main branch as their starting point.
+
+    ✅ Noted  
 3. **Improve Issue Descriptions**: Issues without assigned owners must include a clear description of prerequisites to start work on them.
+
+    ✅ Completed  
 4. **Code Coverage for Current Code**: Create a high-priority branch focused on improving code coverage for existing code.
+
+   ✅ Completed  
 5. **Complete Stage 1**: Finish the pending tasks for Stage 1 as soon as possible.
+    
+    ❌ Pending 
 
 To refer to our complete list of collaboration best practices, please refer to: 
 [Collaboration Best Practices](../Team-Practices.md#collaboration-best-practices)
