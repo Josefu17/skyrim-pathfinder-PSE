@@ -60,7 +60,17 @@ export const InteractiveMap = () => {
                         import.meta.env.VITE_URL
                     );
                     const response = await fetch(
-                        `${import.meta.env.VITE_URL}/cities/route?startpoint=${startpoint}&endpoint=${endpoint}`
+                        `${import.meta.env.VITE_URL}/cities/route`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                startpoint,
+                                endpoint,
+                            }),
+                        }
                     );
                     const data = await response.json();
                     setRouteData(data);

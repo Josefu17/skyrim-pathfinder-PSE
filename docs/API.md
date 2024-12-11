@@ -76,27 +76,6 @@ Fetches all city data.
 
 ---
 
-[back to top](#api-documentation)
-## Route Calculation
-
-**`GET /cities/route?startpoint=<city>&endpoint=<city>`**  
-Calculates the shortest route between two cities.
-
-### Parameters
-- `startpoint`: The starting city name (required).
-- `endpoint`: The destination city name (required).
-
-### Response Example
-```json
-{
-  "distance": 1134.28,
-  "route": {
-    "0": "Whiterun",
-    "1": "Ivarstead",
-    "2": "Riften"
-  }
-}
-```
 
 ### Error Example
 ```json
@@ -194,4 +173,56 @@ Response:
 }
 ```
 
+## Route History Management
+
+### Route Calculation
+
+**`POST /cities/route?startpoint=<city>&endpoint=<city>`**  
+Calculates the shortest route between two cities.
+
+Parameters
+
+- `startpoint`: The starting city name (required).
+- `endpoint`: The destination city name (required).
+- `user_id`: The user's ID (optional).
+
+Response Example
+
+```json
+{
+    "alternative_distance": 1750.45,
+    "alternative_route": {
+        "0": "Riften",
+        "1": "Shor’s Stone",
+        "2": "Riften",
+        "3": "Shor’s Stone",
+        "4": "Windhelm",
+        "5": "Winterhold"
+    },
+    "distance": 1297.55,
+    "route": {
+        "0": "Riften",
+        "1": "Shor’s Stone",
+        "2": "Windhelm",
+        "3": "Winterhold"
+    }
+}
+```
+
+### Route deletion
+**`DELETE /cities/route?user_id=<user_id>&route_id=<route_id>`**
+Deletes a route from the database.
+
+Parameters
+
+- `user_id`: The user's ID (required).
+- `route_id`: The route's ID (required).
+
+Response Example
+
+```json
+{
+    "success": "Route deleted"
+}
+```
 [back to top](#api-documentation)

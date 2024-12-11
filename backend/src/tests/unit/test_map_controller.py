@@ -1,31 +1,26 @@
 """Unit tests for the web backend controller."""
 
-import math
 from typing import Generator
 from unittest.mock import patch, MagicMock
-
 import pytest
 from flask.testing import FlaskClient
-
-from backend.src.app import create_app
+from backend.src.tests.unit.conftest import flask_client
 from backend.src.app import main
-
-app = create_app()
 
 
 @pytest.fixture(name="client")
-def flask() -> Generator[FlaskClient, None, None]:
-    """Fixture to create a test client for the Flask app"""
-    app.config["TESTING"] = True
-    with app.test_client() as client:
-        yield client
+def client() -> Generator[FlaskClient, None, None]:
+    """Fixture to create a test client for the Flask app."""
+    yield from flask_client()
 
 
 # Test for the `/maps` endpoint
 @patch("backend.src.web_backend.controller.map_controller.get_db_session")
 @patch("backend.src.web_backend.controller.map_controller.service_get_map_data")
 def test_get_map_data(
-    mock_service_get_map_data, mock_get_db_session, client: FlaskClient
+    mock_service_get_map_data,
+    mock_get_db_session,
+    client: FlaskClient,  # pylint: disable=redefined-outer-name
 ):
     """Test the get_map_data endpoint."""
     # Mock the database session
@@ -76,7 +71,9 @@ def test_get_map_data(
 @patch("backend.src.web_backend.controller.map_controller.get_db_session")
 @patch("backend.src.web_backend.controller.map_controller.service_get_cities_data")
 def test_get_cities(
-    mock_service_get_cities_data, mock_get_db_session, client: FlaskClient
+    mock_service_get_cities_data,
+    mock_get_db_session,
+    client: FlaskClient,  # pylint: disable=redefined-outer-name
 ):
     """Test the get_cities endpoint."""
     # Mock the database session
@@ -106,67 +103,6 @@ def test_get_cities(
     assert "cities" in data and len(data["cities"]) > 0
     assert data["cities"][0]["name"] == "Markarth"
     assert data["cities"][1]["name"] == "Riften"
-
-
-# Test for the `/cities/route` endpoint
-@patch("backend.src.web_backend.controller.map_controller.get_db_session")
-@patch(
-    "backend.src.web_backend.controller.map_controller.fetch_route_from_navigation_service"
-)
-def test_calculate_route(mock_fetch_route, mock_get_db_session, client: FlaskClient):
-    """Test the calculate_route endpoint."""
-    # Mock the database session
-    mock_session = MagicMock()
-    mock_get_db_session.return_value.__enter__.return_value = mock_session
-
-    # Mock service data
-    mock_fetch_route.return_value = {
-        "route": {"0": "Markarth", "1": "Riften"},
-        "distance": 321.12,
-    }
-
-    # Call endpoint
-    response = client.get("/cities/route?startpoint=Markarth&endpoint=Riften")
-
-    # Assert response
-    assert response.status_code == 200
-    data = response.get_json()
-    assert "route" in data and "distance" in data
-    assert math.isclose(data["distance"], 321.12, rel_tol=1e-9)  # relative tolerance
-    assert response.json == {
-        "route": {"0": "Markarth", "1": "Riften"},
-        "distance": 321.12,
-    }
-
-
-@patch(
-    "backend.src.web_backend.controller.map_controller.fetch_route_from_navigation_service"
-)
-@patch("backend.src.web_backend.controller.map_controller.get_db_session")
-def test_calculate_route_service_error(
-    mock_get_db_session, mock_fetch_route_from_navigation_service, client
-):
-    """Test error response when service fails."""
-    # Mock database session
-    mock_session = MagicMock()
-    mock_get_db_session.return_value.__enter__.return_value = mock_session
-
-    # Mock service response
-    mock_fetch_route_from_navigation_service.return_value = {"error": "Some error"}
-
-    # Call endpoint
-    response = client.get("/cities/route?startpoint=CityA&endpoint=CityB")
-
-    # Assert response
-    assert response.status_code == 400
-    assert response.json == {"error": "Some error"}
-
-
-def test_calculate_route_missing_params(client):
-    """Test error response for missing query parameters."""
-    response = client.get("/cities/route")
-    assert response.status_code == 400
-    assert response.json == {"error": "Start and end cities are required"}
 
 
 @patch("backend.src.app.fetch_and_store_map_data_if_needed")

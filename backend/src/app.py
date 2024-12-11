@@ -5,6 +5,7 @@ from flask_cors import CORS
 from backend.src.logging_config import get_logging_configuration
 from backend.src.web_backend.controller import map_controller
 from backend.src.web_backend.controller import user_controller
+from backend.src.web_backend.controller import route_history_controller
 from backend.src.database.db_connection import get_db_session
 from backend.src.map_service.map_service import fetch_and_store_map_data_if_needed
 
@@ -17,13 +18,14 @@ def create_app():
     CORS(app)
     map_controller.init_map_routes(app)
     user_controller.init_user_routes(app)
+    route_history_controller.init_path_routes(app)
     return app
 
 
 def main():
     """Main function to initialize the backend"""
     logger.info("Starting backend application.")
-    app = create_app()  # App erstellen
+    app = create_app()
 
     with get_db_session() as db_session:
         fetch_and_store_map_data_if_needed(session=db_session)
