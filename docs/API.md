@@ -150,4 +150,48 @@ Verifies the application's health status by checking critical services.
 }
 ```
 
+## User Management
+
+### ```POST /auth/register```
+Registers a new user and stores their credentials in the database.
+
+Request Body:
+```json
+{
+  "username": "Max Mustermann"
+}
+```
+
+Response:
+```json
+{
+    "message": "User Max Mustermann registered successfully.",
+    "user": {
+        "id": 6,
+        "username": "Max Mustermann"
+    }
+}
+```
+
+### ```POST /auth/login```
+Checks if the user exists in the database and returns their username and id.
+
+Request Body:
+```json
+{
+  "username": "Max Mustermann"
+}
+```
+
+Response:
+```json
+{
+    "message": "User Max Mustermann logged in successfully.",
+    "user": {
+        "id": 6,
+        "username": "Max Mustermann"
+    }
+}
+```
+
 [back to top](#api-documentation)
