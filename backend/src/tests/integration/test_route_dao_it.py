@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from backend.src.database.dao.route_dao import RouteDao
-from backend.src.database.schema.route import Route, RouteFilter
+from backend.src.database.schema.route import Route, RouteFilter, OptionalRouteFilters
 from backend.src.database.schema.user import User
 
 
@@ -195,7 +195,7 @@ def test_get_routes_with_to_date(db):
 
     fabricate_basic_routes_and_commit(db, old_date, recent_date, user)
 
-    optional_filters = {"to_date": recent_date - timedelta(days=3)}
+    optional_filters = OptionalRouteFilters(to_date=recent_date - timedelta(days=3))
     filter_params = RouteFilter(user_id=user.id, optional_filters=optional_filters)
 
     # Act
@@ -247,7 +247,7 @@ def test_get_routes_with_combination_filters(db):
     db.add_all(routes)
     db.commit()
 
-    optional_filters = {"startpoint": "Whiterun", "endpoint": "Riften"}
+    optional_filters = OptionalRouteFilters(startpoint="Whiterun", endpoint="Riften")
     filter_params = RouteFilter(user_id=user1.id, optional_filters=optional_filters)
 
     # Act
@@ -271,15 +271,8 @@ def test_get_routes_with_date_range(db):
 
     fabricate_basic_routes_and_commit(db, old_date, recent_date, user)
 
-    optional_filters = {"from_date": recent_date}
+    optional_filters = OptionalRouteFilters(from_date=recent_date)
     filter_params = RouteFilter(user_id=user.id, optional_filters=optional_filters)
-
-    # Act
-    retrieved_routes = RouteDao.get_routes(filter_params, db)
-
-    # Assert
-    assert len(retrieved_routes) == 1
-    assert retrieved_routes[0].startpoint == "Riverwood"
 
     # Act
     retrieved_routes = RouteDao.get_routes(filter_params, db)
@@ -377,6 +370,54 @@ def test_get_routes_with_invalid_sort_field(db):
         RouteDao.get_routes(filter_params, db)
     except ValueError as e:
         assert str(e) == "Invalid sorting field: invalid_field"
+
+
+def test_delete_routes_by_ids(db):
+    """Test deleting multiple routes by their IDs."""
+    # Arrange
+    user = User(username="test_user")
+    db.add(user)
+    db.commit()
+
+    routes = [
+        Route(
+            user_id=user.id,
+            startpoint="Markarth",
+            endpoint="Riften",
+            created_at=datetime.now(timezone.utc),
+            route={"route": {}, "distance": 150},
+        ),
+        Route(
+            user_id=user.id,
+            startpoint="Whiterun",
+            endpoint="Winterhold",
+            created_at=datetime.now(timezone.utc) - timedelta(days=1),
+            route={"route": {}, "distance": 250},
+        ),
+        Route(
+            user_id=user.id,
+            startpoint="Riverwood",
+            endpoint="Helgen",
+            created_at=datetime.now(timezone.utc) - timedelta(days=2),
+            route={"route": {}, "distance": 100},
+        ),
+    ]
+    db.add_all(routes)
+    db.commit()
+
+    # Fetch the IDs of the routes to delete
+    route_ids_to_delete = [routes[0].id, routes[1].id]
+
+    # Act
+    deleted_count = RouteDao.delete_routes_by_ids(route_ids_to_delete, db)
+
+    # Assert
+    assert deleted_count == len(route_ids_to_delete)
+
+    # Verify that the routes were deleted
+    remaining_routes = db.query(Route).all()
+    assert len(remaining_routes) == 1
+    assert remaining_routes[0].id == routes[2].id
 
 
 def fabricate_basic_routes_and_commit(db, old_date, recent_date, user):

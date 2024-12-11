@@ -1,17 +1,10 @@
 """Unit tests for the web backend controller."""
 
-from typing import Generator
 from unittest.mock import patch, MagicMock
-import pytest
+
 from flask.testing import FlaskClient
-from backend.src.tests.unit.conftest import flask_client
+
 from backend.src.app import main
-
-
-@pytest.fixture(name="client")
-def client() -> Generator[FlaskClient, None, None]:
-    """Fixture to create a test client for the Flask app."""
-    yield from flask_client()
 
 
 # Test for the `/maps` endpoint

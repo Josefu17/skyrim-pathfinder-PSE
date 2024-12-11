@@ -26,16 +26,6 @@ class RouteDao:
         return session.query(Route).filter_by(id=route_id).first()
 
     @staticmethod
-    def delete_route_by_id(route_id: int, session: Session) -> bool:
-        """Delete a specific route by its ID, return True if deleted, else False"""
-        route = session.query(Route).filter_by(id=route_id).first()
-        if route:
-            session.delete(route)
-            session.commit()
-            return True
-        return False
-
-    @staticmethod
     def get_routes(filter_params: RouteFilter, session: Session) -> list[Route]:
         """
         Retrieve a list of routes for a user, with optional filtering and sorting.
@@ -80,21 +70,46 @@ class RouteDao:
         sort_column = getattr(Route, field)
         order = desc(sort_column) if descending else asc(sort_column)
 
-        # Build the query
-        query = session.query(Route).filter_by(user_id=user_id)
+        # Build dynamic filter conditions
+        conditions = [Route.user_id == user_id]
 
-        # Apply filters
         if from_date:
-            query = query.filter(Route.created_at >= from_date)
+            conditions.append(Route.created_at >= from_date)
         if to_date:
-            query = query.filter(Route.created_at <= to_date)
+            conditions.append(Route.created_at <= to_date)
         if startpoint:
-            query = query.filter(Route.startpoint == startpoint)
+            conditions.append(Route.startpoint == startpoint)
         if endpoint:
-            query = query.filter(Route.endpoint == endpoint)
+            conditions.append(Route.endpoint == endpoint)
 
-        # Apply sorting and limit
-        return cast(list[Route], query.order_by(order).limit(limit).all())
+        # Apply conditions and sorting, then limit results - handle everything in one go,
+        # letting the DBMS optimize as much as possible
+        return cast(
+            list[Route],
+            session.query(Route).filter(*conditions).order_by(order).limit(limit).all(),
+        )
+
+    @staticmethod
+    def delete_route_by_id(route_id: int, session: Session) -> bool:
+        """Delete a specific route by its ID, return True if deleted, else False"""
+        route = session.query(Route).filter_by(id=route_id).first()
+        if route:
+            session.delete(route)
+            session.commit()
+            return True
+        return False
+
+    @staticmethod
+    def delete_routes_by_ids(route_ids: list[int], session: Session) -> int:
+        """Delete multiple routes by their IDs,
+        return number of deleted routes"""
+        deleted_count = (
+            session.query(Route)
+            .filter(Route.id.in_(route_ids))
+            .delete(synchronize_session=False)
+        )
+        session.commit()
+        return deleted_count
 
     @staticmethod
     def delete_user_route_history(
