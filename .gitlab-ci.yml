@@ -45,8 +45,9 @@ test-backend:
   needs:
   - ci-build-job
 
+# TODO test frontend job
 
-analyze-job:
+analyze-backend:
   stage: analyze
   image: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}"
   variables:
@@ -59,6 +60,18 @@ analyze-job:
   script:
   - python -m pylint --rcfile=backend/.pylintrc backend/src
   - python -m black --config backend/pyproject.toml backend/src
+  needs:
+  - ci-build-job
+
+analyze-frontend:
+  stage: analyze
+  image: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:22"
+  before_script:
+    - cd frontend
+    - npm ci
+  script:
+    - npm run lint
+    - npm run format
   needs:
   - ci-build-job
 

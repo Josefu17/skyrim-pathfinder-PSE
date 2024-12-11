@@ -1,20 +1,9 @@
-.PHONY: help create-venv install remove build build-ci push start login stop restart update test coverage \
+.PHONY: help install remove build build-ci push start login stop restart update test coverage \
 coverage-open-windows lint format nav-enter backend-enter connect-to-database pre-commit
 
 .DEFAULT_GOAL := help
 help:
-	@echo "Hi! Please specify a target. Available targets:"
-	@grep -E '^[a-zA-Z_-]+:' Makefile | grep -v '.PHONY' | awk '{print "  -", $$1}'
-
-# Dependency management
-create-venv:
-	@if [ "$(OS)" = "Windows_NT" ]; then \
-		py -m venv .venv; \
-		echo "To activate: .venv\\Scripts\\activate"; \
-	else \
-		python3 -m venv .venv; \
-		echo "To activate: source .venv/bin/activate"; \
-	fi
+	@echo "Hi! Please specify a target."
 
 install:
 	pip install -r backend/requirements.txt
@@ -61,8 +50,10 @@ restart: stop start
 update: login build push
 
 # Test management
-test:
+test-backend:
 	python -m pytest ./backend/src/tests/
+test-frontend: # TODO
+test: test-backend test-frontend
 
 coverage:
 	python -m pytest --cov=backend/src --cov-report=html:backend/coverage-reports/htmlcov backend/src/tests/ --cov-config=backend/setup.cfg --cov-report=xml:backend/coverage-reports/coverage.xml
@@ -77,14 +68,24 @@ sonar: coverage
 run-tests:
 	@echo "TODO: Implement tests for frontend"
 
-# Navigation service management
-lint:
+# Linting
+lint-backend:
 	python -m pylint --rcfile=backend/.pylintrc backend/src
+lint-frontend:
 	@make npm run=lint
+lint: lint-backend lint-frontend
 
-format:
+# Formatting
+format-backend:
 	python -m black --config backend/pyproject.toml backend/src
+format-frontend:
 	@make npm run=format
+format: format-backend format-frontend
+
+# Pre commit
+pre-commit-backend: test-backend lint-backend format-backend
+pre-commit-frontend: test-frontend lint-frontend format-frontend
+pre-commit: pre-commit-backend pre-commit-frontend
 
 # Services management
 nav-enter:
@@ -100,7 +101,6 @@ migrate:
 connect-to-database:
 	docker exec -it group2-postgres-1 psql -U pg-2 -d pg-2
 
-pre-commit: test format lint coverage
 
 # npm management
 run ?= format
