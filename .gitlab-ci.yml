@@ -1,8 +1,13 @@
 stages:
 - build
+- dependency_scan
 - test
 - analyze
 - deploy
+
+include:
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+
 
 ci-build-job:
   stage: build
@@ -40,28 +45,6 @@ test-backend:
   needs:
   - ci-build-job
 
-
-dependency_scan-job:
-  stage: test
-  image: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:3.13-slim"
-  script:
-    - pip install --upgrade pip
-    - python -m venv venv
-    - source venv/bin/activate
-    - pip install bandit
-    - bandit -r backend/ -f json -o bandit_report.json || true
-    - cat bandit_report.json
-    - if [ ! -s bandit_report.json ]; then echo "[]" > bandit_report.json; fi
-  artifacts:
-    reports:
-      dependency_scanning: bandit_report.json
-    paths:
-      - bandit_report.json
-    expire_in: 7 days
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "set-dependency-scanning-config-1" || $CI_PIPELINE_SOURCE == "schedule"'
-  needs:
-    - test-backend
 
 analyze-job:
   stage: analyze
@@ -122,8 +105,6 @@ deploy-job:
   - ssh -v -i ~/.ssh/ci_ssh debian@group2.osnet.h-da.cloud "make update && echo 'Successfully
     deployed' && exit"
   needs:
-  - test-backend
-  - dependency_scan-job
-  - analyze-job
+  - ci-build-job
   only:
   - main
