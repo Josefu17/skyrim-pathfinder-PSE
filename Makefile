@@ -30,7 +30,7 @@ push:
 	docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/navigation-service:latest
 	docker push registry.code.fbi.h-da.de/bpse-wise2425/group2/web-backend:latest
 
-start:build start-frontend
+start:build
 	docker compose up -d
 	make dev
 
@@ -52,21 +52,29 @@ update: login build push
 # Test management
 test-backend:
 	python -m pytest ./backend/src/tests/
-test-frontend: # TODO
+test-frontend:
+	@make npm run=test
 test: test-backend test-frontend
 
-coverage:
+coverage: coverage-backend coverage-frontend
+
+coverage-backend:
 	python -m pytest --cov=backend/src --cov-report=html:backend/coverage-reports/htmlcov backend/src/tests/ --cov-config=backend/setup.cfg --cov-report=xml:backend/coverage-reports/coverage.xml
 
+coverage-frontend:
+	@make npm run=coverage
+
 coverage-open-windows: coverage
-	 start backend\coverage-reports\htmlcov\index.html
+	powershell -Command "Start-Process -FilePath 'backend\coverage-reports\htmlcov\index.html'"
+	powershell -Command "Start-Process -FilePath 'frontend/coverage/index.html'"
+
+coverage-open-unix: coverage
+	xdg-open backend/coverage-reports/htmlcov/index.html
+	xdg-open frontend/coverage/index.html
 
 # SonarQube management
 sonar: coverage
 	sonar-scanner
-
-run-tests:
-	@echo "TODO: Implement tests for frontend"
 
 # Linting
 lint-backend:
@@ -83,8 +91,8 @@ format-frontend:
 format: format-backend format-frontend
 
 # Pre commit
-pre-commit-backend: test-backend format-backend lint-backend
-pre-commit-frontend: test-frontend format-frontend lint-frontend
+pre-commit-backend: format-backend lint-backend coverage-backend
+pre-commit-frontend: format-frontend lint-frontend coverage-frontend
 pre-commit: pre-commit-backend pre-commit-frontend
 
 # Services management
@@ -110,7 +118,3 @@ npm:
 
 dev:
 	@cd frontend && npm run dev
-
-# Linux / Unix specific commands:
-unix-coverage-open: coverage
-	xdg-open backend/coverage-reports/htmlcov/index.html

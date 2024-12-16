@@ -5,7 +5,7 @@ import { AppRoutes } from './routes/app_routes';
 
 import './style/App.css';
 
-function App() {
+export const App = () => {
     return (
         <BrowserRouter>
             <section id="left">
@@ -17,6 +17,4 @@ function App() {
             </section>
         </BrowserRouter>
     );
-}
-
-export default App;
+};

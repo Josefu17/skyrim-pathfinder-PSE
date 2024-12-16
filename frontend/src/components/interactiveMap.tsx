@@ -45,20 +45,16 @@ export const InteractiveMap = () => {
                 setCities(data.cities);
                 setConnections(data.connections);
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching map data:', error);
             }
         };
         fetchMapData();
     }, []);
 
     useEffect(() => {
-        const fetchRoute = async () => {
+        const fetchRouteData = async () => {
             if (startpoint && endpoint) {
                 try {
-                    console.log(
-                        'Fetching route data from: ',
-                        import.meta.env.VITE_URL
-                    );
                     const response = await fetch(
                         `${import.meta.env.VITE_URL}/routes`,
                         {
@@ -82,7 +78,7 @@ export const InteractiveMap = () => {
                 }
             }
         };
-        fetchRoute();
+        fetchRouteData();
     }, [startpoint, endpoint]);
 
     return (
@@ -92,7 +88,7 @@ export const InteractiveMap = () => {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 3066 2326"
             >
-                {/* Verbindungen zeichnen */}
+                {/* draw connections */}
                 {connections?.map((connection: TConnection) => {
                     const fromCity = getCityCoordinates(
                         connection.parent_city_id
@@ -115,7 +111,7 @@ export const InteractiveMap = () => {
                     );
                 })}
 
-                {/* Route zeichnen */}
+                {/* draw routes */}
                 {routeData &&
                     Object.values(
                         alternative
@@ -146,11 +142,11 @@ export const InteractiveMap = () => {
                         );
                     })}
 
-                {/* Städte zeichnen */}
+                {/* draw cities */}
                 {cities?.map((city) => (
                     <g key={city.id}>
                         <circle
-                            id="endpoint"
+                            id={`endpoint-${city.id}`}
                             cx={city.position_x}
                             cy={city.position_y}
                             r="20"

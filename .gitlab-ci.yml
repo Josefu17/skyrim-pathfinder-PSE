@@ -1,27 +1,25 @@
 stages:
-- build
-- dependency_scan
-- test
-- analyze
-- deploy
+  - build
+  - dependency_scan
+  - test
+  - analyze
+  - deploy
 
 include:
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
-
 
 ci-build-job:
   stage: build
   image: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:latest"
   services:
-  - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:latest"
-    alias: docker
+    - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:latest"
+      alias: docker
   before_script:
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-  - docker build -t "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}"
-    --build-arg "GITLAB_PROXY=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/" .
-  - docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}"
-
+    - docker build -t "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}"
+      --build-arg "GITLAB_PROXY=${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/" .
+    - docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}"
 
 test-backend:
   stage: test
@@ -29,23 +27,36 @@ test-backend:
   variables:
     PYTHONPATH: "$CI_PROJECT_DIR/backend/src"
   before_script:
-  - apk add --no-cache python3 py3-pip
-  - python3 -m venv /venv
-  - ". /venv/bin/activate"
-  - python -m pip install --upgrade pip
-  - pip --version
-  - pip install -r backend/requirements.txt
+    - apk add --no-cache python3 py3-pip
+    - python3 -m venv /venv
+    - ". /venv/bin/activate"
+    - python -m pip install --upgrade pip
+    - pip --version
+    - pip install -r backend/requirements.txt
   script:
-  - pytest --cov=backend/src --cov-report=term --cov-report=xml:backend/coverage-reports/coverage.xml backend/src/tests/ --cov-config=backend/setup.cfg
+    - pytest --cov=backend/src --cov-report=term --cov-report=xml:backend/coverage-reports/coverage.xml backend/src/tests/ --cov-config=backend/setup.cfg
   artifacts:
     paths:
       - backend/coverage-reports/coverage.xml
     expire_in: 7 days
   coverage: "/TOTAL\\s+\\d+\\s+\\d+\\s+(\\d+)%/"
   needs:
-  - ci-build-job
+    - ci-build-job
 
-# TODO test frontend job
+test-frontend:
+  stage: test
+  image: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/node:22"
+  script:
+    - cd frontend
+    - npm ci
+    - npm run coverage
+  artifacts:
+    paths:
+      - frontend/coverage/
+    expire_in: 7 days
+  coverage: "/^All files\\s+\\|\\s+(\\d+\\.\\d+)/"
+  needs:
+    - ci-build-job
 
 analyze-backend:
   stage: analyze
@@ -53,15 +64,16 @@ analyze-backend:
   variables:
     PYTHONPATH: "$CI_PROJECT_DIR/backend/src"
   before_script:
-  - apk add --no-cache python3 py3-pip
-  - python3 -m venv /venv
-  - ". /venv/bin/activate"
-  - pip install -r backend/requirements.txt
+    - apk add --no-cache python3 py3-pip
+    - python3 -m venv /venv
+    - ". /venv/bin/activate"
+    - pip install -r backend/requirements.txt
   script:
-  - python -m pylint --rcfile=backend/.pylintrc backend/src
-  - python -m black --config backend/pyproject.toml backend/src
+    - python -m pylint --rcfile=backend/.pylintrc backend/src
+    - python -m black --config backend/pyproject.toml backend/src
   needs:
-  - ci-build-job
+    - test-backend
+    - test-frontend
 
 analyze-frontend:
   stage: analyze
@@ -73,7 +85,8 @@ analyze-frontend:
     - npm run lint
     - npm run format
   needs:
-  - ci-build-job
+    - test-backend
+    - test-frontend
 
 sonarqube-scan:
   stage: analyze
@@ -92,7 +105,7 @@ sonarqube-scan:
       - sonar-scanner.log
   needs:
     - test-backend
-
+    - test-frontend
 
 deploy-job:
   stage: deploy
@@ -105,19 +118,21 @@ deploy-job:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ''
   before_script:
-  - apk add --no-cache curl bash
-  - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer"
-    | bash
-  - apk add --no-cache make openssh-client
-  - mv $SECURE_FILES_DOWNLOAD_PATH/.env.production ./frontend/.env.production
-  - docker info
+    - apk add --no-cache curl bash
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer"
+      | bash
+    - apk add --no-cache make openssh-client
+    - mv $SECURE_FILES_DOWNLOAD_PATH/.env.production ./frontend/.env.production
+    - docker info
   script:
-  - echo "Deploying to production server"
-  - chmod +x ./scripts/establish_ssh_connection.sh
-  - "./scripts/establish_ssh_connection.sh"
-  - ssh -v -i ~/.ssh/ci_ssh debian@group2.osnet.h-da.cloud "make update && echo 'Successfully
-    deployed' && exit"
+    - echo "Deploying to production server"
+    - chmod +x ./scripts/establish_ssh_connection.sh
+    - "./scripts/establish_ssh_connection.sh"
+    - ssh -v -i ~/.ssh/ci_ssh debian@group2.osnet.h-da.cloud "make update && echo 'Successfully
+      deployed' && exit"
   needs:
-  - ci-build-job
+    - analyze-backend
+    - analyze-frontend
+    - sonarqube-scan
   only:
-  - main
+    - main
