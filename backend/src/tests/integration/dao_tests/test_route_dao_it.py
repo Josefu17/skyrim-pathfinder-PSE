@@ -20,7 +20,6 @@ def test_save_route(db):
         user_id=user.id,
         startpoint="Whiterun",
         endpoint="Riften",
-        created_at=datetime.now(timezone.utc),
         route={"route": {}, "distance": 100},
     )
 
@@ -62,7 +61,6 @@ def test_delete_route_by_id_success(db):
         user_id=user.id,
         startpoint="Riften",
         endpoint="Markarth",
-        created_at=datetime.now(timezone.utc),
         route={"route": {}, "distance": 300},
     )
     db.add(route)
@@ -88,7 +86,6 @@ def test_delete_route_by_id_no_match(db):
         user_id=user.id,
         startpoint="Solitude",
         endpoint="Whiterun",
-        created_at=datetime.now(timezone.utc),
         route={"route": {}, "distance": 300},
     )
     db.add(route)
@@ -148,7 +145,6 @@ def test_delete_user_route_history_by_username(db):
         user_id=user.id,
         startpoint="Riverwood",
         endpoint="Helgen",
-        created_at=datetime.now(timezone.utc),
         route={"route": {}, "distance": 50},
     )
     db.add(route)
