@@ -64,12 +64,8 @@ def test_fetch_and_store_map_data_success(
     assert city_dao_mock.save_city.call_count == 2  # 2 cities
     city_dao_mock.save_city.assert_has_calls(
         [
-            call(
-                City(id=1, name="Whiterun", position_x=10, position_y=20), session_mock
-            ),
-            call(
-                City(id=2, name="Riverwood", position_x=15, position_y=25), session_mock
-            ),
+            call(City(id=1, name="Whiterun", position_x=10, position_y=20), session_mock),
+            call(City(id=2, name="Riverwood", position_x=15, position_y=25), session_mock),
         ],
         any_order=True,  # If the order of calls doesn't matter
     )
@@ -129,9 +125,7 @@ def test_fetch_and_store_map_data_http_error(requests_mock, session_mock):
     """Test HTTP error handling."""
     # Mock HTTP response with an error status
     requests_mock.return_value.status_code = 500
-    requests_mock.return_value.raise_for_status.side_effect = RequestException(
-        "HTTP error"
-    )
+    requests_mock.return_value.raise_for_status.side_effect = RequestException("HTTP error")
 
     # Call the function
     fetch_and_store_map_data_if_needed(session_mock)

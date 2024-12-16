@@ -52,9 +52,7 @@ def test_database_connection_env_fallback():
 
 
 # Test missing parameters (raises ValueError)
-@patch.dict(
-    "os.environ", {}, clear=True
-)  # Clear environment variables to simulate missing values
+@patch.dict("os.environ", {}, clear=True)  # Clear environment variables to simulate missing values
 def test_database_connection_missing_parameters():
     """
     Test that DatabaseConnection raises a ValueError when required parameters are missing,

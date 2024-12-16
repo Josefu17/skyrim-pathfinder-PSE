@@ -26,7 +26,7 @@ class Route(Base):
     route = Column(JSON, nullable=False)
 
     def to_dict(self):
-        """Convert object into dictionary"""
+        """Convert the object into dictionary"""
         route_dict = {
             "id": self.id,
             "user_id": self.user_id,
@@ -66,9 +66,7 @@ class RouteFilter:
     field: str = "created_at"
     limit: int = 10
     descending: bool = True
-    optional_filters: OptionalRouteFilters = dataclasses.field(
-        default_factory=OptionalRouteFilters
-    )
+    optional_filters: OptionalRouteFilters = dataclasses.field(default_factory=OptionalRouteFilters)
 
     def __post_init__(self):
         # Ensure optional_filters is a dictionary

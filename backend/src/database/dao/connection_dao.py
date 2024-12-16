@@ -14,9 +14,7 @@ class ConnectionDao:
         return session.query(Connection).all()
 
     @staticmethod
-    def get_connection_by_parent_and_child(
-        parent_city_id, child_city_id, session: Session
-    ):
+    def get_connection_by_parent_and_child(parent_city_id, child_city_id, session: Session):
         """get connection by endpoints."""
         return (
             session.query(Connection)

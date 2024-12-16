@@ -104,8 +104,6 @@ def update_config_with_parameter_values(config, env_config):
 
     if config:
         for key in config:
-            if (
-                config[key] is not None
-            ):  # Only overwrite if the value in config is not None
+            if config[key] is not None:  # Only overwrite if the value in config is not None
                 final_config[key] = config[key]
     return final_config

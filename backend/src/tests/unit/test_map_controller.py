@@ -13,14 +13,14 @@ from backend.src.app import main
 def test_get_map_data(
     mock_service_get_map_data,
     mock_get_db_session,
-    client: FlaskClient,  # pylint: disable=redefined-outer-name
+    client: FlaskClient,
 ):
     """Test the get_map_data endpoint."""
     # Mock the database session
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
 
-    # Mock service data to return map, cities and connections
+    # Mock service data to return the map, cities and connections
     mock_service_get_map_data.return_value = (
         {
             "id": 1,
@@ -63,11 +63,7 @@ def test_get_map_data(
 # Test for the `/cities` endpoint
 @patch("backend.src.web_backend.controller.map_controller.get_db_session")
 @patch("backend.src.web_backend.controller.map_controller.service_get_cities_data")
-def test_get_cities(
-    mock_service_get_cities_data,
-    mock_get_db_session,
-    client: FlaskClient,  # pylint: disable=redefined-outer-name
-):
+def test_get_cities(mock_service_get_cities_data, mock_get_db_session, client: FlaskClient):
     """Test the get_cities endpoint."""
     # Mock the database session
     mock_session = MagicMock()
@@ -101,9 +97,7 @@ def test_get_cities(
 @patch("backend.src.app.fetch_and_store_map_data_if_needed")
 @patch("backend.src.app.get_db_session")
 @patch("backend.src.app.create_app")
-def test_main_script(
-    mock_create_app, mock_get_db_session, mock_fetch_and_store_map_data
-):
+def test_main_script(mock_create_app, mock_get_db_session, mock_fetch_and_store_map_data):
     """Test the main script block."""
     mock_app = MagicMock()
     mock_create_app.return_value = mock_app

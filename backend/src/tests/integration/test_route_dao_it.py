@@ -163,11 +163,9 @@ def test_delete_user_route_history_by_username(db):
 
 
 def test_delete_user_route_history_no_user_id_or_username(db):
-    """Test ValueError when neither user_id nor username is provided."""
+    """Test ValueError, when neither user_id nor username is provided."""
     # Act & Assert
-    with pytest.raises(
-        ValueError, match="Either 'user_id' or 'username' must be provided."
-    ):
+    with pytest.raises(ValueError, match="Either 'user_id' or 'username' must be provided."):
         RouteDao.delete_user_route_history(db)
 
 
@@ -344,9 +342,7 @@ def test_get_routes_limit_and_sorting(db):
     db.add_all(routes)
     db.commit()
 
-    filter_params = RouteFilter(
-        user_id=user.id, limit=1, field="created_at", descending=True
-    )
+    filter_params = RouteFilter(user_id=user.id, limit=1, field="created_at", descending=True)
 
     # Act
     retrieved_routes = RouteDao.get_routes(filter_params, db)

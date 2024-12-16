@@ -103,11 +103,15 @@ The backend fetches map data (cities and connections) from an external source an
 The backend exposes RESTful endpoints for the frontend:
 - **GET `/maps`**: Returns all cities and connections.
 - **GET `/cities`**: Returns all cities.
-- **POST `/cities/route`**: Accepts startpoint, endpoint and user_id as request body, then returns the optimal route along with its distance. Additionally, provides an alternative route and its corresponding distance. Finally, it stores the user's route in the database.
+- **POST `/users/<int:user_id>/routes`**: Accepts startpoint, endpoint and user_id as request body, then returns the optimal route along with its distance. Additionally, provides an alternative route and its corresponding distance. Finally, it stores the user's route in the database.
+- **POST `/routes`**: Accepts startpoint and endpoint as request body, then returns the optimal route along with its distance. Calculated routes are not stored in the database.
 - **POST `/auth/regiser`**: Registers a new user and stores their credentials in the database.
 - **POST `/auth/login`**: Checks if the user exists in the database and returns their username and id.
-- **DELETE `/cities/route/delete`**: Deletes a user's route from the database.
+- **DELETE `/users/<int:user_id>/routes/<int:route_id>`**: Deletes a user's route from the database.
 These endpoints serve as the bridge between the frontend, database, and navigation service.
+- **GET `/users/<int:user_id>/routes`**: Returns the user's route history.
+- **DELETE `/users/<int:user_id>/routes`**: Deletes all routes associated with a user (by user`s id).
+- **DELETE `/users/<string:user_name>/routes`**: Deletes all routes associated with a user (by user`s name).
 
 ---
 

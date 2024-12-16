@@ -18,7 +18,7 @@ class City(Base):
     position_y = Column(Integer, nullable=False)
 
     def to_dict(self):
-        """convert object into dictionary"""
+        """convert the object into dictionary"""
         city_dict = {
             "id": self.id,
             "name": self.name,
@@ -31,8 +31,7 @@ class City(Base):
     def __repr__(self):
         """Returns a string representation of a City object."""
         repr_str = (
-            f"<City(id={self.id}, name={self.name}, x={self.position_x}, "
-            f"y={self.position_y})>"
+            f"<City(id={self.id}, name={self.name}, x={self.position_x}, y={self.position_y})>"
         )
         logger.debug("City representation: %s", repr_str)
         return repr_str

@@ -60,7 +60,7 @@ export const InteractiveMap = () => {
                         import.meta.env.VITE_URL
                     );
                     const response = await fetch(
-                        `${import.meta.env.VITE_URL}/cities/route`,
+                        `${import.meta.env.VITE_URL}/routes`,
                         {
                             method: 'POST',
                             headers: {

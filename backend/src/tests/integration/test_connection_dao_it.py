@@ -18,9 +18,7 @@ def test_save_and_get_connection(db):
     # Act
     connection = Connection(parent_city_id=city1.id, child_city_id=city2.id)
     ConnectionDao.save_connection(connection, db)
-    retrieved_connection = ConnectionDao.get_connection_by_parent_and_child(
-        city1.id, city2.id, db
-    )
+    retrieved_connection = ConnectionDao.get_connection_by_parent_and_child(city1.id, city2.id, db)
 
     # Assert
     assert retrieved_connection is not None
@@ -46,15 +44,7 @@ def test_get_all_connections(db):
     connections = ConnectionDao.get_all_connections(db)
 
     # Assert
-    assert len(connections) == 2
-    assert any(
-        conn.parent_city_id == city1.id and conn.child_city_id == city2.id
-        for conn in connections
-    )
-    assert any(
-        conn.parent_city_id == city2.id and conn.child_city_id == city1.id
-        for conn in connections
-    )
+    assert_connections_exist(connections, [(city1.id, city2.id), (city2.id, city1.id)])
 
 
 def test_save_connections_bulk(db):
@@ -75,15 +65,7 @@ def test_save_connections_bulk(db):
     retrieved_connections = ConnectionDao.get_all_connections(db)
 
     # Assert
-    assert len(retrieved_connections) == 2
-    assert any(
-        conn.parent_city_id == city1.id and conn.child_city_id == city2.id
-        for conn in retrieved_connections
-    )
-    assert any(
-        conn.parent_city_id == city2.id and conn.child_city_id == city1.id
-        for conn in retrieved_connections
-    )
+    assert_connections_exist(retrieved_connections, [(city1.id, city2.id), (city2.id, city1.id)])
 
 
 def test_delete_connection(db):
@@ -105,3 +87,18 @@ def test_delete_connection(db):
 
     # Assert
     assert deleted_connection is None
+
+
+def assert_connections_exist(connections, expected_pairs):
+    """
+    Assert that the given connections contain the expected parent-child pairs.
+    :param connections: List of Connection objects.
+    :param expected_pairs: List of (parent_city_id, child_city_id) tuples.
+    """
+    assert len(connections) == len(expected_pairs)
+
+    for parent_id, child_id in expected_pairs:
+        assert any(
+            conn.parent_city_id == parent_id and conn.child_city_id == child_id
+            for conn in connections
+        )

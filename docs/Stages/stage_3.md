@@ -30,10 +30,10 @@
 ### **Route history management**
 - **Implement a route for route history retrieval**  
   - **`GET /routes`**  
-      ❌ Pending 
+      ✅ Completed  
 - **Implement a route for route history deletion**  
   - **`DELETE /routes`**  
-      ❌ Pending 
+      ✅ Completed  
 
 ### **Advanced route calculation**
 - **Adjust the [navigation service](../App.md#stateless-navigation-service) to calculate an alternative route**

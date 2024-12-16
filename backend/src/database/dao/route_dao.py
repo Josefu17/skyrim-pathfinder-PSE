@@ -43,7 +43,7 @@ class RouteDao:
             - to_date: End of the date range for filtering (optional).
             - startpoint: Filter by route starting point (optional).
             - endpoint: Filter by route ending point (optional).
-        :param session: db session.
+        :param session: Db session.
 
         :return: A list of Route objects matching the filters and sorted by the specified field.
         :raises ValueError: If an invalid sorting field is provided.
@@ -104,9 +104,7 @@ class RouteDao:
         """Delete multiple routes by their IDs,
         return number of deleted routes"""
         deleted_count = (
-            session.query(Route)
-            .filter(Route.id.in_(route_ids))
-            .delete(synchronize_session=False)
+            session.query(Route).filter(Route.id.in_(route_ids)).delete(synchronize_session=False)
         )
         session.commit()
         return deleted_count
@@ -116,7 +114,7 @@ class RouteDao:
         session: Session, user_id: int = None, username: str = None
     ) -> int:
         """
-        Delete all routes for a user by user_id or username and return number of routes deleted.
+        Delete all routes for a user by user_id or username and return the number of routes deleted.
         """
         if not user_id and not username:
             raise ValueError("Either 'user_id' or 'username' must be provided.")

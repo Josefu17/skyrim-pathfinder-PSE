@@ -6,63 +6,71 @@
   },
   "item": [
     {
-      "name": "Register User",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"username\": \"example_user\"\n}"
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"example_user\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:4243/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "4243",
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
         },
-        "url": {
-          "raw": "http://localhost:4243/auth/register",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "4243",
-          "path": [
-            "auth",
-            "register"
-          ]
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"example_user\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:4243/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "4243",
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "Login User",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"username\": \"example_user\"\n}"
-        },
-        "url": {
-          "raw": "http://localhost:4243/auth/login",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "4243",
-          "path": [
-            "auth",
-            "login"
-          ]
-        }
-      },
-      "response": []
-    },
+  "name": "Cities",
+  "item": [
     {
       "name": "Calculate Route",
       "request": {
@@ -75,141 +83,220 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"startpoint\": \"CityA\",\n  \"endpoint\": \"CityB\",\n  \"user_id\": 1\n}"
+          "raw": "{\n  \"startpoint\": \"CityA\",\n  \"endpoint\": \"CityB\"\n}"
         },
         "url": {
-          "raw": "http://localhost:4243/cities/route",
+          "raw": "http://localhost:4243/users/1/routes",
           "protocol": "http",
           "host": [
             "localhost"
           ],
           "port": "4243",
           "path": [
-            "cities",
-            "route"
+            "users",
+            "1",
+            "routes"
           ]
         }
       },
       "response": []
     },
     {
-      "name": "Get Map Data",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:4243/maps",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "4243",
-          "path": [
-            "maps"
-          ]
-        }
-      },
-      "response": []
+  "name": "Calculate Route Without User",
+  "request": {
+    "method": "POST",
+    "header": [
+      {
+        "key": "Content-Type",
+        "value": "application/json"
+      }
+    ],
+    "body": {
+      "mode": "raw",
+      "raw": "{\n  \"startpoint\": \"CityA\",\n  \"endpoint\": \"CityB\"\n}"
     },
-    {
-      "name": "Get Cities",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:4243/cities",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "4243",
-          "path": [
-            "cities"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Health Check",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:4243/healthz",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "4243",
-          "path": [
-            "healthz"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Delete Route",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:4243/cities/route/delete?user_id=1&route_id=1",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "4243",
-          "path": [
-            "cities",
-            "route",
-            "delete"
-          ],
-          "query": [
-            {
-              "key": "user_id",
-              "value": "1"
-            },
-            {
-              "key": "route_id",
-              "value": "1"
+    "url": {
+      "raw": "http://localhost:4243/routes",
+      "protocol": "http",
+      "host": [
+        "localhost"
+      ],
+      "port": "4243",
+      "path": [
+        "routes"
+      ]
+    }
+  },
+  "response": []
+},
+        {
+  "name": "Delete Route",
+  "request": {
+    "method": "DELETE",
+    "header": [],
+    "url": {
+      "raw": "http://localhost:4243/users/1/routes/1",
+      "protocol": "http",
+      "host": [
+        "localhost"
+      ],
+      "port": "4243",
+      "path": [
+        "users",
+        "1",
+        "routes",
+        "1"
+      ]
+    }
+  },
+  "response": []
+},
+        {
+          "name": "Get Cities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4243/cities",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "4243",
+              "path": [
+                "cities"
+              ]
             }
-          ]
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "Delete Route",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:4243/cities/route/delete?user_id=1&route_id=1",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "4243",
-          "path": [
-            "cities",
-            "route",
-            "delete"
-          ],
-          "query": [
-            {
-              "key": "user_id",
-              "value": "1"
-            },
-            {
-              "key": "route_id",
-              "value": "1"
+      "name": "Maps",
+      "item": [
+        {
+          "name": "Get Map Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4243/maps",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "4243",
+              "path": [
+                "maps"
+              ]
             }
-          ]
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
+    },
+    {
+      "name": "History",
+      "item": [
+        {
+          "name": "Get User History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4243/users/1/routes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "4243",
+              "path": [
+                "users",
+                "1",
+                "routes"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "descending",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+  "name": "Clear User History by ID",
+  "request": {
+    "method": "DELETE",
+    "header": [],
+    "url": {
+      "raw": "http://localhost:4243/users/1/routes",
+      "protocol": "http",
+      "host": [
+        "localhost"
+      ],
+      "port": "4243",
+      "path": [
+        "users",
+        "1",
+        "routes"
+      ]
+    }
+  },
+  "response": []
+},
+        {
+  "name": "Clear User History by Name",
+  "request": {
+    "method": "DELETE",
+    "header": [],
+    "url": {
+      "raw": "http://localhost:4243/users/user_name/routes",
+      "protocol": "http",
+      "host": [
+        "localhost"
+      ],
+      "port": "4243",
+      "path": [
+        "users",
+        "user_name",
+        "routes"
+      ]
+    }
+  },
+  "response": []
+}
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:4243/healthz",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "4243",
+              "path": [
+                "healthz"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

@@ -11,7 +11,7 @@ logger = get_logging_configuration()
 
 
 def fetch_route_from_navigation_service(start_city_name, end_city_name, session):
-    """Fetch the shortest route from the navigation service by providing 2 cities"""
+    """Fetch the shortest route from the navigation service by providing two cities"""
     try:
 
         with xmlrpc.client.ServerProxy("http://navigation-service:8000/") as proxy:
@@ -40,9 +40,7 @@ def fetch_route_from_navigation_service(start_city_name, end_city_name, session)
             if result:
                 logger.info("Route fetched successfully between the two endpoints.")
                 return result
-            logger.error(
-                "Error occurred while calculation the route between endpoints."
-            )
+            logger.error("Error occurred while calculation the route between endpoints.")
             return {"error": "Error during Route Calculation"}
 
     except xmlrpc.client.Error as e:
@@ -54,7 +52,7 @@ def fetch_route_from_navigation_service(start_city_name, end_city_name, session)
 
 
 def fetch_cities_as_dicts(session):
-    """Retrieve and return cities information from the database as dictionary"""
+    """Retrieve and return cities' information from the database as dictionary"""
     # Fetch all cities as objects
     cities = CityDao.get_all_cities(session)
     # Convert each city to a dictionary, excluding the 'id' field
