@@ -54,7 +54,7 @@ test-frontend:
     paths:
       - frontend/coverage/
     expire_in: 7 days
-  coverage: "/^All files\\s+\\|\\s+(\\d+\\.\\d+)/"
+  coverage: "/^All files\\s+\\|\\s+(\\d+(\\.\\d+)?)/"
   needs:
     - ci-build-job
 
