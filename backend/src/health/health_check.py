@@ -50,9 +50,7 @@ def check_map_service_connection():
             "message": "Request to map service failed",
         }
     except requests.exceptions.RequestException as e:
-        logger.error(
-            "Health check: Map service connection failed with error: %s", str(e)
-        )
+        logger.error("Health check: Map service connection failed with error: %s", str(e))
         return {"map_service_connection": False, "message": str(e)}
 
 
@@ -63,12 +61,13 @@ def check_navigation_service_connection():
     start_point = "Markarth"
     end_point = "Karthwasten"
 
-    url = f"http://localhost:4243/cities/route?startpoint={start_point}&endpoint={end_point}"
+    url = "http://localhost:4243/routes"
+    data = {"startpoint": start_point, "endpoint": end_point}
 
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.post(url, json=data, timeout=10)
         response.raise_for_status()
-        if response.status_code == 200:
+        if response.status_code == 201:
             logger.info("Connection to navigation service successful")
             return {"navigation_service_connection": True}
         logger.error("Request to navigation service failed")
@@ -77,9 +76,7 @@ def check_navigation_service_connection():
             "message": "Request to navigation service failed",
         }
     except requests.exceptions.RequestException as e:
-        logger.error(
-            "Health check: Navigation service connection failed with error: %s", str(e)
-        )
+        logger.error("Health check: Navigation service connection failed with error: %s", str(e))
         return {"navigation_service_connection": False, "message": str(e)}
 
 

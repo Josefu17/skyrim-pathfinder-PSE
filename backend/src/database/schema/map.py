@@ -39,8 +39,7 @@ class Map(Base):
     def __repr__(self):
         """Returns a string representation of a Connection object."""
         repr_str = (
-            f"<Map(id={self.id}, name={self.name}, "
-            f"size_x={self.size_x}, size_y={self.size_y})>"
+            f"<Map(id={self.id}, name={self.name}, size_x={self.size_x}, size_y={self.size_y})>"
         )
         logger.debug("Map representation: %s", repr_str)
         return repr_str

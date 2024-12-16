@@ -28,17 +28,11 @@ def get_route(start_city_name, end_city_name, data):
     logger.info("Calculating route from %s to %s.", start_city_name, end_city_name)
     cities = data["cities"]
 
-    end_city, start_city = find_start_and_end_cities(
-        cities, end_city_name, start_city_name
-    )
+    end_city, start_city = find_start_and_end_cities(cities, end_city_name, start_city_name)
 
     if not start_city or not end_city:
-        logger.error(
-            "One of the cities was not found: %s, %s.", start_city_name, end_city_name
-        )
-        return {
-            "error": f"One of the cities was not found: {start_city_name}, {end_city_name}"
-        }
+        logger.error("One of the cities was not found: %s, %s.", start_city_name, end_city_name)
+        return {"error": f"One of the cities was not found: {start_city_name}, {end_city_name}"}
 
     graph = create_graph(data)
     try:
@@ -46,12 +40,8 @@ def get_route(start_city_name, end_city_name, data):
             graph, start_city["id"], end_city["id"]
         )
         if distance == float("inf"):
-            logger.warning(
-                "No connection found between %s and %s.", start_city_name, end_city_name
-            )
-            return {
-                "error": f"No connection found between {start_city_name} and {end_city_name}"
-            }
+            logger.warning("No connection found between %s and %s.", start_city_name, end_city_name)
+            return {"error": f"No connection found between {start_city_name} and {end_city_name}"}
 
         # Convert paths to city names
         path_names = {
@@ -138,18 +128,14 @@ def update_heap_and_distances(heap, update_data: UpdateData):
 
 
 def validate_paths(path, second_path, distances_dict, end_city_id, start_city_id):
-    """helper method to dijkstra to to validate if paths exists between the two cities"""
+    """helper method to dijkstra to validate if paths exist between the two cities"""
     distances = distances_dict["distances"]
     second_distances = distances_dict["second_distances"]
     if not path or distances[end_city_id] == float("inf"):
-        logger.warning(
-            "No connection found between %s and %s.", start_city_id, end_city_id
-        )
+        logger.warning("No connection found between %s and %s.", start_city_id, end_city_id)
         return [], float("inf"), [], float("inf")
     if not second_path or second_distances[end_city_id] == float("inf"):
-        logger.warning(
-            "No alternative route found between %s and %s.", start_city_id, end_city_id
-        )
+        logger.warning("No alternative route found between %s and %s.", start_city_id, end_city_id)
         second_path = []
     return path, distances[end_city_id], second_path, second_distances[end_city_id]
 
@@ -201,14 +187,12 @@ def calculate_distance(city_1, city_2):
         (city_1["position_x"] - city_2["position_x"]) ** 2
         + (city_1["position_y"] - city_2["position_y"]) ** 2
     )
-    logger.debug(
-        "Distance between %s and %s: %s.", city_1["name"], city_2["name"], distance
-    )
+    logger.debug("Distance between %s and %s: %s.", city_1["name"], city_2["name"], distance)
     return distance
 
 
 def find_start_and_end_cities(cities, end_city_name, start_city_name):
-    """finds the start and end cities with matching name from list of dicts"""
+    """finds the start and end cities with matching name from a list of dicts"""
     start_city, end_city = None, None
 
     for city in cities:

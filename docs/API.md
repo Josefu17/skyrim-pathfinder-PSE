@@ -177,14 +177,14 @@ Response:
 
 ### Route Calculation
 
-**`POST /cities/route?startpoint=<city>&endpoint=<city>`**  
+**`POST /users/<int:user_id>/routes`**  and **`POST /routes`**
+
 Calculates the shortest route between two cities.
 
-Parameters
+Request body
 
 - `startpoint`: The starting city name (required).
 - `endpoint`: The destination city name (required).
-- `user_id`: The user's ID (optional).
 
 Response Example
 
@@ -210,7 +210,7 @@ Response Example
 ```
 
 ### Route deletion
-**`DELETE /cities/route?user_id=<user_id>&route_id=<route_id>`**
+**`DELETE /users/<int:user_id>/routes/<int:route_id>`**
 Deletes a route from the database.
 
 Parameters
@@ -225,4 +225,133 @@ Response Example
     "success": "Route deleted"
 }
 ```
+
+### Route filtering
+**`GET /users/<int:user_id>/routes`**
+
+Parameters
+- `user_id`: The user's ID.
+- `limit`: The number of routes to return.
+- `descending`: Sort routes in descending order.
+- Optional parameters: 
+  - `from_date`: Filter routes from a specific date.
+  - `to_date`: Filter routes up to a specific date.
+  - `startpoint`: Filter routes by starting city.
+  - `endpoint`: Filter routes by destination city.
+
+Request Example
+
+```json
+{
+    "user_id": 7,
+    "limit": 10,
+    "descending": true
+}
+```
+
+Response Example
+
+```json
+{
+    "routes": [
+        {
+            "endpoint": "Riften",
+            "id": 14,
+            "route": {
+                "alternative_distance": 2376.27,
+                "alternative_route": {
+                    "0": "Markarth",
+                    "1": "Falkreath",
+                    "2": "Helgen",
+                    "3": "Ivarstead",
+                    "4": "Riften"
+                },
+                "distance": 2343.5,
+                "route": {
+                    "0": "Markarth",
+                    "1": "Rorikstead",
+                    "2": "Whiterun",
+                    "3": "Ivarstead",
+                    "4": "Riften"
+                }
+            },
+            "startpoint": "Markarth"
+        },
+        {
+            "endpoint": "Winterhold",
+            "id": 12,
+            "route": {
+                "alternative_distance": 2055.9,
+                "alternative_route": {
+                    "0": "Markarth",
+                    "1": "Karthwasten",
+                    "2": "Dragon Bridge",
+                    "3": "Morthal",
+                    "4": "Dawnstar",
+                    "5": "Winterhold"
+                },
+                "distance": 2008.69,
+                "route": {
+                    "0": "Markarth",
+                    "1": "Rorikstead",
+                    "2": "Morthal",
+                    "3": "Dawnstar",
+                    "4": "Winterhold"
+                }
+            },
+            "startpoint": "Markarth"
+        },
+        {
+            "endpoint": "Riften",
+            "id": 13,
+            "route": {
+                "alternative_distance": 2376.27,
+                "alternative_route": {
+                    "0": "Markarth",
+                    "1": "Falkreath",
+                    "2": "Helgen",
+                    "3": "Ivarstead",
+                    "4": "Riften"
+                },
+                "distance": 2343.5,
+                "route": {
+                    "0": "Markarth",
+                    "1": "Rorikstead",
+                    "2": "Whiterun",
+                    "3": "Ivarstead",
+                    "4": "Riften"
+                }
+            },
+            "startpoint": "Markarth"
+        }
+    ]
+}
+```
+
+### Clear route history
+**`DELETE /users/<int:user_id>/routes`**
+
+Parameters
+- `user_id`: The user's ID.
+
+Response Example
+
+```json
+{
+    "deleted_count": 2,
+    "success": "Route history cleared"
+}
+```
+
+**`DELETE /users/<string:user_name>/routes`**
+
+Response Example
+```json
+{
+    "deleted_count": 3,
+    "success": "Route history cleared"
+}
+```
+
+
 [back to top](#api-documentation)
