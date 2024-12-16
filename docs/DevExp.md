@@ -6,7 +6,6 @@ enforce consistent practices.
 
 ---
 
-
 ## **Table of Contents**
 
 1. [Debugger (debugpy)](#debugger-debugpy)  
