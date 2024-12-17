@@ -184,7 +184,7 @@ export const InteractiveMap = () => {
                 type="button"
                 className="boton-elegante"
                 value={
-                    alternative ? 'show main route' : 'show alternative route'
+                    alternative ? 'Show Main Route' : 'Show Alternative Route'
                 }
                 onClick={() => {
                     setAlternative(!alternative);
