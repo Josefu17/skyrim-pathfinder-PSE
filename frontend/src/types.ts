@@ -29,3 +29,8 @@ export type TCityOptionProps = {
     name: string;
     onClick: (name: string) => void;
 };
+
+export type TUser = {
+    id: number;
+    username: string;
+};

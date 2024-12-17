@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 
-import '../style/header.css';
 import mapImage from '../assets/map.svg';
+import { UserSection } from './userSection';
+import '../styles/header.css';
 
 export const Header = () => {
     return (
@@ -16,6 +17,7 @@ export const Header = () => {
                     <Link to="/docs">Documentation</Link>
                 </li>
             </ul>
+            <UserSection />
         </header>
     );
 };

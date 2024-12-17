@@ -123,9 +123,10 @@ The `fetchMapData()` function fetches all cities with their positions and connec
 
 ### User Interaction
 Users can:
-- Select a starting city and a destination city from the interactive map.
-- Receive the optimal(and alternative) route and distance based on their selection.
-- TODO: Ensure valid input with restrictions preventing duplicate or invalid city selections.
+- Select a starting city and a destination city from the interactive map by clicking on the nodes.
+- Receive the optimal (and alternative) route, along with the distance, based on their selection. To toggle between the main and alternative routes, click the "Show Alternative Route" / "Show Main Route" button.
+- TODO: Ensure valid input by implementing restrictions to prevent duplicate or invalid city selections.
+- Create an account by entering a username and submitting it by clicking the "`Register`" button. Both options can be accessed by clicking the "`Register Now`" button in the left section.
 
 ### Displaying the Route
 Once a route is calculated, the backend sends the route and distance back to the frontend. The frontend updates the relevant DOM to visually highlight the route and display the distance in a user-friendly format.
