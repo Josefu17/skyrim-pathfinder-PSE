@@ -97,17 +97,23 @@ pre-commit: pre-commit-backend pre-commit-frontend
 
 # Services management
 nav-enter:
-	docker exec -it group2-navigation-service-1 bash
+	docker exec -it group2-navigation-service bash
 
 backend-enter:
-	docker exec -it group2-web-backend-1 bash
+	docker exec -it group2-web-backend bash
 
 # Database management
-migrate:
+db-migrate:
 	alembic -c backend/alembic.ini upgrade head
 
-connect-to-database:
-	docker exec -it group2-postgres-1 psql -U pg-2 -d pg-2
+db-connect:
+	docker exec -it group2-postgres psql -U pg-2 -d pg-2
+
+db-seed:
+	python -m backend.src.database.seed_db seed
+
+db-clear:
+	python -m backend.src.database.seed_db clear
 
 
 # npm management

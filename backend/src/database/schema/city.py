@@ -1,9 +1,10 @@
 """ Python file for database class City"""
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.src.database.schema.base import Base
-from backend.src.logging_config import get_logging_configuration
+from backend.src.utils.helpers import get_logging_configuration
 
 logger = get_logging_configuration()
 
@@ -12,10 +13,10 @@ class City(Base):
     """Database class City"""
 
     __tablename__ = "city"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(255), nullable=False)
-    position_x = Column(Integer, nullable=False)
-    position_y = Column(Integer, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(255))
+    position_x: Mapped[int] = mapped_column()
+    position_y: Mapped[int] = mapped_column()
 
     def to_dict(self):
         """convert the object into dictionary"""

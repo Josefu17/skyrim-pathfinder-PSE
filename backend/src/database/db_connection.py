@@ -3,25 +3,17 @@
 import os
 from contextlib import contextmanager
 
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
-from backend.src.logging_config import get_logging_configuration
+from backend.src.utils.helpers import load_dotenv_if_exists, get_logging_configuration
 
 logger = get_logging_configuration()
 
 # getcwd(): path where the script was executed
 dotenv_path = os.path.join(os.getcwd(), ".env")
 
-if os.path.exists(dotenv_path):
-    load_dotenv(dotenv_path)
-    logger.info("Loaded .env from %s", dotenv_path)
-else:
-    logger.warning(
-        ".env file not found at %s; ensure environment variables are set manually",
-        dotenv_path,
-    )
+load_dotenv_if_exists(dotenv_path)
 
 
 class DatabaseConnection:

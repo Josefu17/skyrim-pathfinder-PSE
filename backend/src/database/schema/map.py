@@ -1,9 +1,10 @@
 """Python file for database class Map"""
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.src.database.schema.base import Base
-from backend.src.logging_config import get_logging_configuration
+from backend.src.utils.helpers import get_logging_configuration
 
 logger = get_logging_configuration()
 
@@ -12,10 +13,10 @@ class Map(Base):
     """Database class Map"""
 
     __tablename__ = "maps"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(255), nullable=False)
-    size_x = Column(Integer, nullable=False)
-    size_y = Column(Integer, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(255))
+    size_x: Mapped[int] = mapped_column()
+    size_y: Mapped[int] = mapped_column()
 
     def to_dict(self):
         """regular to_dict method for map"""

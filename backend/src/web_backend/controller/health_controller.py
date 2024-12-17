@@ -3,7 +3,7 @@
 from flask import jsonify
 from backend.src.health.health_check import check_all_criteria
 
-from backend.src.logging_config import get_logging_configuration
+from backend.src.utils.helpers import get_logging_configuration
 
 logger = get_logging_configuration()
 

@@ -3,13 +3,14 @@
 import dataclasses
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, Dict
 
-from sqlalchemy import Column, Integer, ForeignKey, String, DateTime
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.src.database.schema.base import Base
-from backend.src.logging_config import get_logging_configuration
+from backend.src.utils.helpers import get_logging_configuration
 
 logger = get_logging_configuration()
 
@@ -18,12 +19,12 @@ class Route(Base):
     """Database class Route"""
 
     __tablename__ = "routes"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    startpoint = Column(String(255), nullable=False)
-    endpoint = Column(String(255), nullable=False)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc), nullable=False)
-    route = Column(JSON, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    startpoint: Mapped[str] = mapped_column(String(255))
+    endpoint: Mapped[str] = mapped_column(String(255))
+    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    route: Mapped[Dict] = mapped_column(JSON)
 
     def to_dict(self):
         """Convert the object into dictionary"""

@@ -2,7 +2,7 @@
 
 from flask import request, jsonify
 
-from backend.src.logging_config import get_logging_configuration
+from backend.src.utils.helpers import get_logging_configuration
 from backend.src.database.schema.user import User
 from backend.src.database.db_connection import get_db_session
 from backend.src.database.dao.user_dao import UserDao
