@@ -3,7 +3,7 @@
 import json
 
 from flask import jsonify, request
-from backend.src.logging_config import get_logging_configuration
+from backend.src.utils.helpers import get_logging_configuration
 from backend.src.database.db_connection import get_db_session
 from backend.src.web_backend.web_backend_service import (
     fetch_route_from_navigation_service,

@@ -2,7 +2,7 @@
 
 from flask import Flask
 from flask_cors import CORS
-from backend.src.logging_config import get_logging_configuration
+from backend.src.utils.helpers import get_logging_configuration
 from backend.src.web_backend.controller import map_controller
 from backend.src.web_backend.controller import user_controller
 from backend.src.web_backend.controller import route_history_controller

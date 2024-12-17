@@ -1,9 +1,10 @@
 """ Python file for database class Connection"""
 
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column
 
 from backend.src.database.schema.base import Base
-from backend.src.logging_config import get_logging_configuration
+from backend.src.utils.helpers import get_logging_configuration
 
 logger = get_logging_configuration()
 
@@ -12,12 +13,12 @@ class Connection(Base):
     """Database class Connection"""
 
     __tablename__ = "connections"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    parent_city_id = Column(Integer, ForeignKey("city.id"), nullable=False)
-    child_city_id = Column(Integer, ForeignKey("city.id"), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    parent_city_id: Mapped[int] = mapped_column(ForeignKey("city.id"))
+    child_city_id: Mapped[int] = mapped_column(ForeignKey("city.id"))
 
     def to_dict(self):
-        """convert object into dictionary"""
+        """convert the object into dictionary"""
         connection_dict = {
             "id": self.id,
             "parent_city_id": self.parent_city_id,

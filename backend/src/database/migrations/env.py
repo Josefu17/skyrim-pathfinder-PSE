@@ -8,7 +8,7 @@ from sqlalchemy import pool
 
 from backend.src.database.schema.base import Base
 from backend.src.database.schema.models import register_models
-from backend.src.logging_config import get_logging_configuration
+from backend.src.utils.helpers import get_logging_configuration
 
 logger = get_logging_configuration()
 

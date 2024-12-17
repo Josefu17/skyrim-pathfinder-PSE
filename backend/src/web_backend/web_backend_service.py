@@ -4,7 +4,7 @@ import xmlrpc.client
 
 from backend.src.database.dao.city_dao import CityDao
 from backend.src.database.dao.connection_dao import ConnectionDao
-from backend.src.logging_config import get_logging_configuration
+from backend.src.utils.helpers import get_logging_configuration
 from backend.src.database.dao.map_dao import MapDao
 
 logger = get_logging_configuration()

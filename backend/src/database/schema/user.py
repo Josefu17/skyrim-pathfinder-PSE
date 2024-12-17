@@ -1,9 +1,10 @@
 """Python file for database class User"""
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import String
+from sqlalchemy.orm import Mapped, mapped_column
 
-from backend.src.logging_config import get_logging_configuration
 from backend.src.database.schema.base import Base
+from backend.src.utils.helpers import get_logging_configuration
 
 logger = get_logging_configuration()
 
@@ -12,8 +13,8 @@ class User(Base):
     """Database class User"""
 
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(255), unique=True, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(String(255), unique=True)
 
     def to_dict(self):
         """convert User into dictionary"""

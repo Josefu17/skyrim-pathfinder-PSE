@@ -6,7 +6,7 @@ to listen for incoming requests.
 from xmlrpc.server import SimpleXMLRPCServer
 from backend.src.navigation_service.navigation_service import get_route
 
-from backend.src.logging_config import get_logging_configuration
+from backend.src.utils.helpers import get_logging_configuration
 
 logger = get_logging_configuration()
 

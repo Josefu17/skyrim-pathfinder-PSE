@@ -159,6 +159,43 @@ Database migrations are managed with **Alembic**. Follow these steps:
 4. **Apply Migrations:**  
    Migrations are automatically applied when the backend container starts.
 
+### Database Seeding
+
+To populate the database with dummy data for local development, we provide a seeding script. 
+The script inserts sample users and routes into the database.
+
+#### Usage
+
+```bash
+# To seed the database
+python -m backend.src.database.seed_db seed # or 'make db-seed'
+
+# To clear the database
+python -m backend.src.database.seed_db clear # or 'make db-clear'
+```
+
+#### Prerequisites
+Ensure the database is running (e.g., using Docker Compose):
+```bash
+docker compose up -d postgres
+```
+
+#### `.env` Configuration
+The seeding script relies on environment variables for database credentials. Add these to your `.env` file:
+
+**Note**: Ensure the environment variables are set correctly to allow communication with the database from your local machine.
+
+By default:
+- `DB_PORT` is set to `5433` (as per the current Docker Compose configuration).
+- `DB_HOST` is set to `localhost` for local connections.
+
+If needed, adjust these values to match your setup. Other values:
+```dotenv
+DB_USER=<your_db_user>
+DB_PASSWORD=<your_db_password>
+DB_DATABASE=<your_db_name>
+```
+
 ---
 
 ## Running the Application
@@ -201,7 +238,7 @@ Database migrations are managed with **Alembic**. Follow these steps:
    - example curl commands:
      - `curl -X GET http://localhost:4243/maps`
      - `curl -X GET http://localhost:4243/cities`
-   - For our postman collection please refer to [Postman Collection](docs/Postman/PSE.postman_collection.json)
+   - For our postman collection, please refer to [Postman Collection](docs/Postman/PSE.postman_collection.json)
    or [Documentation.](#postman-collection)
 
 [back to top](#table-of-contents)

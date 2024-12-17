@@ -6,7 +6,7 @@ from backend.src.database.dao.city_dao import CityDao
 from backend.src.database.dao.connection_dao import ConnectionDao
 from backend.src.database.schema.city import City
 from backend.src.database.schema.connection import Connection
-from backend.src.logging_config import get_logging_configuration
+from backend.src.utils.helpers import get_logging_configuration
 from backend.src.database.dao.map_dao import MapDao
 from backend.src.database.schema.map import Map
 
