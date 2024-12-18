@@ -247,7 +247,7 @@ describe('InteractiveMap Component', () => {
         });
 
         it('handles missing city for route', async () => {
-            // Mock Cities and route and fetch responses
+            // Mock Cities und Route-Daten
             globalThis.fetch = vi
                 .fn()
                 .mockResolvedValueOnce({
@@ -267,10 +267,12 @@ describe('InteractiveMap Component', () => {
             const { container } =
                 await RenderInteractiveMapAndTriggerFetchRoute();
 
-            // Check if the route line is not displayed
+            // Stelle sicher, dass keine Linie gerendert wird, wenn Städte fehlen
             const notExistingLine = container.querySelector(
                 'line[stroke="blue"]'
             );
+
+            // Testen, dass die Linie nicht existiert
             expect(notExistingLine).not.toBeInTheDocument();
         });
     });

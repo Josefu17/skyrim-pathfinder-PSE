@@ -3,21 +3,19 @@ import { FormEvent, useState } from 'react';
 import { TUser } from '../types';
 import { useAuth } from '../contexts/authContext';
 import { MESSAGETIMER } from '../support';
-import '../styles/register.css';
+import '../styles/login.css';
 
-export const Register = () => {
-    const [username, setUsername] = useState<string>(''); // State to store the username input
+export const Login = () => {
+    const [username, setUsername] = useState<string>('');
     const [statusMessage, setStatusMessage] = useState<string>(''); // State to display feedback messages
-    const { setUser } = useAuth(); // Get the setUser function from the AuthContext
+    const { setUser } = useAuth();
 
-    // Function to handle form submission
-    const handleRegister = async (e: FormEvent) => {
+    const handleLogin = async (e: FormEvent) => {
         e.preventDefault(); // Prevent the default form behavior (page reload)
 
         try {
-            // Send a POST request with the username as JSON
             const response = await fetch(
-                `${import.meta.env.VITE_URL}/auth/register`,
+                `${import.meta.env.VITE_URL}/auth/login`,
                 {
                     method: 'POST',
                     headers: {
@@ -27,16 +25,17 @@ export const Register = () => {
                 }
             );
 
+            console.log(response);
             if (response.ok) {
                 const data = await response.json();
                 console.log(data);
-                setStatusMessage('Registration successful!'); // Show success message
-                const user: TUser = data?.user;
-                setUser(user); // Set the user in the context
+                const user: TUser = { username: username, id: data.id };
+                setStatusMessage(`Logged in as ${user.username}`); // Show success message
+                setUser(user);
                 setUsername(''); // Clear the input field
             } else {
                 const errorData = await response.json();
-                setStatusMessage(`${errorData.error}`); // Show server error message
+                setStatusMessage(`${errorData.error}`);
             }
         } catch (error: unknown) {
             setStatusMessage(
@@ -49,22 +48,22 @@ export const Register = () => {
     };
 
     return (
-        <section id="register">
-            <h2>Register</h2>
-            <form id="register-form" onSubmit={handleRegister}>
-                <label htmlFor="register-username">Username</label>
+        <section id="login">
+            <h2>Login</h2>
+            <form id="login-form" onSubmit={handleLogin}>
+                <label htmlFor="login-username">Username</label>
                 <input
-                    id="register-username"
+                    id="login-username"
                     name="username"
                     type="text"
-                    value={username} // Bind input value to state
-                    onChange={(e) => setUsername(e.target.value)} // Update state on input change
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
                 />
                 <input
-                    id="submit-register-username"
+                    id="submit-login-username"
                     type="submit"
-                    value="Register"
+                    value={'Login'}
                 />
             </form>
             {/* Conditionally render feedback message */}
