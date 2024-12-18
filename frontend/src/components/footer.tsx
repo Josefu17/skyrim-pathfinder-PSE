@@ -2,7 +2,7 @@ import '../styles/footer.css';
 
 export const Footer = () => {
     return (
-        <footer>
+        <footer role="contentinfo">
             <fieldset>
                 <legend>Developers</legend>
                 <section id="developers">

@@ -54,8 +54,12 @@ test-backend:
 	python -m pytest ./backend/src/tests/
 test-frontend:
 	@make npm run=test
+test-frontend-startup:
+	@make npm run=test-startup
 test: test-backend test-frontend
 
+
+# Coverage management
 coverage: coverage-backend coverage-frontend
 
 coverage-backend:
