@@ -9,6 +9,12 @@
     font-size: 5rem;
     color: black;
     font-weight: bold;
+    pointer-events: 'none';
+    user-select: none;
+}
+
+#map > g > circle {
+    cursor: pointer;
 }
 
 #distance {
