@@ -61,6 +61,7 @@ export const UserSection = () => {
                     <Login />
                 </article>
             );
+        if (user != null) setActiveForm(''); // Nothing is shown if no form is active
         return null; // Nothing is shown if no form is active
     };
 
@@ -72,16 +73,20 @@ export const UserSection = () => {
             ) : (
                 <p>Welcome, Guest!</p>
             )}
-            <RegisterSwitcher
-                activeForm={activeForm}
-                setActiveForm={setActiveForm}
-            />
-            <LoginSwitcher
-                activeForm={activeForm}
-                setActiveForm={setActiveForm}
-            />
+            {user ? null : (
+                <RegisterSwitcher
+                    activeForm={activeForm}
+                    setActiveForm={setActiveForm}
+                />
+            )}
+            {user ? null : (
+                <LoginSwitcher
+                    activeForm={activeForm}
+                    setActiveForm={setActiveForm}
+                />
+            )}
             <LogoutSwitcher />
-            {renderForm()}
+            {user ? null : renderForm()}
         </section>
     );
 };

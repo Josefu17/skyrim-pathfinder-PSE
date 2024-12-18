@@ -138,45 +138,68 @@ export const InteractiveMap = () => {
                                 y1={fromCity.position_y}
                                 x2={toCity.position_x}
                                 y2={toCity.position_y}
-                                stroke="blue"
+                                stroke="green"
                                 strokeWidth={20}
                             />
                         );
                     })}
 
                 {/* draw cities */}
-                {cities?.map((city) => (
-                    <g key={city.id}>
-                        <circle
-                            id={`endpoint-${city.id}`}
-                            cx={city.position_x}
-                            cy={city.position_y}
-                            r="20"
-                            fill="brown"
-                            onClick={() => {
-                                if (!startpoint) {
-                                    setStartpoint(city.name);
-                                    console.log(`Set startpoint: ${city.name}`);
-                                } else if (!endpoint) {
-                                    setEndpoint(city.name);
-                                    console.log(`Set endpoint: ${city.name}`);
-                                } else {
-                                    setStartpoint('');
-                                    setEndpoint('');
-                                    console.log('reset data');
-                                }
-                            }}
-                        />
-                        <text
-                            fontSize={90}
-                            x={city.position_x}
-                            y={city.position_y + 80}
-                            textAnchor="middle"
-                        >
-                            {city.name}
-                        </text>
-                    </g>
-                ))}
+                {cities?.map((city) => {
+                    // Function to check if the city is part of the current route
+                    const isCityOnRoute = () => {
+                        const currentRoute = alternative
+                            ? routeData?.alternative_route
+                            : routeData?.route;
+                        return Object.values(currentRoute || {}).includes(
+                            city.name
+                        );
+                    };
+
+                    const getCityColor = () => {
+                        if (city.name === startpoint) return 'blue'; // Highlight startpoint
+                        if (isCityOnRoute()) return 'green'; // Highlight cities on the route
+                        return 'brown'; // Default color
+                    };
+                    return (
+                        <g key={city.id}>
+                            <text
+                                fontSize={90}
+                                x={city.position_x}
+                                y={city.position_y + 80}
+                                textAnchor="middle"
+                            >
+                                {city.name}
+                            </text>
+                            <circle
+                                id={`endpoint-${city.id}`}
+                                cx={city.position_x}
+                                cy={city.position_y}
+                                r="1.5rem"
+                                fill={getCityColor()}
+                                onClick={() => {
+                                    if (!startpoint) {
+                                        setStartpoint(city.name);
+                                        console.log(
+                                            `Set startpoint: ${city.name}`
+                                        );
+                                    } else if (!endpoint) {
+                                        if (startpoint != city.name) {
+                                            setEndpoint(city.name);
+                                            console.log(
+                                                `Set endpoint: ${city.name}`
+                                            );
+                                        }
+                                    } else {
+                                        setStartpoint('');
+                                        setEndpoint('');
+                                        console.log('reset data');
+                                    }
+                                }}
+                            />
+                        </g>
+                    );
+                })}
             </svg>
             {routeDistance && (
                 <p id="distance">Distance to destination: {routeDistance} m</p>
