@@ -6,7 +6,7 @@ import '../styles/header.css';
 
 export const Header = () => {
     return (
-        <header>
+        <header role="banner">
             <h1>Path finder</h1>
             <img id="header-logo" src={mapImage} alt="" />
             <ul>
