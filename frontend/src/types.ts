@@ -34,3 +34,8 @@ export type TUser = {
     id: number;
     username: string;
 };
+
+export type TAuthContext = {
+    user: TUser | null;
+    setUser: (user: TUser | null) => void; // Function to update user
+};

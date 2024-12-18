@@ -127,7 +127,9 @@ export const InteractiveMap = () => {
                                 ?.id
                         );
 
-                        if (!fromCity || !toCity) return null;
+                        if (!fromCity || !toCity) {
+                            return null;
+                        }
 
                         return (
                             <line

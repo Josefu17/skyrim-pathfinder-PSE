@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { render, fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import React, { act } from 'react';
 
+import { renderWithAuthProvider } from '../skip.support.test';
 import { Register } from '../../src/components/register';
 
 globalThis.fetch = vi.fn();
@@ -16,7 +17,7 @@ const renderAndSubmitTestUser = async (): Promise<{
 
     // Use act to wrap rendering
     await act(async () => {
-        ({ container } = render(<Register />));
+        ({ container } = renderWithAuthProvider(<Register />));
     });
 
     // Find the username input field
@@ -51,7 +52,7 @@ describe('Register', () => {
 
     it('should render correctly', async () => {
         await act(async () => {
-            render(<Register />);
+            renderWithAuthProvider(<Register />);
         });
 
         const submitUsernameButton = await screen.findByRole('button', {
@@ -80,12 +81,12 @@ describe('Register', () => {
         // Mock fetch response
         globalThis.fetch = vi.fn().mockResolvedValueOnce({
             ok: false,
-            json: async () => ({ message: 'Username already taken' }),
+            json: async () => ({ error: 'Username already taken' }),
         });
 
         await renderAndSubmitTestUser();
 
-        const errorMessage = await screen.findByText(/username already taken/i);
+        const errorMessage = await screen.findByText(/Username already taken/i);
         expect(errorMessage).toBeInTheDocument();
     });
 
@@ -99,5 +100,45 @@ describe('Register', () => {
 
         const errorMessage = await screen.findByText(/an error occurred/i);
         expect(errorMessage).toBeInTheDocument();
+    });
+
+    it.skip('should show success message and then clear it after timeout', async () => {
+        // Enable fake timers
+        vi.useFakeTimers();
+        globalThis.fetch = vi.fn().mockReturnValueOnce({
+            ok: true,
+            json: async () => ({
+                message: 'Registration successful!',
+                user: { username: 'test_user', id: 1 },
+            }),
+        });
+
+        renderWithAuthProvider(<Register />);
+
+        // Fill the form and simulate the submit
+        const input = await screen.getByLabelText(/username/i);
+        const button = await screen.getByRole('button', { name: /Register/i });
+
+        act(() => {
+            fireEvent.change(input, { target: { value: 'test_user' } });
+            fireEvent.click(button);
+        });
+
+        // Check if the success message is displayed
+        const successMessage = await screen.getByText(
+            /Registration successful!/i
+        );
+        expect(successMessage).toBeInTheDocument();
+
+        // Simulate the passing of time (3 seconds)
+        act(() => {
+            vi.advanceTimersByTime(3000); // Advance the timer by 3 seconds
+        });
+
+        // Check if the success message is removed after timeout
+        expect(successMessage).not.toBeInTheDocument();
+
+        // Disable fake timers
+        vi.useRealTimers();
     });
 });

@@ -3,6 +3,7 @@ import { waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom'; // For better matcher like `toBeInTheDocument`
 import React, { StrictMode } from 'react';
 
+import { AuthProvider } from '../src/contexts/authContext';
 import { App } from '../src/App';
 
 // Mock the `react-dom/client` module
@@ -30,7 +31,9 @@ describe('Root rendering', () => {
             expect(createRoot).toHaveBeenCalledWith(rootElement);
             expect(renderMock).toHaveBeenCalledWith(
                 <StrictMode>
-                    <App />
+                    <AuthProvider>
+                        <App />
+                    </AuthProvider>
                 </StrictMode>
             );
         });
