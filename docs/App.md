@@ -35,6 +35,7 @@ The Navigation Service uses the Dijkstra algorithm to calculate the best route b
   - Terminates only after all cities were visited. Since all possible paths are checked, the shortest possible route is found.
   - Updates distances for neighboring cities if a shorter path is found, adding them back to `min_heap`.
   - Also updates the second-shortest path if a new second-shortest path is found.
+  - If the alternative path contains a city twice, the algorithm recalculates the path with current path to provide a valid short path.
 
 ### Method
 - `get_route(start_city_name, end_city_name, data)`:
