@@ -163,22 +163,58 @@ def dijkstra(graph, start_city_id, end_city_id):
             if not path:
                 path = current_path
             elif not second_path:
-                second_path = current_path
+                # Check for duplicate cities in the second path
+                if len(set(current_path)) == len(current_path):
+                    second_path = current_path
+                else:
+                    # Recalculate the second path without duplicates
+                    second_path = recalculate_path_without_duplicates(
+                        graph, end_city_id, current_path
+                    )
                 break
 
         # Explore neighbors of the current city
         for distance, neighbor in graph[current_city]:
-            update_data = UpdateData(
-                distances,
-                second_distances,
-                neighbor,
-                (current_distance + distance),
-                current_path,
-            )
-            update_heap_and_distances(min_heap, update_data)
+            if neighbor not in current_path:  # Ensure no duplicate cities
+                update_data = UpdateData(
+                    distances,
+                    second_distances,
+                    neighbor,
+                    (current_distance + distance),
+                    current_path,
+                )
+                update_heap_and_distances(min_heap, update_data)
 
     distances_dict = {"distances": distances, "second_distances": second_distances}
     return validate_paths(path, second_path, distances_dict, end_city_id, start_city_id)
+
+
+def recalculate_path_without_duplicates(graph, end_city_id, current_path):
+    """Recalculates the path ensuring no city is visited twice."""
+    visited = set()
+    new_path = []
+
+    for city in current_path:
+        if city not in visited:
+            visited.add(city)
+            new_path.append(city)
+
+    # If the end city is not reached, continue exploring
+    if new_path[-1] != end_city_id:
+        min_heap = [(0, new_path[-1], new_path)]
+
+        while min_heap:
+            current_distance, current_city, current_path = heapq.heappop(min_heap)
+            current_path = current_path + [current_city]
+
+            if current_city == end_city_id:
+                return current_path
+
+            for distance, neighbor in graph[current_city]:
+                if neighbor not in current_path:
+                    heapq.heappush(min_heap, (current_distance + distance, neighbor, current_path))
+
+    return new_path
 
 
 def calculate_distance(city_1, city_2):
