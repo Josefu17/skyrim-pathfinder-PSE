@@ -1,4 +1,4 @@
-"""Tests for the metrics_controller module."""
+"""Tests for the metrics controller."""
 
 from unittest.mock import patch, MagicMock
 from flask.testing import FlaskClient
@@ -27,18 +27,18 @@ def test_get_metrics(mock_redis_client, client: FlaskClient):
 
     response = client.get("/metrics")
     assert response.status_code == 200
-    data = response.get_json()
+    data = response.data.decode("utf-8")
 
-    assert data["traffic"][0]["logged_in_users"] == 5
-    assert data["traffic"][0]["registered_calculated_route"] == 20
-    assert data["traffic"][0]["anonymous_calculated_route"] == 10
-    assert data["latency"][0]["registered_avg_execution_time"] == 10.0
-    assert data["latency"][0]["anonymous_avg_execution_time"] == 10.0
-    assert data["error"][0]["error_missing_username"] == 1
-    assert data["error"][0]["error_existing_username"] == 2
-    assert data["error"][0]["error_user_not_found"] == 3
-    assert data["error"][0]["error_missing_city"] == 4
-    assert data["error"][0]["error_calculating_route"] == 5
-    assert data["error"][0]["error_route_not_found"] == 6
-    assert data["error"][0]["error_clearing_route_history"] == 7
-    assert data["saturation"][0]["concurrent_requests"] == 8
+    assert "logged_in_users 5" in data
+    assert "registered_calculated_route 20" in data
+    assert "anonymous_calculated_route 10" in data
+    assert "registered_avg_execution_time 10.0" in data
+    assert "anonymous_avg_execution_time 10.0" in data
+    assert "error_missing_username 1" in data
+    assert "error_existing_username 2" in data
+    assert "error_user_not_found 3" in data
+    assert "error_missing_city 4" in data
+    assert "error_calculating_route 5" in data
+    assert "error_route_not_found 6" in data
+    assert "error_clearing_route_history 7" in data
+    assert "concurrent_requests 8" in data

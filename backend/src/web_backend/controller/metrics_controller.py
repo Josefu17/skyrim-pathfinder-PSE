@@ -1,6 +1,5 @@
 """This module contains the controller for the metrics endpoint"""
 
-from flask import jsonify
 from backend.src.utils.helpers import get_logging_configuration
 from backend.src.redis_client import redis_client
 
@@ -12,6 +11,16 @@ METRICS = "/metrics"
 def init_metrics_routes(app):
     """Initialize all routes for the Flask app."""
     app.route(METRICS, methods=["GET"])(get_metrics)
+
+
+def json_to_prometheus(data):
+    """Convert JSON data to Prometheus format"""
+    result = []
+    for _, items in data.items():
+        for item in items:
+            for key, value in item.items():
+                result.append(f"{key} {value}")
+    return "\n".join(result)
 
 
 def get_metrics():
@@ -70,4 +79,4 @@ def get_metrics():
             }
         ],
     }
-    return jsonify(metrics), 200
+    return json_to_prometheus(metrics), 200
