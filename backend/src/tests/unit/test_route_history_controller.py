@@ -1,4 +1,4 @@
-"""Unit tests for the route_history_controller module."""
+"""Tests for the route_history_controller module."""
 
 import math
 from unittest.mock import patch, MagicMock
@@ -6,17 +6,16 @@ from unittest.mock import patch, MagicMock
 from flask.testing import FlaskClient
 
 
-# Test for the `/cities/route` endpoint
+# Test for the `/users/1/routes` endpoint
+@patch("backend.src.redis_client.redis_client.incr", MagicMock())
+@patch("backend.src.redis_client.redis_client.incrbyfloat", MagicMock())
+@patch("backend.src.redis_client.redis_client.decr", MagicMock())
 @patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
 @patch(
-    "backend.src.web_backend.controller.route_history_controller"
-    ".fetch_route_from_navigation_service"
+    "backend.src.web_backend.controller.route_history_controller."
+    "fetch_route_from_navigation_service"
 )
-def test_calculate_route(
-    mock_fetch_route,
-    mock_get_db_session,
-    client: FlaskClient,
-):
+def test_calculate_route(mock_fetch_route, mock_get_db_session, client: FlaskClient):
     """Test the calculate_route endpoint."""
     # Mock the database session
     mock_session = MagicMock()
@@ -75,23 +74,21 @@ def test_calculate_route(
     }
 
 
+@patch("backend.src.redis_client.redis_client.incr", MagicMock())
+@patch("backend.src.redis_client.redis_client.decr", MagicMock())
+@patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
 @patch(
     "backend.src.web_backend.controller.route_history_controller."
     "fetch_route_from_navigation_service"
 )
-@patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
-def test_calculate_route_service_error(
-    mock_get_db_session,
-    mock_fetch_route_from_navigation_service,
-    client,
-):
+def test_calculate_route_service_error(mock_fetch_route, mock_get_db_session, client: FlaskClient):
     """Test error response when service fails."""
     # Mock database session
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
 
     # Mock service response
-    mock_fetch_route_from_navigation_service.return_value = {"error": "Some error"}
+    mock_fetch_route.return_value = {"error": "Some error"}
 
     # Call endpoint
     response = client.post(
@@ -104,15 +101,18 @@ def test_calculate_route_service_error(
     assert response.json == {"error": "Some error"}
 
 
-def test_calculate_route_missing_params(client):
+@patch("backend.src.redis_client.redis_client.incr", MagicMock())
+@patch("backend.src.redis_client.redis_client.decr", MagicMock())
+def test_calculate_route_missing_params(client: FlaskClient):
     """Test error response for missing query parameters."""
     response = client.post("/users/1/routes", json={})
     assert response.status_code == 400
     assert response.json == {"error": "Start and end cities are required"}
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
-def test_delete_route_success(mock_get_db_session, client):
+def test_delete_route_success(mock_get_db_session, mock_redis_incr, client):
     """Test the delete_route endpoint."""
     # Mock the database session
     mock_session = MagicMock()
@@ -126,10 +126,12 @@ def test_delete_route_success(mock_get_db_session, client):
     response = client.delete("/users/1/routes/1")
     assert response.status_code == 200
     assert response.json == {"success": "Route deleted"}
+    mock_redis_incr.assert_not_called()
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
-def test_delete_route_not_found(mock_get_db_session, client):
+def test_delete_route_not_found(mock_get_db_session, mock_redis_incr, client):
     """Test error response for route not found."""
     # Mock the database session
     mock_session = MagicMock()
@@ -141,10 +143,12 @@ def test_delete_route_not_found(mock_get_db_session, client):
     response = client.delete("/users/1/routes/1")
     assert response.status_code == 404
     assert response.json == {"error": "Route not found"}
+    mock_redis_incr.assert_called_once_with("error_route_not_found")
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
-def test_delete_route_wrong_user(mock_get_db_session, client):
+def test_delete_route_wrong_user(mock_get_db_session, mock_redis_incr, client):
     """Test error response for route not belonging to user."""
     # Mock the database session
     mock_session = MagicMock()
@@ -158,10 +162,12 @@ def test_delete_route_wrong_user(mock_get_db_session, client):
     response = client.delete("/users/1/routes/1")
     assert response.status_code == 404
     assert response.json == {"error": "Route not found"}
+    mock_redis_incr.assert_called_once_with("error_route_not_found")
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
-def test_get_user_history_success(mock_get_db_session, client):
+def test_get_user_history_success(mock_get_db_session, mock_redis_incr, client):
     """Test the get_user_history endpoint."""
     # Mock the database session
     mock_session = MagicMock()
@@ -207,10 +213,12 @@ def test_get_user_history_success(mock_get_db_session, client):
             },
         ]
     }
+    mock_redis_incr.assert_not_called()
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
-def test_get_user_history_no_routes_found(mock_get_db_session, client):
+def test_get_user_history_no_routes_found(mock_get_db_session, mock_redis_incr, client):
     """Test the get_user_history endpoint with no routes found."""
     # Mock routes
     mock_routes = []
@@ -221,10 +229,12 @@ def test_get_user_history_no_routes_found(mock_get_db_session, client):
     response = client.get("/users/1/routes")
     assert response.status_code == 404
     assert response.json == {"error": "No routes found"}
+    mock_redis_incr.assert_called_once_with("error_route_not_found")
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
-def test_get_user_history_filter_by_date_range(mock_get_db_session, client):
+def test_get_user_history_filter_by_date_range(mock_get_db_session, mock_redis_incr, client):
     """Test the get_user_history endpoint with date range filtering."""
     # Mock routes
     mock_routes = [
@@ -254,10 +264,14 @@ def test_get_user_history_filter_by_date_range(mock_get_db_session, client):
             },
         ]
     }
+    mock_redis_incr.assert_not_called()
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
-def test_get_user_history_filter_by_startpoint_and_endpoint(mock_get_db_session, client):
+def test_get_user_history_filter_by_startpoint_and_endpoint(
+    mock_get_db_session, mock_redis_incr, client
+):
     """Test the get_user_history endpoint with startpoint and endpoint filtering."""
     # Mock routes
     mock_routes = [
@@ -287,6 +301,7 @@ def test_get_user_history_filter_by_startpoint_and_endpoint(mock_get_db_session,
             },
         ]
     }
+    mock_redis_incr.assert_not_called()
 
 
 def setup_mock_session(mock_get_db_session, mock_routes):
@@ -304,8 +319,11 @@ def setup_mock_session(mock_get_db_session, mock_routes):
     return mock_session
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
-def test_clear_user_history_by_id_success(mock_get_db_session, client: FlaskClient):
+def test_clear_user_history_by_id_success(
+    mock_get_db_session, mock_redis_incr, client: FlaskClient
+):
     """Test successful clearing of user history by user_id."""
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
@@ -314,10 +332,14 @@ def test_clear_user_history_by_id_success(mock_get_db_session, client: FlaskClie
     response = client.delete("/users/1/routes")
     assert response.status_code == 200
     assert response.json == {"success": "Route history cleared", "deleted_count": 5}
+    mock_redis_incr.assert_not_called()
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
-def test_clear_user_history_by_name_success(mock_get_db_session, client: FlaskClient):
+def test_clear_user_history_by_name_success(
+    mock_get_db_session, mock_redis_incr, client: FlaskClient
+):
     """Test successful clearing of user history by user_name."""
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
@@ -326,10 +348,12 @@ def test_clear_user_history_by_name_success(mock_get_db_session, client: FlaskCl
     response = client.delete("/users/user_name/routes")
     assert response.status_code == 200
     assert response.json == {"success": "Route history cleared", "deleted_count": 3}
+    mock_redis_incr.assert_not_called()
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
-def test_clear_user_history_value_error(mock_get_db_session, client: FlaskClient):
+def test_clear_user_history_value_error(mock_get_db_session, mock_redis_incr, client: FlaskClient):
     """Test error response when a ValueError is raised."""
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
@@ -340,3 +364,4 @@ def test_clear_user_history_value_error(mock_get_db_session, client: FlaskClient
     response = client.delete("/users/invalid_user/routes")
     assert response.status_code == 400
     assert response.json == {"error": "Invalid user"}
+    mock_redis_incr.assert_called_once_with("error_clearing_route_history")

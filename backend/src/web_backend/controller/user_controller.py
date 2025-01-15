@@ -6,6 +6,7 @@ from backend.src.utils.helpers import get_logging_configuration
 from backend.src.database.schema.user import User
 from backend.src.database.db_connection import get_db_session
 from backend.src.database.dao.user_dao import UserDao
+from backend.src.redis_client import redis_client
 
 logger = get_logging_configuration()
 
@@ -25,10 +26,12 @@ def register_user():
     username = data.get("username")
 
     if not username:
+        redis_client.incr("error_missing_username")
         return jsonify({"error": "Username is required"}), 400
 
     with get_db_session() as session:
         if UserDao.user_exists_by_username(username, session):
+            redis_client.incr("error_existing_username")
             return jsonify({"error": "Username already exists"}), 400
 
         user = User(username=username)
@@ -49,19 +52,23 @@ def register_user():
 
 def login_user():
     """Login an existing user."""
+
     data = request.get_json()
     username = data.get("username")
 
     if not username:
+        redis_client.incr("error_missing_username")
         return jsonify({"error": "Username is required"}), 400
 
     with get_db_session() as session:
         user = UserDao.get_user_by_username(username, session)
 
         if not user:
+            redis_client.incr("error_user_not_found")
             return jsonify({"error": "User not found"}), 404
 
     logger.info("Logging in user: %s", username)
+    redis_client.incr("logged_in_users")
     return (
         jsonify(
             {

@@ -10,6 +10,8 @@ This document details the API routes provided by the backend.
 2. [Cities](#cities)  
 3. [Route Calculation](#route-calculation)  
 4. [Health Check](#health-check)
+5. [User Management](#user-management)
+6. [Metrics](#metrics)
 
 ---
 
@@ -355,3 +357,10 @@ Response Example
 
 
 [back to top](#api-documentation)
+
+## Metrics
+The `/metrics` endpoint provides the four golden signals for monitoring the application:
+1. **Latency:** The time taken to calculate a route.
+2. **Traffic:** The number of logged in user and requested route calculation.
+3. **Errors:** The number of failed route calculations.
+4. **Saturation:** The number of concurrent users.
