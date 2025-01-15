@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react';
 
 import { TUser } from '../types';
 import { useAuth } from '../contexts/authContext';
-import { MESSAGETIMER } from '../support';
+import { MESSAGETIMER } from '../support/support';
 import '../styles/login.css';
 
 export const Login = () => {
@@ -29,7 +29,7 @@ export const Login = () => {
             if (response.ok) {
                 const data = await response.json();
                 console.log(data);
-                const user: TUser = { username: username, id: data.id };
+                const user: TUser = { username: username, id: data.user.id };
                 setStatusMessage(`Logged in as ${user.username}`); // Show success message
                 setUser(user);
                 setUsername(''); // Clear the input field

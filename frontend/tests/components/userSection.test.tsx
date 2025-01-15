@@ -3,9 +3,8 @@ import { describe, it, expect } from 'vitest';
 import '@testing-library/jest-dom'; // For better matchers like `toBeInTheDocument`
 import React, { act } from 'react';
 
-import { renderWithAuthProvider } from '../skip.support.test';
+import { renderWithAuthProvider, testUser } from '../skip.support.test';
 import { UserSection } from '../../src/components/userSection';
-import { TUser } from '../../src/types';
 
 describe('UserSection', () => {
     it('should render correctly without showing Register or Login forms initially', async () => {
@@ -118,10 +117,8 @@ describe('UserSection', () => {
         expect(loginComponent).not.toBeInTheDocument();
     });
 
-    it.skip('should render Logout button if user is logged in', async () => {
-        const mockUser: TUser = { id: 1, username: 'test_user' };
-
-        renderWithAuthProvider(<UserSection />, mockUser);
+    it('should render Logout button if user is logged in', async () => {
+        renderWithAuthProvider(<UserSection />, testUser);
 
         // Wait for the user to be set in the context
         await waitFor(() => {

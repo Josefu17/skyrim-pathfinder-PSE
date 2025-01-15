@@ -6,6 +6,7 @@ import {
     TConnection,
     TCity,
 } from '../types';
+import { useAuth } from '../contexts/authContext';
 
 export const InteractiveMap = () => {
     const [cities, setCities] = useState<TCities | null>(null);
@@ -17,6 +18,7 @@ export const InteractiveMap = () => {
     const routeDistance = alternative
         ? routeData?.alternative_distance
         : routeData?.distance;
+    const { user } = useAuth();
 
     const getCityCoordinates = (id: number | undefined): TCity | null => {
         const city = cities?.find((city) => city.id === id);
@@ -53,26 +55,29 @@ export const InteractiveMap = () => {
 
     useEffect(() => {
         const fetchRouteData = async () => {
+            if (user === undefined) return; // Warten, bis der Benutzerstatus feststeht
             if (startpoint && endpoint) {
                 try {
-                    const response = await fetch(
-                        `${import.meta.env.VITE_URL}/routes`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                startpoint,
-                                endpoint,
-                            }),
-                        }
-                    );
+                    console.log('Test user:', user); // Sollte null sein
+                    const url =
+                        user !== null && user !== undefined
+                            ? `${import.meta.env.VITE_URL}/users/${user?.id}/routes`
+                            : `${import.meta.env.VITE_URL}/routes`;
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            startpoint,
+                            endpoint,
+                        }),
+                    });
                     const data = await response.json();
+                    console.log('Route data:', data);
                     setRouteData(data);
                     setStartpoint('');
                     setEndpoint('');
-                    console.log('Route data:', data);
                 } catch (error) {
                     console.error('Error fetching route data:', error);
                 }
@@ -214,7 +219,7 @@ export const InteractiveMap = () => {
                 onClick={() => {
                     setAlternative(!alternative);
                 }}
-            ></input>
+            />
         </>
     );
 };

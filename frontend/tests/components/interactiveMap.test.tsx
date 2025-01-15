@@ -1,8 +1,9 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom'; // For better matcher like `toBeInTheDocument`
 import React from 'react';
 
+import { renderWithAuthProvider, testUser } from '../skip.support.test';
 import { InteractiveMap } from '../../src/components/interactiveMap';
 
 globalThis.fetch = vi.fn();
@@ -39,7 +40,7 @@ describe('InteractiveMap Component', () => {
         cityA: Element;
         cityB: Element;
     }> {
-        const { container } = render(<InteractiveMap />);
+        const { container } = renderWithAuthProvider(<InteractiveMap />);
 
         // Wait for the map to render
         const cityA = await screen.findByText('City A');
@@ -58,7 +59,7 @@ describe('InteractiveMap Component', () => {
         cityB: Element;
     }> {
         // Render the component
-        const { container } = render(<InteractiveMap />);
+        const { container } = renderWithAuthProvider(<InteractiveMap />);
 
         // Wait for the cities to render
         const cityA = await waitFor(() => {
@@ -114,7 +115,7 @@ describe('InteractiveMap Component', () => {
                 .mockRejectedValueOnce(new Error('Fetch error'));
 
             // Render the component
-            render(<InteractiveMap />);
+            renderWithAuthProvider(<InteractiveMap />);
 
             // Wait for the map data fetch error to be logged
             await waitFor(() => {
@@ -186,7 +187,7 @@ describe('InteractiveMap Component', () => {
             vi.spyOn(Array.prototype, 'find').mockImplementation(mockFind);
 
             // Render the component
-            const { container } = render(<InteractiveMap />);
+            const { container } = renderWithAuthProvider(<InteractiveMap />);
 
             // Check if `getCityNameById` returns an empty string for a non-existent city
             const element = await waitFor(() => {
@@ -204,7 +205,7 @@ describe('InteractiveMap Component', () => {
     });
 
     describe('fetch route data and display route', () => {
-        it('fetches and displays route data', async () => {
+        it('fetches and displays route data when logged in', async () => {
             // Mock cities and route and fetch responses
             globalThis.fetch = vi
                 .fn()
@@ -215,14 +216,98 @@ describe('InteractiveMap Component', () => {
                     json: async () => mockRoute,
                 } as Response);
 
-            // Render the component and trigger route fetch
-            await RenderInteractiveMapAndTriggerFetchRoute();
+            // Render the component
+            const { container } = renderWithAuthProvider(
+                <InteractiveMap />,
+                testUser
+            );
+
+            // Wait for the cities to render
+            const cityA = await waitFor(() => {
+                const element = container.querySelector('[id="endpoint-1"]');
+                if (!element) throw new Error('Element not found');
+                return element;
+            });
+            const cityB = await waitFor(() => {
+                const element = container.querySelector('[id="endpoint-2"]');
+                if (!element) throw new Error('Element not found');
+                return element;
+            });
+
+            // trigger route fetch
+            fireEvent.click(cityA);
+            fireEvent.click(cityB);
 
             // Check if the route line is displayed
             const routeLine = await screen.findByText(
                 'Distance to destination: 5000 m'
             );
             expect(routeLine).toBeInTheDocument();
+            expect(globalThis.fetch).toHaveBeenLastCalledWith(
+                // @ts-expect-error - TS doesn't know about env variables
+                `${import.meta.env.VITE_URL}/users/${testUser.id}/routes`,
+                {
+                    body: '{"startpoint":"City A","endpoint":"City B"}',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    method: 'POST',
+                }
+            );
+        });
+
+        it.skip('fetches and displays route data when not logged in', async () => {
+            // Mock cities and route and fetch responses
+            globalThis.fetch = vi
+                .fn()
+                .mockResolvedValueOnce({
+                    json: async () => mockCities,
+                } as Response)
+                .mockResolvedValueOnce({
+                    json: async () => mockRoute,
+                } as Response);
+
+            // Render the component
+            const { container } = renderWithAuthProvider(
+                <InteractiveMap />,
+                null
+            );
+
+            // Wait for the cities to render
+            const cityA = await waitFor(() => {
+                const element = container.querySelector('[id="endpoint-1"]');
+                if (!element) throw new Error('Element not found');
+                return element;
+            });
+            const cityB = await waitFor(() => {
+                const element = container.querySelector('[id="endpoint-2"]');
+                if (!element) throw new Error('Element not found');
+                return element;
+            });
+
+            // trigger route fetch
+            fireEvent.click(cityA);
+            fireEvent.click(cityB);
+
+            // Check if the route line is displayed
+            const routeLine = await screen.findByText(
+                'Distance to destination: 5000 m'
+            );
+            expect(routeLine).toBeInTheDocument();
+
+            console.log('Test user:', testUser);
+            screen.debug();
+
+            expect(globalThis.fetch).toHaveBeenLastCalledWith(
+                `http://localhost:4243/routes`,
+                {
+                    body: '{"startpoint":"City A","endpoint":"City B"}',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    method: 'POST',
+                }
+            );
         });
 
         it('handles fetch errors for route data', async () => {

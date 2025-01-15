@@ -1,7 +1,7 @@
 header {
     display: flex;
     flex-direction: column;
-    border-right: solid 0.1em white;
+    border-right: solid 0.1rem white;
     height: 100%;
     width: 100%;
     justify-content: flex-start;
