@@ -297,6 +297,30 @@
           "response": []
         }
       ]
+    },
+    {
+  "name": "Metrics",
+  "item": [
+    {
+      "name": "Get Metrics",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4243/metrics",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4243",
+          "path": [
+            "metrics"
+          ]
+        }
+      },
+      "response": []
     }
+  ]
+}
   ]
 }

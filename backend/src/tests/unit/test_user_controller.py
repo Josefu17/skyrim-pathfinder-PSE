@@ -1,16 +1,13 @@
-"""
-Tests for the user controller.
-"""
+"""Unit tests for the user controller."""
 
 from unittest.mock import patch, MagicMock
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.user_controller.UserDao")
 @patch("backend.src.web_backend.controller.user_controller.get_db_session")
-def test_register_user_success(mock_get_db_session, mock_user_dao, client):
-    """
-    Test registering a new user successfully.
-    """
+def test_register_user_success(mock_get_db_session, mock_user_dao, mock_redis_client, client):
+    """Test registering a new user successfully."""
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
     mock_user_dao.user_exists_by_username.return_value = False
@@ -28,28 +25,25 @@ def test_register_user_success(mock_get_db_session, mock_user_dao, client):
         "user": {"username": "testuser", "id": 1},
     }
     mock_user_dao.save_user.assert_called_once()
+    mock_redis_client.assert_not_called()
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.user_controller.UserDao")
-def test_register_user_missing_username(
-    mock_user_dao,
-    client,
-):
-    """
-    Test registering a new user without a username.
-    """
+def test_register_user_missing_username(mock_user_dao, mock_redis_client, client):
+    """Test registering a new user without a username."""
     response = client.post("/auth/register", json={})
     assert response.status_code == 400
     assert response.json == {"error": "Username is required"}
     mock_user_dao.save_user.assert_not_called()
+    mock_redis_client.assert_called_once_with("error_missing_username")
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.user_controller.UserDao")
 @patch("backend.src.web_backend.controller.user_controller.get_db_session")
-def test_user_login_success(mock_get_db_session, mock_user_dao, client):
-    """
-    Test logging in an existing user successfully.
-    """
+def test_user_login_success(mock_get_db_session, mock_user_dao, mock_redis_client, client):
+    """Test logging in an existing user successfully."""
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
 
@@ -59,34 +53,33 @@ def test_user_login_success(mock_get_db_session, mock_user_dao, client):
     mock_user_dao.get_user_by_username.return_value = mock_user
 
     response = client.post("/auth/login", json={"username": "testuser"})
+
     assert response.status_code == 200
     assert response.json == {
         "message": "User testuser logged in successfully.",
         "user": {"username": "testuser", "id": 1},
     }
+
     mock_user_dao.get_user_by_username.assert_called_once()
+    mock_redis_client.assert_called_once_with("logged_in_users")
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.user_controller.UserDao")
-def test_user_login_missing_username(
-    mock_user_dao,
-    client,
-):
-    """
-    Test logging in without providing a username.
-    """
+def test_user_login_missing_username(mock_user_dao, mock_redis_client, client):
+    """Test logging in without providing a username."""
     response = client.post("/auth/login", json={})
     assert response.status_code == 400
     assert response.json == {"error": "Username is required"}
     mock_user_dao.get_user_by_username.assert_not_called()
+    mock_redis_client.assert_called_once_with("error_missing_username")
 
 
+@patch("backend.src.redis_client.redis_client.incr")
 @patch("backend.src.web_backend.controller.user_controller.UserDao")
 @patch("backend.src.web_backend.controller.user_controller.get_db_session")
-def test_user_login_user_not_found(mock_get_db_session, mock_user_dao, client):
-    """
-    Test logging in with a non-existent user.
-    """
+def test_user_login_user_not_found(mock_get_db_session, mock_user_dao, mock_redis_client, client):
+    """Test logging in with a non-existent user."""
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
     mock_user_dao.get_user_by_username.return_value = None
@@ -95,3 +88,4 @@ def test_user_login_user_not_found(mock_get_db_session, mock_user_dao, client):
     assert response.status_code == 404
     assert response.json == {"error": "User not found"}
     mock_user_dao.get_user_by_username.assert_called_once()
+    mock_redis_client.assert_called_once_with("error_user_not_found")

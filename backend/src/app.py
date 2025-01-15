@@ -7,6 +7,7 @@ from backend.src.web_backend.controller import map_controller
 from backend.src.web_backend.controller import user_controller
 from backend.src.web_backend.controller import route_history_controller
 from backend.src.web_backend.controller import health_controller
+from backend.src.web_backend.controller import metrics_controller
 from backend.src.database.db_connection import get_db_session
 from backend.src.map_service.map_service import fetch_and_store_map_data_if_needed
 
@@ -21,6 +22,7 @@ def create_app():
     user_controller.init_user_routes(app)
     route_history_controller.init_path_routes(app)
     health_controller.init_health_routes(app)
+    metrics_controller.init_metrics_routes(app)
     return app
 
 

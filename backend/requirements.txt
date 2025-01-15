@@ -14,3 +14,4 @@ pytest-mock
 python-dotenv
 alembic
 beautifulsoup4
+redis
