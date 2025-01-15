@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/authContext';
 import { Register } from './register';
 import { Login } from './login';
 import { Logout } from './logout';
-import { REGISTER, LOGIN } from '../support';
+import { REGISTER, LOGIN } from '../support/support';
 import '../styles/userSection.css';
 
 const RegisterSwitcher = ({
@@ -61,7 +61,6 @@ export const UserSection = () => {
                     <Login />
                 </article>
             );
-        if (user != null) setActiveForm(''); // Nothing is shown if no form is active
         return null; // Nothing is shown if no form is active
     };
 
@@ -69,7 +68,7 @@ export const UserSection = () => {
         <section id="user-section">
             <h2>User Section</h2>
             {user ? (
-                <p>Logged in as {user.username}</p>
+                <p>{`Logged in as ${user.username}`}</p>
             ) : (
                 <p>Welcome, Guest!</p>
             )}

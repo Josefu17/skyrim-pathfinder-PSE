@@ -7,16 +7,17 @@ import React, {
 } from 'react';
 
 import { TUser, TAuthContext } from '../types'; // Types for the user and the AuthContext
-import { USER } from '../support'; // Constants for the storage keys
+import { USER } from '../support/support'; // Constants for the storage keys
 
 // Create the context with default values
-const AuthContext = createContext<TAuthContext | undefined>(undefined);
+export const AuthContext = createContext<TAuthContext | undefined>(undefined);
 
 // AuthProvider component that wraps the application and provides the context
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
     const [user, setUser] = useState<TUser | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
 
     // Load user data from localStorage on initial render
     useEffect(() => {
@@ -31,6 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         } else {
             setUser(null); // Explicitly set user to null if no data exists
         }
+        setLoading(false); // Set loading to false after loading user data
     }, []);
 
     // Save user data to localStorage whenever it changes
@@ -43,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [user]);
 
     // Memoize the value object so it doesn't change on every render
-    const value = useMemo(() => ({ user, setUser }), [user]);
+    const value = useMemo(() => ({ user, setUser, loading }), [user, loading]);
 
     return (
         <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

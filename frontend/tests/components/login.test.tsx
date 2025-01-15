@@ -5,7 +5,7 @@ import React from 'react';
 
 import { Login } from '../../src/components/login';
 import { useAuth } from '../../src/contexts/authContext';
-import { MESSAGETIMER } from '../../src/support';
+import { MESSAGETIMER } from '../../src/support/support';
 
 // Mock useAuth Hook
 vi.mock('../../src/contexts/authContext', () => ({
@@ -31,7 +31,7 @@ describe('Login Component', () => {
 
     it('should handle successful login', async () => {
         const mockResponse = {
-            json: async () => ({ id: 1 }),
+            json: async () => ({ user: { id: 1 } }),
             ok: true,
         };
 
@@ -116,7 +116,7 @@ describe('Login Component', () => {
 
     it('should clear status message after MESSAGETIMER duration', async () => {
         const mockResponse = {
-            json: async () => ({ id: 1 }),
+            json: async () => ({ user: { id: 1 } }),
             ok: true,
         };
 

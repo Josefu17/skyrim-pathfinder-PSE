@@ -1,7 +1,8 @@
 import { Header } from './components/header';
 import { Footer } from './components/footer';
 import { BrowserRouter } from 'react-router-dom';
-import { AppRoutes } from './routes/app_routes';
+import { AppRoutes } from './routes/appRoutes';
+import { ErrorBoundary } from './support/errorBoundary';
 
 import './styles/App.css';
 
@@ -9,11 +10,17 @@ export const App = () => {
     return (
         <BrowserRouter>
             <section id="left">
-                <Header />
+                <ErrorBoundary fallback={<h1>Something went wrong!</h1>}>
+                    <Header />
+                </ErrorBoundary>
             </section>
             <section id="right">
-                <AppRoutes />
-                <Footer />
+                <ErrorBoundary fallback={<h1>Something went wrong!</h1>}>
+                    <AppRoutes />
+                </ErrorBoundary>
+                <ErrorBoundary fallback={<h1>Something went wrong!</h1>}>
+                    <Footer />
+                </ErrorBoundary>
             </section>
         </BrowserRouter>
     );

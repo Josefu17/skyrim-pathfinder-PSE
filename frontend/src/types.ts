@@ -1,3 +1,6 @@
+import { ReactNode } from 'react';
+import { NavigateFunction } from 'react-router-dom';
+
 export type TConnection = {
     child_city_id: number;
     parent_city_id: number;
@@ -25,9 +28,27 @@ export type TRouteData = {
     alternative_distance: number;
 };
 
+export type TStrRouteData = {
+    id: number;
+    startpoint: string;
+    endpoint: string;
+    route: Record<string, unknown>; // serializable object for JSON
+};
+
+export type TStrRoutes = TStrRouteData[];
+
 export type TCityOptionProps = {
     name: string;
     onClick: (name: string) => void;
+};
+
+export type TFilterOptions = {
+    limit: number;
+    descending: boolean;
+    from_date: string;
+    to_date: string;
+    startpoint: string;
+    endpoint: string;
 };
 
 export type TUser = {
@@ -38,4 +59,15 @@ export type TUser = {
 export type TAuthContext = {
     user: TUser | null;
     setUser: (user: TUser | null) => void; // Function to update user
+    loading: boolean;
+};
+
+export type ErrorBoundaryProps = {
+    fallback: ReactNode; // UI, die angezeigt wird, wenn ein Fehler auftritt
+    children: ReactNode; // Die Kinder, die von der ErrorBoundary geschützt werden
+    navigate: NavigateFunction; // Navigationsfunktion von React Router
+};
+
+export type ErrorBoundaryState = {
+    hasError: boolean; // Gibt an, ob ein Fehler aufgetreten ist
 };

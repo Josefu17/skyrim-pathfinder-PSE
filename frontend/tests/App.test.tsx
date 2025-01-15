@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import '@testing-library/jest-dom'; // For better matcher like `toBeInTheDocument`
 import React from 'react';
 
@@ -7,6 +7,13 @@ import { App } from '../src/App';
 
 describe('App', () => {
     it('should render correctly', () => {
+        globalThis.fetch = vi.fn().mockImplementation(() => {
+            return {
+                ok: true,
+                json: async () => [],
+            };
+        });
+
         const { container } = renderWithAuthProvider(<App />);
 
         const leftSection = container.querySelector("[id='left']");

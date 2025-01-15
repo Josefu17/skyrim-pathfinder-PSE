@@ -1,0 +1,56 @@
+#manage-routes-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-top: solid 0.1rem white;
+    margin-bottom: 1rem;
+}
+
+#manage-routes-section > * {
+    margin-bottom: 0.7rem;
+}
+
+#manage-routes-section > article {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+}
+
+#manage-routes-section > article > * {
+    margin-right: 0.7rem;
+}
+#routes-section {
+    text-align: center;
+    border-top: solid 0.1rem white;
+    max-height: parent;
+    max-width: parent;
+    width: inherit;
+    flex-grow: 3;
+    padding: 1.5rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#routes-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: left;
+    padding: 0;
+}
+
+#routes-list > * {
+    list-style-type: none;
+    margin-bottom: 0.7rem;
+}
+
+#routes-list > li > .selectable {
+    background-color: darkred;
+}
+
+#limit {
+    width: 1.5rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.3rem;
+}

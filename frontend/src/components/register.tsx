@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react';
 
 import { TUser } from '../types';
 import { useAuth } from '../contexts/authContext';
-import { MESSAGETIMER } from '../support';
+import { MESSAGETIMER } from '../support/support';
 import '../styles/register.css';
 
 export const Register = () => {
@@ -31,7 +31,7 @@ export const Register = () => {
                 const data = await response.json();
                 console.log(data);
                 setStatusMessage('Registration successful!'); // Show success message
-                const user: TUser = data?.user;
+                const user: TUser = data.user;
                 setUser(user); // Set the user in the context
                 setUsername(''); // Clear the input field
             } else {
@@ -43,8 +43,10 @@ export const Register = () => {
                 'An error occurred. Please try again later. ' + error
             ); // Show generic error message
         }
+        console.log('Waiting to clear message ...');
         setTimeout(() => {
-            setStatusMessage(''); // Clear the message after 3 seconds
+            setStatusMessage(''); // Clear the message after predefined timeout
+            console.log('Message cleared!');
         }, MESSAGETIMER);
     };
 

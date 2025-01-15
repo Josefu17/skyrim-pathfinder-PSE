@@ -5,11 +5,14 @@ import React, { StrictMode } from 'react';
 
 import { AuthProvider } from '../src/contexts/authContext';
 import { App } from '../src/App';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock the `react-dom/client` module
 vi.mock('react-dom/client', () => ({
     createRoot: vi.fn(),
 }));
+
+const queryClient = new QueryClient();
 
 describe('Root rendering', () => {
     it('should call createRoot and render the app', async () => {
@@ -32,7 +35,9 @@ describe('Root rendering', () => {
             expect(renderMock).toHaveBeenCalledWith(
                 <StrictMode>
                     <AuthProvider>
-                        <App />
+                        <QueryClientProvider client={queryClient}>
+                            <App />
+                        </QueryClientProvider>
                     </AuthProvider>
                 </StrictMode>
             );

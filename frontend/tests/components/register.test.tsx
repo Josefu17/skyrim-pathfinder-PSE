@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import React, { act } from 'react';
 
-import { renderWithAuthProvider } from '../skip.support.test';
+import { renderWithAuthProvider, testUser } from '../skip.support.test';
 import { Register } from '../../src/components/register';
+import { MESSAGETIMER } from '../../src/support/support';
 
 globalThis.fetch = vi.fn();
 
@@ -48,6 +49,10 @@ const renderAndSubmitTestUser = async (): Promise<{
 describe('Register', () => {
     afterEach(() => {
         vi.clearAllMocks();
+    });
+
+    afterAll(() => {
+        vi.restoreAllMocks();
     });
 
     it('should render correctly', async () => {
@@ -105,38 +110,85 @@ describe('Register', () => {
     it.skip('should show success message and then clear it after timeout', async () => {
         // Enable fake timers
         vi.useFakeTimers();
-        globalThis.fetch = vi.fn().mockReturnValueOnce({
-            ok: true,
-            json: async () => ({
-                message: 'Registration successful!',
-                user: { username: 'test_user', id: 1 },
-            }),
-        });
+
+        // Mock the fetch call
+        globalThis.fetch = vi
+            .fn()
+            .mockReturnValueOnce({
+                ok: true,
+                json: async () => ({
+                    message: 'Registration successful!',
+                    user: testUser,
+                }),
+            })
+            .mockReturnValueOnce({
+                ok: true,
+                json: async () => ({
+                    routes: [
+                        {
+                            endpoint: 'Rorikstead',
+                            id: 139,
+                            route: {
+                                alternative_distance: 877.25,
+                                alternative_route: {
+                                    0: 'Karthwasten',
+                                    1: 'Markarth',
+                                    2: 'Rorikstead',
+                                },
+                                distance: 362.94,
+                                route: {
+                                    0: 'Karthwasten',
+                                    1: 'Rorikstead',
+                                },
+                            },
+                            startpoint: 'Karthwasten',
+                        },
+                    ],
+                }),
+            });
 
         renderWithAuthProvider(<Register />);
 
-        // Fill the form and simulate the submit
-        const input = await screen.getByLabelText(/username/i);
-        const button = await screen.getByRole('button', { name: /Register/i });
+        // Debug the DOM before interaction
+        screen.debug();
+
+        // Simulate filling the form
+        const input = screen.getByLabelText(/Username/i);
+        const button = screen.getByRole('button', { name: /Register/i });
 
         act(() => {
-            fireEvent.change(input, { target: { value: 'test_user' } });
+            fireEvent.change(input, { target: { value: testUser.username } });
             fireEvent.click(button);
         });
 
-        // Check if the success message is displayed
-        const successMessage = await screen.getByText(
-            /Registration successful!/i
-        );
-        expect(successMessage).toBeInTheDocument();
+        // Debug the DOM after interaction
+        screen.debug();
 
-        // Simulate the passing of time (3 seconds)
+        // Wait for the success message to appear
+        console.log('Waiting for success message...');
+        const successMessage = await waitFor(() => {
+            const element = screen.getByText(/Registration successful!/i);
+            if (!element) throw new Error('Success message not found!');
+            return element;
+        });
+        expect(successMessage).toBeInTheDocument();
+        console.log('Success message is visible:', successMessage.textContent);
+
+        // Simulate the passing of time
+        console.log('Advancing timers by 2000ms...');
         act(() => {
-            vi.advanceTimersByTime(3000); // Advance the timer by 3 seconds
+            vi.advanceTimersByTime(MESSAGETIMER);
         });
 
-        // Check if the success message is removed after timeout
-        expect(successMessage).not.toBeInTheDocument();
+        // Wait for the success message to disappear
+        console.log('Checking if success message disappears...');
+        await waitFor(() => {
+            expect(
+                screen.queryByText(/Registration successful!/i)
+            ).not.toBeInTheDocument();
+        });
+
+        console.log('Success message cleared.');
 
         // Disable fake timers
         vi.useRealTimers();

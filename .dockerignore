@@ -1,0 +1,18 @@
+# Ignore .git directory
+.git
+
+# Ignore node_modules (they are usually reinstalled during the Docker build)
+node_modules
+
+# Ignore log files
+*.log
+
+# Ignore other temporary or build files
+*.tmp
+*.bak
+
+# Ignore Docker files
+.dockerfile
+
+# This concrete file is responsible for the error:
+# frontend/src/routes/app_routes.tsx
