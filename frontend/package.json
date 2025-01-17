@@ -33,7 +33,7 @@
         "@types/testing-library__react": "^10.0.1",
         "@vitejs/plugin-react": "^4.3.4",
         "@vitejs/plugin-vue": "^5.2.1",
-        "@vitest/coverage-istanbul": "^2.1.8",
+        "@vitest/coverage-istanbul": "^3.0.0",
         "eslint": "^9.17.0",
         "eslint-config-prettier": "^10.0.0",
         "eslint-plugin-prettier": "^5.2.1",
@@ -46,6 +46,6 @@
         "typescript": "~5.7.0",
         "typescript-eslint": "^8.18.0",
         "vite": "^6.0.1",
-        "vitest": "^2.1.8"
+        "vitest": "^3.0.0"
     }
 }
