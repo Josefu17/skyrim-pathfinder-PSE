@@ -30,7 +30,6 @@
         "@types/jest": "^29.5.14",
         "@types/react": "^19.0.0",
         "@types/react-dom": "^19.0.0",
-        "@types/testing-library__react": "^10.0.1",
         "@vitejs/plugin-react": "^4.3.4",
         "@vitejs/plugin-vue": "^5.2.1",
         "@vitest/coverage-istanbul": "^2.1.8",
