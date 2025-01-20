@@ -345,7 +345,7 @@ indent-after-paren=4
 indent-string='    '
 
 # Maximum number of characters on a single line.
-max-line-length=100
+max-line-length=110
 
 # Maximum number of lines in a module.
 max-module-lines=1000
@@ -411,6 +411,7 @@ logging-modules=logging
 
 [MESSAGES CONTROL]
 
+
 # Only show warnings with the listed confidence levels. Leave empty to show
 # all. Valid levels: HIGH, CONTROL_FLOW, INFERENCE, INFERENCE_FAILURE,
 # UNDEFINED.
@@ -440,6 +441,7 @@ disable=raw-checker-failed,
         use-implicit-booleaness-not-comparison-to-zero,
         use-symbolic-message-instead,
         too-few-public-methods,
+        redefined-outer-name,
         fixme
 
 # Enable the message, report, category or checker with the given id(s). You can

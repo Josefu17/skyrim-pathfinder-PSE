@@ -1,44 +1,49 @@
-"""Tests for the metrics controller."""
+"""Tests for the metrics controller"""
 
-from unittest.mock import patch, MagicMock
-from flask.testing import FlaskClient
+import pytest
+from flask import Flask
+from backend.src.web_backend.controller.metrics_controller import init_metrics_routes
+from backend.src.utils.helpers import metrics_logger
 
 
-@patch("backend.src.web_backend.controller.metrics_controller.redis_client")
-def test_get_metrics(mock_redis_client, client: FlaskClient):
-    """Test the get_metrics endpoint."""
-    mock_redis_client.get = MagicMock(
-        side_effect=lambda key: {
-            "logged_in_users": "5",
-            "anonymous_route_execution_time": "100.0",
-            "anonymous_calculated_route": "10",
-            "registered_route_execution_time": "200.0",
-            "registered_calculated_route": "20",
-            "error_missing_username": "1",
-            "error_existing_username": "2",
-            "error_user_not_found": "3",
-            "error_missing_city": "4",
-            "error_calculating_route": "5",
-            "error_route_not_found": "6",
-            "error_clearing_route_history": "7",
-            "concurrent_requests": "8",
-        }.get(key, 0)
-    )
+@pytest.fixture
+def app():
+    """Create a Flask app for testing"""
+    app = Flask(__name__)
+    init_metrics_routes(app)
+    return app
+
+
+@pytest.fixture
+def client(app):
+    """Create a test client for the Flask application."""
+    return app.test_client()
+
+
+def test_metrics_endpoint(client, mocker):
+    """Test the metrics endpoint"""
+    mocker.patch.object(metrics_logger.redis_client, "keys", return_value=[b"m_test_metric"])
+    mocker.patch.object(metrics_logger, "get", return_value=10)
 
     response = client.get("/metrics")
     assert response.status_code == 200
-    data = response.data.decode("utf-8")
+    assert b"m_test_metric 10" in response.data
 
-    assert "logged_in_users 5" in data
-    assert "registered_calculated_route 20" in data
-    assert "anonymous_calculated_route 10" in data
-    assert "registered_avg_execution_time 10.0" in data
-    assert "anonymous_avg_execution_time 10.0" in data
-    assert "error_missing_username 1" in data
-    assert "error_existing_username 2" in data
-    assert "error_user_not_found 3" in data
-    assert "error_missing_city 4" in data
-    assert "error_calculating_route 5" in data
-    assert "error_route_not_found 6" in data
-    assert "error_clearing_route_history 7" in data
-    assert "concurrent_requests 8" in data
+
+def test_metrics_endpoint_no_metrics(client, mocker):
+    """Test the metrics endpoint with no metrics"""
+    mocker.patch.object(metrics_logger.redis_client, "keys", return_value=[])
+
+    response = client.get("/metrics")
+    assert response.status_code == 200
+    assert response.data == b""
+
+
+def test_metrics_endpoint_invalid_metric(client, mocker):
+    """Test the metrics endpoint with an invalid metric"""
+    mocker.patch.object(metrics_logger.redis_client, "keys", return_value=[b"m_invalid_metric"])
+    mocker.patch.object(metrics_logger, "get", side_effect=ValueError)
+
+    response = client.get("/metrics")
+    assert response.status_code == 200
+    assert response.data == b""
