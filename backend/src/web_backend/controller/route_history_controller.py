@@ -3,14 +3,13 @@
 import json
 import time
 from flask import jsonify, request
-from backend.src.utils.helpers import get_logging_configuration
+from backend.src.utils.helpers import get_logging_configuration, metrics_logger
 from backend.src.database.db_connection import get_db_session
 from backend.src.web_backend.web_backend_service import (
     fetch_route_from_navigation_service,
 )
 from backend.src.database.schema.route import Route, RouteFilter, OptionalRouteFilters
 from backend.src.database.dao.route_dao import RouteDao
-from backend.src.redis_client import redis_client
 
 logger = get_logging_configuration()
 
@@ -47,22 +46,25 @@ def clear_user_history_by_name(user_name):
 
 def calculate_route(user_id):
     """
-    Calculate the shortest route for given two endpoints and optionally add to user's
-    route history
+    Calculate the shortest route for given 2 endpoints and save to
+    user's route history if user_id is provided.
     """
     start_time = time.time()
     user_type = "anonymous" if not user_id else "registered"
 
-    redis_client.incr("concurrent_requests")
+    metrics_logger.incr("m_concurrent_requests")
 
     data = request.get_json()
     start_city_name = data.get("startpoint")
     end_city_name = data.get("endpoint")
 
+    route_id = None
+    key_prefix = f"user_{user_id}_{start_city_name}_{end_city_name}_route"
+
     if not start_city_name or not end_city_name:
         logger.error("Start and end cities are required but at least one of them is missing")
-        redis_client.incr("error_missing_city")
-        redis_client.decr("concurrent_requests")
+        metrics_logger.incr("m_error_missing_city")
+        metrics_logger.decr("m_concurrent_requests")
         return (
             jsonify({"error": "Start and end cities are required"}),
             400,
@@ -74,11 +76,10 @@ def calculate_route(user_id):
 
         if "error" in route_result:
             logger.error("Error calculating route: %s", route_result["error"])
-            redis_client.incr("error_calculating_route")
-            redis_client.decr("concurrent_requests")
+            metrics_logger.incr("m_error_calculating_route")
+            metrics_logger.decr("m_concurrent_requests")
             return jsonify(route_result), 400
 
-        # Optionally add route to user's history
         if user_id:
             route = Route(
                 user_id=user_id,
@@ -86,7 +87,11 @@ def calculate_route(user_id):
                 endpoint=end_city_name,
                 route=json.dumps(route_result),
             )
-            RouteDao.save_route(route, session)
+            saved_route = RouteDao.save_route(route, session)
+            route_id = saved_route.id
+            key_prefix += f"_{route_id}"
+            metrics_logger.incr(f"m_user_{user_id}_route")
+            metrics_logger.incr(f"m_{key_prefix}_calculated")
             logger.info("Route calculated and saved successfully for user %d.", user_id)
         else:
             logger.info("Route calculated successfully without saving to user history.")
@@ -96,15 +101,21 @@ def calculate_route(user_id):
     logger.info("Route calculation took %f seconds.", total_execution_time)
 
     if user_type == "anonymous":
-        redis_client.incr("anonymous_calculated_route")
-        redis_client.incrbyfloat("anonymous_route_execution_time", total_execution_time)
+        metrics_logger.incr("m_anonymous_calculation_count")
+        metrics_logger.incrbyfloat("anonymous", total_execution_time)
     else:
-        redis_client.incr("registered_calculated_route")
-        redis_client.incrbyfloat("registered_route_execution_time", total_execution_time)
+        metrics_logger.incr("m_registered_calculation_count")
+        metrics_logger.incrbyfloat("registered", total_execution_time)
+        metrics_logger.log_execution_time(
+            f"m_{key_prefix}_execution_time",
+            total_execution_time,
+        )
+        metrics_logger.log_calculated_route_for_user(user_id, key_prefix)
 
-    redis_client.decr("concurrent_requests")
+    metrics_logger.decr("m_concurrent_requests")
 
-    return jsonify(route_result), 201
+    response_data = route_result
+    return jsonify(response_data), 201
 
 
 def delete_route(user_id, route_id):
@@ -118,7 +129,7 @@ def delete_route(user_id, route_id):
         route = RouteDao.get_route_by_id(int(route_id), session)
         if not route or route.user_id != int(user_id):
             logger.error("Route with id %s not found.", route_id)
-            redis_client.incr("error_route_not_found")
+            metrics_logger.incr("m_error_route_not_found")
             return jsonify({"error": "Route not found"}), 404
 
         RouteDao.delete_route_by_id(int(route_id), session)
@@ -160,7 +171,7 @@ def get_user_history(user_id):
         routes = RouteDao.get_routes(filter_params, session)
         if not routes:
             logger.error("No routes found for user %d.", int(user_id))
-            redis_client.incr("error_route_not_found")
+            metrics_logger.incr("m_error_route_not_found")
             return jsonify({"error": "No routes found"}), 404
 
         routes_data = [
@@ -189,7 +200,7 @@ def clear_user_history(user_id=None, user_name=None):
             deleted_count = RouteDao.delete_user_route_history(session, user_id, user_name)
         except ValueError as e:
             logger.error(str(e))
-            redis_client.incr("error_clearing_route_history")
+            metrics_logger.incr("m_error_clearing_route_history")
             return jsonify({"error": str(e)}), 400
 
     logger.info("Route history cleared successfully.")

@@ -13,6 +13,7 @@ from backend.src.health.health_check import (
     check_navigation_service_connection,
     check_database_connection,
     check_frontend_availability,
+    check_all_criteria,
 )
 
 
@@ -169,3 +170,81 @@ def test_check_frontend_availability_missing_elements():
 
         assert result["frontend_availability"] is False
         assert result["message"] == "Elements are missing"
+
+
+@patch("backend.src.web_backend.controller.health_controller.check_all_criteria")
+@patch("backend.src.web_backend.controller.health_controller.logger")
+def test_health_check_healthy(mock_logger, mock_check_all_criteria, client):
+    """
+    Test that health_check returns healthy status when all criteria are met.
+    """
+    mock_check_all_criteria.return_value = {
+        "database_connection": True,
+        "map_service_connection": True,
+        "navigation_service_connection": True,
+        "frontend_availability": True,
+    }
+
+    response = client.get("/healthz")
+    json_data = response.get_json()
+
+    assert response.status_code == 200
+    assert json_data["status"] == "healthy"
+    assert json_data["details"] == mock_check_all_criteria.return_value
+    mock_logger.info.assert_called_once_with("All criteria passed")
+
+
+@patch("backend.src.web_backend.controller.health_controller.check_all_criteria")
+@patch("backend.src.web_backend.controller.health_controller.logger")
+def test_health_check_unhealthy(mock_logger, mock_check_all_criteria, client):
+    """
+    Test that health_check returns unhealthy status when some criteria are not met.
+    """
+    mock_check_all_criteria.return_value = {
+        "database_connection": False,
+        "map_service_connection": True,
+        "navigation_service_connection": True,
+        "frontend_availability": True,
+    }
+
+    response = client.get("/healthz")
+    json_data = response.get_json()
+
+    assert response.status_code == 503
+    assert json_data["status"] == "unhealthy"
+    assert json_data["details"] == mock_check_all_criteria.return_value
+    mock_logger.error.assert_called_once_with("Some criteria failed")
+
+
+@patch("backend.src.health.health_check.check_database_connection")
+@patch("backend.src.health.health_check.check_map_service_connection")
+@patch("backend.src.health.health_check.check_navigation_service_connection")
+@patch("backend.src.health.health_check.check_frontend_availability")
+def test_check_all_criteria(
+    mock_check_frontend, mock_check_navigation, mock_check_map, mock_check_database
+):
+    """
+    Test that `check_all_criteria` returns the correct combined status of all checks.
+    """
+    mock_check_database.return_value = {"database_connection": True}
+    mock_check_map.return_value = {"map_service_connection": True}
+    mock_check_navigation.return_value = {"navigation_service_connection": True}
+    mock_check_frontend.return_value = {"frontend_availability": True}
+
+    result = check_all_criteria()
+
+    expected_result = {
+        "database_connection": True,
+        "map_service_connection": True,
+        "navigation_service_connection": True,
+        "frontend_availability": True,
+    }
+
+    assert result == expected_result, "Expected all criteria to be met"
+
+    # Test with some criteria failing
+    mock_check_database.return_value = {"database_connection": False}
+    result = check_all_criteria()
+    expected_result["database_connection"] = False
+
+    assert result == expected_result, "Expected database connection to fail"
