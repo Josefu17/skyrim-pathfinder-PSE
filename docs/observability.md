@@ -41,3 +41,6 @@ The Grafana dashboards provide insights into the application's performance and u
 This dashboard visualizes the number of logged-in users and route calculations over time.
 ![Traffic Metrics](./images/grafana_traffic_dashboard.png)
 
+### Dashboard 2: Latency Metrics
+This dashboard displays the average execution time for route calculations by anonymous and registered users.
+![Latency Metrics](./images/grafana_latency_dashboard.png)
