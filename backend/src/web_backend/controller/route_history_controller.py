@@ -10,6 +10,7 @@ from backend.src.web_backend.web_backend_service import (
 )
 from backend.src.database.schema.route import Route, RouteFilter, OptionalRouteFilters
 from backend.src.database.dao.route_dao import RouteDao
+from backend.src.utils.prometheus_converter import make_prometheus_conform
 
 logger = get_logging_configuration()
 
@@ -59,7 +60,8 @@ def calculate_route(user_id):
     end_city_name = data.get("endpoint")
 
     route_id = None
-    key_prefix = f"user_{user_id}_{start_city_name}_{end_city_name}_route"
+
+    key_prefix = make_prometheus_conform(f"user_{user_id}_{start_city_name}_{end_city_name}_route")
 
     if not start_city_name or not end_city_name:
         logger.error("Start and end cities are required but at least one of them is missing")
