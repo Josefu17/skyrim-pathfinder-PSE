@@ -44,3 +44,7 @@ This dashboard visualizes the number of logged-in users and route calculations o
 ### Dashboard 2: Latency Metrics
 This dashboard displays the average execution time for route calculations by anonymous and registered users.
 ![Latency Metrics](./images/grafana_latency_dashboard.png)
+
+### Dashboard 3: Error Metrics
+This dashboard shows the number of errors encountered during route calculations and user interactions.
+![Error Metrics](./images/grafana_error_dashboard.png)
