@@ -13,8 +13,9 @@
 8. [Testing and Code Quality](#testing-and-code-quality)  
 9. [Debugging](#debugging)  
 10. [Postman Collection](#postman-collection)  
-11. [Definition of Done (DoD)](#definition-of-done-dod)  
-12. [Requirements Checklist](#requirements-checklist)
+11. [Monitoring and Observability]()
+12. [Definition of Done (DoD)](#definition-of-done-dod)
+13. [Requirements Checklist](#requirements-checklist)
 
 ---
 
@@ -308,6 +309,16 @@ A Postman collection is available under the `docs/Postman` directory to test the
 - **Health Check**: Verify the application's health.
 
 To use the collection, import the file into Postman. Ensure the `base_url` variable matches your local or deployed backend.
+
+## Monitoring and Observability
+The application uses Prometheus and Grafana for monitoring and observability. We follow the four golden signals of monitoring:
+- **Latency**: Time taken to calculate a route.
+- **Traffic**: Number of requests to the backend and active users.
+- **Errors**: Number of failed requests.
+- **Saturation**: Number of concurrent requests to backend.
+
+For detailed information on monitoring and observability, refer to the [Monitoring Documentation](docs/observability.md).
+
 
 ## Definition of Done (DoD)
 
