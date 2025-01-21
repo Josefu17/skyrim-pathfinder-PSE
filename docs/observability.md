@@ -48,3 +48,7 @@ This dashboard displays the average execution time for route calculations by ano
 ### Dashboard 3: Error Metrics
 This dashboard shows the number of errors encountered during route calculations and user interactions.
 ![Error Metrics](./images/grafana_error_dashboard.png)
+
+### Dashboard 4: Saturation Metrics
+This dashboard tracks the number of concurrent requests to the application.
+![Saturation Metrics](./images/grafana_saturation_dashboard.png)
