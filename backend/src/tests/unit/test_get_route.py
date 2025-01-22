@@ -78,7 +78,7 @@ def test_get_route_no_connection(mocker):
     )
 
     result = get_route("CityA", "CityE", data)
-    assert result == {"error": "One of the cities was not found: CityA, CityE"}
+    assert result == {"error": "City not found: CityA or CityE"}
 
 
 def test_get_route_no_connection_between_cities(mocker):

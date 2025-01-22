@@ -25,7 +25,7 @@ def mock_metrics_logger():
     metrics_logger.decr = MagicMock()
     metrics_logger.log_execution_time = MagicMock()
     metrics_logger.log_calculated_route_for_user = MagicMock()
-    metrics_logger.incrbyfloat = MagicMock()
+    metrics_logger.incr_by_float = MagicMock()
 
 
 @pytest.fixture(autouse=True)

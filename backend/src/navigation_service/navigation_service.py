@@ -6,6 +6,9 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List
 
+from opentelemetry.trace import get_tracer
+from opentelemetry.trace.status import StatusCode
+
 from backend.src.utils.helpers import get_logging_configuration
 
 
@@ -21,60 +24,70 @@ class UpdateData:
 
 
 logger = get_logging_configuration()
+tracer = get_tracer("navigation-service")
 
 
 def get_route(start_city_name, end_city_name, data):
     """Calculates the route and returns the results."""
-    logger.info("Calculating route from %s to %s.", start_city_name, end_city_name)
-    cities = data["cities"]
+    with tracer.start_as_current_span("get_route") as span:
+        try:
+            logger.info("Calculating route from %s to %s.", start_city_name, end_city_name)
+            span.set_attribute("start_city", start_city_name)
+            span.set_attribute("end_city", end_city_name)
 
-    end_city, start_city = find_start_and_end_cities(cities, end_city_name, start_city_name)
+            # Check for missing city data
+            cities = data["cities"]
+            end_city, start_city = find_start_and_end_cities(cities, end_city_name, start_city_name)
+            if not start_city or not end_city:
+                raise ValueError(f"City not found: {start_city_name} or {end_city_name}")
 
-    if not start_city or not end_city:
-        logger.error("One of the cities was not found: %s, %s.", start_city_name, end_city_name)
-        return {"error": f"One of the cities was not found: {start_city_name}, {end_city_name}"}
+            graph = create_graph(data)
+            path, distance, second_path, second_distance = dijkstra(
+                graph, start_city["id"], end_city["id"]
+            )
 
-    graph = create_graph(data)
-    try:
-        path, distance, second_path, second_distance = dijkstra(
-            graph, start_city["id"], end_city["id"]
-        )
-        if distance == float("inf"):
-            logger.warning("No connection found between %s and %s.", start_city_name, end_city_name)
-            return {"error": f"No connection found between {start_city_name} and {end_city_name}"}
+            if distance == float("inf"):
+                raise ValueError(
+                    f"No connection found between {start_city_name} and {end_city_name}"
+                )
 
-        # Convert paths to city names
-        path_names = {
-            str(index): get_city_by_id(cities, city_id)["name"]
-            for index, city_id in enumerate(path)
-        }
-        second_path_names = {}
-        if second_path:
-            second_path_names = {
+            # Convert paths to city names
+            path_names = {
                 str(index): get_city_by_id(cities, city_id)["name"]
-                for index, city_id in enumerate(second_path)
+                for index, city_id in enumerate(path)
+            }
+            second_path_names = (
+                {
+                    str(index): get_city_by_id(cities, city_id)["name"]
+                    for index, city_id in enumerate(second_path)
+                }
+                if second_path
+                else {}
+            )
+
+            result = {
+                "route": path_names,
+                "distance": round(distance, 2),
+                "alternative_route": second_path_names,
+                "alternative_distance": round(second_distance, 2),
             }
 
-        result = {
-            "route": path_names,
-            "distance": round(distance, 2),
-            "alternative_route": second_path_names,
-            "alternative_distance": round(second_distance, 2),
-        }
+            logger.info(
+                "Route calculated successfully from %s to %s.", start_city_name, end_city_name
+            )
+            return result
 
-        logger.info(
-            "Route calculated successfully from %s to %s.",
-            start_city_name,
-            end_city_name,
-        )
-        return result
+        except ValueError as ve:
+            logger.error("Validation error in get_route: %s", ve)
+            span.set_status(StatusCode.ERROR)
+            span.record_exception(ve)
+            return {"error": str(ve)}
 
-    except KeyError as e:
-        logger.error("Error during route calculation: Missing key %s.", e)
-        return {"error": f"Error during route calculation: Missing key {e}"}
-    except ValueError as e:
-        logger.error("Error during route calculation: Invalid value %s.", e)
-        return {"error": f"Error during route calculation: {e}"}
+        except KeyError as ke:
+            logger.error("Key error in get_route: %s", ke)
+            span.set_status(StatusCode.ERROR)
+            span.record_exception(ke)
+            return {"error": f"Invalid input data: {ke}"}
 
 
 def create_graph(data):
