@@ -71,3 +71,20 @@ export type ErrorBoundaryProps = {
 export type ErrorBoundaryState = {
     hasError: boolean; // Gibt an, ob ein Fehler aufgetreten ist
 };
+
+export type CustomNode = Node & {
+    tagName: string;
+    children: ChildNode[];
+    properties: {
+        id?: string;
+        href: string;
+        onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+        target?: '_self' | '_blank' | '_parent' | '_top';
+        rel?: string | string[];
+    };
+};
+
+type ChildNode = Node & {
+    type: 'text' | 'element' | 'comment';
+    value: string;
+};

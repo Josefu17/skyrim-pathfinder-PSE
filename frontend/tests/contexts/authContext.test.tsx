@@ -3,7 +3,8 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom'; // For better matcher like `toBeInTheDocument`
 import React from 'react';
 
-import { AuthProvider, useAuth } from '../../src/contexts/authContext';
+import { useAuth } from '../../src/contexts/authContext';
+import { renderWithAuthProvider } from '../skip.support.test';
 
 // Mock localStorage
 const mockUser = { id: 1, username: 'test_user' };
@@ -32,11 +33,7 @@ describe('AuthContext', () => {
             return <div>{user ? `Hello, ${user.username}` : 'No user'}</div>;
         };
 
-        render(
-            <AuthProvider>
-                <TestComponent />
-            </AuthProvider>
-        );
+        renderWithAuthProvider(TestComponent);
 
         // Expect the user to be loaded from localStorage
         expect(screen.getByText('Hello, test_user')).toBeInTheDocument();
@@ -57,11 +54,7 @@ describe('AuthContext', () => {
             return <div>{user ? `User: ${user.username}` : 'No user'}</div>;
         };
 
-        render(
-            <AuthProvider>
-                <TestComponent />
-            </AuthProvider>
-        );
+        renderWithAuthProvider(TestComponent);
 
         // Expect the user to be null due to invalid JSON
         expect(screen.getByText('No user')).toBeInTheDocument();
@@ -84,11 +77,7 @@ describe('AuthContext', () => {
             return <div>{user ? `User: ${user.username}` : 'No user'}</div>;
         };
 
-        render(
-            <AuthProvider>
-                <TestComponent />
-            </AuthProvider>
-        );
+        renderWithAuthProvider(TestComponent);
 
         // Expect the user to be null and "No user" to be displayed
         expect(screen.getByText('No user')).toBeInTheDocument();
