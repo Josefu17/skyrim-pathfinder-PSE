@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/react';
 import '@testing-library/jest-dom'; // Für bessere Matcher wie `toBeInTheDocument`
-import React from 'react';
+import React, { act } from 'react';
 
 import { Logout } from '../../src/components/logout';
 import { useAuth } from '../../src/contexts/authContext';
@@ -32,7 +32,9 @@ describe('Logout Component', () => {
 
         // Click the logout button
         const logoutButton = screen.getByRole('button', { name: /logout/i });
-        fireEvent.click(logoutButton);
+        act(() => {
+            fireEvent.click(logoutButton);
+        });
 
         // Expect "No user logged in" to be logged
         expect(consoleLogSpy).toHaveBeenCalledWith('No user logged in');
@@ -55,7 +57,9 @@ describe('Logout Component', () => {
 
         // Click the logout button
         const logoutButton = screen.getByRole('button', { name: /logout/i });
-        fireEvent.click(logoutButton);
+        act(() => {
+            fireEvent.click(logoutButton);
+        });
 
         // Expect "Logging out user: test_user" to be logged
         expect(consoleLogSpy).toHaveBeenCalledWith(

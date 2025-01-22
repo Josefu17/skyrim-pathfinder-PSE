@@ -1,7 +1,7 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import React, { act } from 'react';
+import { act } from 'react';
 
 import { renderWithAuthProvider, testUser } from '../skip.support.test';
 import { Register } from '../../src/components/register';
@@ -18,7 +18,7 @@ const renderAndSubmitTestUser = async (): Promise<{
 
     // Use act to wrap rendering
     await act(async () => {
-        ({ container } = renderWithAuthProvider(<Register />));
+        ({ container } = renderWithAuthProvider(Register));
     });
 
     // Find the username input field
@@ -57,7 +57,7 @@ describe('Register', () => {
 
     it('should render correctly', async () => {
         await act(async () => {
-            renderWithAuthProvider(<Register />);
+            renderWithAuthProvider(Register);
         });
 
         const submitUsernameButton = await screen.findByRole('button', {
@@ -107,7 +107,7 @@ describe('Register', () => {
         expect(errorMessage).toBeInTheDocument();
     });
 
-    it.skip('should show success message and then clear it after timeout', async () => {
+    it('should show success message and then clear it after timeout', async () => {
         // Enable fake timers
         vi.useFakeTimers();
 
@@ -147,32 +147,27 @@ describe('Register', () => {
                 }),
             });
 
-        renderWithAuthProvider(<Register />);
-
-        // Debug the DOM before interaction
-        screen.debug();
+        renderWithAuthProvider(Register);
 
         // Simulate filling the form
         const input = screen.getByLabelText(/Username/i);
         const button = screen.getByRole('button', { name: /Register/i });
 
-        act(() => {
+        await act(async () => {
             fireEvent.change(input, { target: { value: testUser.username } });
+        });
+        await act(async () => {
             fireEvent.click(button);
         });
 
-        // Debug the DOM after interaction
-        screen.debug();
-
-        // Wait for the success message to appear
-        console.log('Waiting for success message...');
-        const successMessage = await waitFor(() => {
-            const element = screen.getByText(/Registration successful!/i);
-            if (!element) throw new Error('Success message not found!');
-            return element;
+        // Simulate the passing of time to wait for the success message to appear
+        act(() => {
+            vi.advanceTimersByTime(100);
         });
-        expect(successMessage).toBeInTheDocument();
-        console.log('Success message is visible:', successMessage.textContent);
+
+        expect(
+            screen.getByText(/Registration successful!/i)
+        ).toBeInTheDocument();
 
         // Simulate the passing of time
         console.log('Advancing timers by 2000ms...');
@@ -181,14 +176,9 @@ describe('Register', () => {
         });
 
         // Wait for the success message to disappear
-        console.log('Checking if success message disappears...');
-        await waitFor(() => {
-            expect(
-                screen.queryByText(/Registration successful!/i)
-            ).not.toBeInTheDocument();
-        });
-
-        console.log('Success message cleared.');
+        expect(
+            screen.queryByText(/Registration successful!/i)
+        ).not.toBeInTheDocument();
 
         // Disable fake timers
         vi.useRealTimers();

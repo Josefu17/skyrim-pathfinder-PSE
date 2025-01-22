@@ -1,14 +1,14 @@
 import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import '@testing-library/jest-dom'; // For better matchers like `toBeInTheDocument`
-import React, { act } from 'react';
+import { act } from 'react';
 
 import { renderWithAuthProvider, testUser } from '../skip.support.test';
 import { UserSection } from '../../src/components/userSection';
 
 describe('UserSection', () => {
     it('should render correctly without showing Register or Login forms initially', async () => {
-        renderWithAuthProvider(<UserSection />);
+        renderWithAuthProvider(UserSection);
 
         // Check if the Register button is visible
         const switchRegisterSectionButton = screen.getByRole('button', {
@@ -32,7 +32,7 @@ describe('UserSection', () => {
     });
 
     it('should show Register component when "Register now" button is clicked', async () => {
-        renderWithAuthProvider(<UserSection />);
+        renderWithAuthProvider(UserSection);
 
         // Find the "Register now" button
         const switchRegisterSectionButton = screen.getByRole('button', {
@@ -50,7 +50,7 @@ describe('UserSection', () => {
     });
 
     it('should hide Register component when "Register now" button is clicked again', async () => {
-        renderWithAuthProvider(<UserSection />);
+        renderWithAuthProvider(UserSection);
 
         // Find the "Register now" button and click it to show the Register form
         const switchRegisterSectionButton = screen.getByRole('button', {
@@ -75,7 +75,7 @@ describe('UserSection', () => {
     });
 
     it('should show Login component when "Login now" button is clicked', async () => {
-        renderWithAuthProvider(<UserSection />);
+        renderWithAuthProvider(UserSection);
 
         // Find the "Login now" button
         const switchLoginSectionButton = screen.getByRole('button', {
@@ -93,7 +93,7 @@ describe('UserSection', () => {
     });
 
     it('should hide Login component when "Login now" button is clicked again', async () => {
-        renderWithAuthProvider(<UserSection />);
+        renderWithAuthProvider(UserSection);
 
         // Find the "Login now" button and click it to show the Login form
         const switchLoginSectionButton = screen.getByRole('button', {
@@ -118,7 +118,7 @@ describe('UserSection', () => {
     });
 
     it('should render Logout button if user is logged in', async () => {
-        renderWithAuthProvider(<UserSection />, testUser);
+        renderWithAuthProvider(UserSection, testUser);
 
         // Wait for the user to be set in the context
         await waitFor(() => {

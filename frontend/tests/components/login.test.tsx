@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
 import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import React from 'react';
+import React, { act } from 'react';
 
 import { Login } from '../../src/components/login';
 import { useAuth } from '../../src/contexts/authContext';
@@ -41,11 +41,15 @@ describe('Login Component', () => {
 
         // Input username
         const input = screen.getByLabelText('Username');
-        fireEvent.change(input, { target: { value: 'test_user' } });
+        act(() => {
+            fireEvent.change(input, { target: { value: 'test_user' } });
+        });
 
         // Submit form
         const submitButton = screen.getByRole('button', { name: /Login/i });
-        fireEvent.click(submitButton);
+        act(() => {
+            fireEvent.click(submitButton);
+        });
 
         // Check for success message
         await waitFor(() => {
@@ -73,11 +77,15 @@ describe('Login Component', () => {
 
         // Input username
         const input = screen.getByLabelText('Username');
-        fireEvent.change(input, { target: { value: 'test_user' } });
+        act(() => {
+            fireEvent.change(input, { target: { value: 'test_user' } });
+        });
 
         // Submit form
         const submitButton = screen.getByRole('button', { name: /login/i });
-        fireEvent.click(submitButton);
+        act(() => {
+            fireEvent.click(submitButton);
+        });
 
         // Check for error message
         await waitFor(() => {
@@ -95,11 +103,15 @@ describe('Login Component', () => {
 
         // Input username
         const input = screen.getByLabelText('Username');
-        fireEvent.change(input, { target: { value: 'test_user' } });
+        act(() => {
+            fireEvent.change(input, { target: { value: 'test_user' } });
+        });
 
         // Submit form
         const submitButton = screen.getByRole('button', { name: /login/i });
-        fireEvent.click(submitButton);
+        act(() => {
+            fireEvent.click(submitButton);
+        });
 
         // Check for network error message
         await waitFor(() => {
@@ -126,11 +138,15 @@ describe('Login Component', () => {
 
         // Input username
         const input = screen.getByLabelText('Username');
-        fireEvent.change(input, { target: { value: 'test_user' } });
+        act(() => {
+            fireEvent.change(input, { target: { value: 'test_user' } });
+        });
 
         // Submit form
         const submitButton = screen.getByRole('button', { name: /login/i });
-        fireEvent.click(submitButton);
+        act(() => {
+            fireEvent.click(submitButton);
+        });
 
         // Check for success message
         await waitFor(() => {

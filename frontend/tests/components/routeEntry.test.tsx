@@ -13,12 +13,14 @@ import {
 describe('RouteEntry', () => {
     it('should display route data and toggle expanded view on button click', async () => {
         renderWithAuthProvider(
-            <RouteEntry
-                routeId={mockRouteData.id}
-                routeData={mockRouteData}
-                isDeleting={false}
-                onSelection={() => {}}
-            />,
+            () => (
+                <RouteEntry
+                    routeId={mockRouteData.id}
+                    routeData={mockRouteData}
+                    isDeleting={false}
+                    onSelection={() => {}}
+                />
+            ),
             testUser
         );
 
@@ -52,12 +54,14 @@ describe('RouteEntry', () => {
         const mockOnSelection = vi.fn();
 
         renderWithAuthProvider(
-            <RouteEntry
-                routeId={mockRouteData.id}
-                routeData={mockRouteData}
-                isDeleting={true}
-                onSelection={mockOnSelection}
-            />,
+            () => (
+                <RouteEntry
+                    routeId={mockRouteData.id}
+                    routeData={mockRouteData}
+                    isDeleting={true}
+                    onSelection={mockOnSelection}
+                />
+            ),
             testUser
         );
 
@@ -72,12 +76,14 @@ describe('RouteEntry', () => {
 
     it('should render correctly with isDeleting as false', () => {
         renderWithAuthProvider(
-            <RouteEntry
-                routeId={mockRouteData.id}
-                routeData={mockRouteData}
-                isDeleting={false}
-                onSelection={() => {}}
-            />,
+            () => (
+                <RouteEntry
+                    routeId={mockRouteData.id}
+                    routeData={mockRouteData}
+                    isDeleting={false}
+                    onSelection={() => {}}
+                />
+            ),
             testUser
         );
 
@@ -91,12 +97,14 @@ describe('RouteEntry', () => {
 
     it('should render correctly with isDeleting as true', () => {
         renderWithAuthProvider(
-            <RouteEntry
-                routeId={mockRouteData.id}
-                routeData={mockRouteData}
-                isDeleting={true}
-                onSelection={() => {}}
-            />,
+            () => (
+                <RouteEntry
+                    routeId={mockRouteData.id}
+                    routeData={mockRouteData}
+                    isDeleting={true}
+                    onSelection={() => {}}
+                />
+            ),
             testUser
         );
 
@@ -105,37 +113,35 @@ describe('RouteEntry', () => {
         expect(button).toHaveValue('Karthwasten to Rorikstead');
     });
 
-    it('should also allow expanded view in deletion mode', () => {
-        const TestComponent = () => {
-            const [isDeleting, setIsDeleting] = useState(false);
+    const TestComponent = () => {
+        const [isDeleting, setIsDeleting] = useState(false);
 
-            // Function to set isDeleting to true
-            const toggleDeleting = () => {
-                setIsDeleting((prev) => !prev);
-            };
-
-            return (
-                <div>
-                    {isDeleting ? (
-                        <button onClick={toggleDeleting}>
-                            Exit deletion mode
-                        </button>
-                    ) : (
-                        <button onClick={toggleDeleting}>
-                            Enter deletion mode
-                        </button>
-                    )}
-                    <RouteEntry
-                        routeId={mockRouteData.id}
-                        routeData={mockRouteData}
-                        isDeleting={isDeleting}
-                        onSelection={() => {}}
-                    />
-                </div>
-            );
+        // Function to set isDeleting to true
+        const toggleDeleting = () => {
+            setIsDeleting((prev) => !prev);
         };
 
-        renderWithAuthProvider(<TestComponent />, testUser);
+        return (
+            <div>
+                {isDeleting ? (
+                    <button onClick={toggleDeleting}>Exit deletion mode</button>
+                ) : (
+                    <button onClick={toggleDeleting}>
+                        Enter deletion mode
+                    </button>
+                )}
+                <RouteEntry
+                    routeId={mockRouteData.id}
+                    routeData={mockRouteData}
+                    isDeleting={isDeleting}
+                    onSelection={() => {}}
+                />
+            </div>
+        );
+    };
+
+    it('should also allow expanded view in deletion mode', () => {
+        renderWithAuthProvider(TestComponent, testUser);
 
         // Click the button to expand the view
         const button = screen.getByRole('button', {
