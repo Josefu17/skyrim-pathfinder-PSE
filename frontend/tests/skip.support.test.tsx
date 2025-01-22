@@ -1,6 +1,6 @@
 import { AuthProvider, useAuth } from '../src/contexts/authContext';
 import { fireEvent, render, waitFor } from '@testing-library/react';
-import React, { useEffect } from 'react';
+import React, { act, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { TUser } from '../src/types';
@@ -8,8 +8,9 @@ import { vi } from 'vitest';
 
 // Rendering function that wraps the component in the AuthProvider
 export const renderWithAuthProvider = (
-    component: React.ReactNode,
-    user: TUser | null = null
+    Component: React.ElementType,
+    user: TUser | null = null,
+    props: Record<string, string | number | boolean | object> = {}
 ) => {
     const queryClient = createMockQueryClient();
     return render(
@@ -17,10 +18,10 @@ export const renderWithAuthProvider = (
             <AuthProvider>
                 {user ? (
                     <AuthProviderWithUser user={user}>
-                        {component}
+                        <Component {...props} />
                     </AuthProviderWithUser>
                 ) : (
-                    component
+                    <Component {...props} />
                 )}
             </AuthProvider>
         </QueryClientProvider>
@@ -55,8 +56,7 @@ export const testUser: TUser = {
     username: 'test',
 };
 
-// Mock data for the map
-
+// Mock data for the map and routes
 export const mockFetch = vi.fn().mockImplementation(async (url) => {
     if (url.includes('/users/1/routes')) {
         return {
@@ -67,7 +67,7 @@ export const mockFetch = vi.fn().mockImplementation(async (url) => {
         return {
             ok: true,
             json: async () => ({
-                cities: mockCities,
+                cities: mockCitiesWithoutConnections,
             }),
         };
     } else if (url.includes('/maps')) {
@@ -75,7 +75,13 @@ export const mockFetch = vi.fn().mockImplementation(async (url) => {
             ok: true,
             json: async () => mockMapData,
         };
+    } else if (url.includes('README.md')) {
+        return Promise.resolve({
+            ok: true,
+            text: () => Promise.resolve('[Main Documentation](../other.md)'),
+        });
     }
+    return Promise.reject(new Error('Not Found'));
 });
 
 export const mockConnection = {
@@ -86,12 +92,19 @@ export const mockConnection = {
     connections: [{ parent_city_id: 1, child_city_id: 2 }],
 };
 
-export const mockCities = {
+export const mockCitiesWithoutConnections = {
     cities: [
         { id: 1, name: 'City A', position_x: 100, position_y: 200 },
         { id: 2, name: 'City B', position_x: 300, position_y: 400 },
     ],
     connections: [],
+};
+
+export const mockCities = {
+    cities: [
+        { name: 'City A', position_x: 100, position_y: 200 },
+        { name: 'City B', position_x: 300, position_y: 400 },
+    ],
 };
 
 export const mockRoute = {
@@ -201,7 +214,9 @@ export const changePage = async (container: HTMLElement, href: string) => {
         if (!element) throw new Error('Element not found');
         return element;
     });
-    fireEvent.click(routePageButton);
+    act(() => {
+        fireEvent.click(routePageButton);
+    });
 };
 
 // Error throwing component

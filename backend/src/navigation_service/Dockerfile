@@ -31,7 +31,7 @@ USER appuser
 EXPOSE 8000 5678
 
 # Specify python path
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app/backend
 
 # Run the server
 CMD ["python", "-m", "backend.src.rpc_api.server"]

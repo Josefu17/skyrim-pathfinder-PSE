@@ -18,7 +18,7 @@ def make_prometheus_conform(string: str, max_length: int = 100) -> str:
         string = string.replace(char, replacement)
 
     # replace all non-alphanumeric characters with underscores
-    string = re.sub(r"[^a-zA-Z0-9_]", "_", string)
+    string = re.sub(r"\W", "_", string)
 
     # if the string starts with a number, prepend an underscore
     if re.match(r"^\d", string):

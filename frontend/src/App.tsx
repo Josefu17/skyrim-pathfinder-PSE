@@ -6,19 +6,21 @@ import { ErrorBoundary } from './support/errorBoundary';
 
 import './styles/App.css';
 
+const fallback = <h1>Something went wrong!</h1>;
+
 export const App = () => {
     return (
         <BrowserRouter>
             <section id="left">
-                <ErrorBoundary fallback={<h1>Something went wrong!</h1>}>
+                <ErrorBoundary fallback={fallback}>
                     <Header />
                 </ErrorBoundary>
             </section>
             <section id="right">
-                <ErrorBoundary fallback={<h1>Something went wrong!</h1>}>
+                <ErrorBoundary fallback={fallback}>
                     <AppRoutes />
                 </ErrorBoundary>
-                <ErrorBoundary fallback={<h1>Something went wrong!</h1>}>
+                <ErrorBoundary fallback={fallback}>
                     <Footer />
                 </ErrorBoundary>
             </section>

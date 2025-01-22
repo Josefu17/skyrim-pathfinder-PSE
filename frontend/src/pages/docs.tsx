@@ -1,3 +1,6 @@
+import { DisplayDocumentation } from '../components/displayDocumentation';
+import '../styles/docs.css';
+
 export const Docs = () => {
-    return <p>This is the documentation page</p>;
+    return <DisplayDocumentation initialFile="README.md" />;
 };

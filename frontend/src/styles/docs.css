@@ -1,0 +1,34 @@
+#documentation {
+    text-align: left;
+    max-height: parent;
+    max-width: parent;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+a,
+a:hover,
+a:focus {
+    text-decoration: none;
+    color: burlywood;
+}
+
+code {
+    color: white;
+    background-color: #ffffff1e;
+    padding: 0.2em 0.4em;
+    border-radius: 0.3em;
+}
+
+pre {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    white-space: pre-wrap;
+}

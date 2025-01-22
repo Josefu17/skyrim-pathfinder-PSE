@@ -13,7 +13,13 @@ import { RouteEntry } from './routeEntry';
 
 import '../styles/routesHistory.css';
 
-export const DisplayRoutes = () => {
+export const DisplayRoutes = ({
+    defaultOptionalParametersVisible = false,
+    defaultFilterOptions,
+}: {
+    defaultOptionalParametersVisible?: boolean;
+    defaultFilterOptions?: TFilterOptions;
+}) => {
     const { user, loading } = useAuth();
     const queryClient = useQueryClient();
     const [startpoint, setStartpoint] = useState<string>('');
@@ -25,13 +31,17 @@ export const DisplayRoutes = () => {
         to_date: '',
         startpoint: '',
         endpoint: '',
+        ...defaultFilterOptions,
     });
     const [isOptionalParametersVisible, setIsOptionalParametersVisible] =
-        useState<boolean>(false);
+        useState<boolean>(defaultOptionalParametersVisible);
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
     const { data: cities } = useQuery<TCities>({
-        queryKey: ['cities'],
+        queryKey: [
+            'cities',
+            { startpoint: options.startpoint, endpoint: options.endpoint },
+        ],
         queryFn: async () => {
             const response = await fetch(`${import.meta.env.VITE_URL}/cities`);
             const data = await response.json();
@@ -43,21 +53,24 @@ export const DisplayRoutes = () => {
     const { data: routes, isLoading: routesLoading } = useQuery<TStrRoutes>({
         queryKey: ['routes', user?.id, { options }],
         queryFn: async () => {
-            console.log('fetching routes');
-            let parameters = '?';
-            for (const [key, value] of Object.entries(options)) {
-                parameters += `${key}=${value}&`;
-            }
-            const response = await fetch(
-                `${import.meta.env.VITE_URL}/users/${user?.id}/routes${parameters}`
-            );
-            const data = await response.json();
-            console.log('response:', data);
-            if (!response.ok) {
-                console.log('Error fetching routes');
+            try {
+                let parameters = '?';
+                for (const [key, value] of Object.entries(options)) {
+                    parameters += `${key}=${value}&`;
+                }
+                const response = await fetch(
+                    `${import.meta.env.VITE_URL}/users/${user?.id}/routes${parameters}`
+                );
+                const data = await response.json();
+                if (!response.ok) {
+                    console.error('Error fetching routes');
+                    throw new Error(`(user ${user?.username}): ` + data.error);
+                }
+                return data.routes;
+            } catch (error) {
+                console.error('Error fetching routes' + error);
                 return null;
             }
-            return data.routes;
         },
         enabled: !!user, // Start query only when user is defined
     });
@@ -87,14 +100,11 @@ export const DisplayRoutes = () => {
             if (response.ok) {
                 console.log(data);
             } else {
-                console.log('Error deleting routes');
-                throw new Error(
-                    `Error deleting routes of user ${user?.username}: ` +
-                        data.error
-                );
+                console.error('Error deleting route');
+                throw new Error(`(user ${user?.username}): ` + data.error);
             }
         } catch (error) {
-            console.error(`Error deleting routes: `, error);
+            console.error(`Error deleting route: ` + error);
         }
     };
 
@@ -119,14 +129,11 @@ export const DisplayRoutes = () => {
                 if (response.ok) {
                     console.log(data);
                 } else {
-                    console.log('Error deleting all routes');
-                    throw new Error(
-                        `Error deleting all routes of user ${user?.username}: ` +
-                            data.error
-                    );
+                    console.error('Error deleting all routes');
+                    throw new Error(`(user ${user?.username}): ` + data.error);
                 }
             } catch (error) {
-                console.error(`Error deleting all routes: `, error);
+                console.error(`Error deleting all routes: ` + error);
             }
         },
         onSuccess: () => {

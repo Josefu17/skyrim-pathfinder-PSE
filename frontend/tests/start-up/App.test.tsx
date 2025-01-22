@@ -1,4 +1,3 @@
-import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { App } from '../../src/App';
@@ -7,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 describe('renders the App component without crashing', async () => {
     it('should render the App component', async () => {
-        renderWithAuthProvider(<App />);
+        renderWithAuthProvider(App);
 
         await waitFor(() => {
             expect(screen.getByRole('banner')).toBeInTheDocument();

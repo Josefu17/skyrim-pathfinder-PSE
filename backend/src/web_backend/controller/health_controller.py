@@ -1,11 +1,13 @@
 """This module contains the routes for the health check of the application."""
 
 from flask import jsonify
-from backend.src.health.health_check import check_all_criteria
+from opentelemetry.trace import get_tracer
 
+from backend.src.health.health_check import check_all_criteria
 from backend.src.utils.helpers import get_logging_configuration
 
 logger = get_logging_configuration()
+tracer = get_tracer("health-controller")
 
 HEALTHZ = "/healthz"
 
@@ -17,11 +19,13 @@ def init_health_routes(app):
 
 def health_check():
     """Checks the health status of the application."""
-    criteria_status = check_all_criteria()
+    with tracer.start_as_current_span("health_check") as span:
+        criteria_status = check_all_criteria()
+        span.set_attribute("criteria_status", criteria_status)
 
-    if all(status is True for status in criteria_status.values() if isinstance(status, bool)):
-        logger.info("All criteria passed")
-        return jsonify({"status": "healthy", "details": criteria_status}), 200
+        if all(status is True for status in criteria_status.values() if isinstance(status, bool)):
+            logger.info("All criteria passed")
+            return jsonify({"status": "healthy", "details": criteria_status}), 200
 
-    logger.error("Some criteria failed")
-    return jsonify({"status": "unhealthy", "details": criteria_status}), 503
+        logger.error("Some criteria failed")
+        return jsonify({"status": "unhealthy", "details": criteria_status}), 503

@@ -2,7 +2,7 @@ import { describe, expect, it, vi, Mock } from 'vitest';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom'; // For better matcher like `toBeInTheDocument`
 import { useNavigate } from 'react-router-dom';
-import React from 'react';
+import React, { act } from 'react';
 
 import {
     ErrorBoundary,
@@ -56,14 +56,14 @@ describe('ErrorBoundary', () => {
     it('should render fallback UI and a home button when there is an error', async () => {
         const mockNavigate = vi.fn();
 
-        renderWithAuthProvider(
+        renderWithAuthProvider(() => (
             <ErrorBoundaryClass
                 navigate={mockNavigate}
                 fallback={<p>Error Occurred</p>}
             >
                 <ErrorComponent />
             </ErrorBoundaryClass>
-        );
+        ));
 
         // Check if the fallback UI was rendered
         const element = await waitFor(() => screen.getByText('Error Occurred'));
@@ -74,7 +74,9 @@ describe('ErrorBoundary', () => {
         expect(button).toBeInTheDocument();
 
         // Simulate a click on the button
-        fireEvent.click(button);
+        act(() => {
+            fireEvent.click(button);
+        });
 
         // Check if the navigation occurred
         expect(mockNavigate).toHaveBeenCalledWith('/');
@@ -92,11 +94,11 @@ describe('ErrorBoundary (HOC(Higher-Order Component))', () => {
         });
         (useNavigate as Mock).mockReturnValue(vi.fn());
 
-        const { container } = renderWithAuthProvider(
+        const { container } = renderWithAuthProvider(() => (
             <ErrorBoundary fallback={<p>Error Occurred</p>}>
                 <ErrorComponent />
             </ErrorBoundary>
-        );
+        ));
 
         // Ensure that the ErrorBoundaryClass was rendered
         expect(container).toBeInTheDocument();

@@ -10,11 +10,11 @@ import { Header } from '../../src/components/header';
 describe('Header', () => {
     it('should render correctly', async () => {
         // Wrap the Header with MemoryRouter to provide router context
-        renderWithAuthProvider(
+        renderWithAuthProvider(() => (
             <MemoryRouter>
                 <Header />
             </MemoryRouter>
-        );
+        ));
 
         const header = screen.getByText('Path finder');
 

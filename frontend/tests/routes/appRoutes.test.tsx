@@ -17,31 +17,29 @@ global.fetch = mockFetch;
 
 describe('App Routes', () => {
     it('should render the Home page', async () => {
-        const { container } = renderWithAuthProvider(
+        const { container } = renderWithAuthProvider(() => (
             <MemoryRouter initialEntries={['/']}>
                 <AppRoutes />
             </MemoryRouter>
-        );
+        ));
 
         const element = container.querySelector('[id="map"]');
         expect(element).toBeInTheDocument();
     });
 
     it('should render the Docs page', async () => {
-        renderWithAuthProvider(
+        renderWithAuthProvider(() => (
             <MemoryRouter initialEntries={['/Docs']}>
                 <AppRoutes />
             </MemoryRouter>
-        );
+        ));
 
-        const element = await screen.findByText(
-            'This is the documentation page'
-        );
+        const element = await screen.findByText('Home');
         expect(element).toBeInTheDocument();
     });
 
     it('should render the Routes History page', async () => {
-        const { container } = renderWithAuthProvider(<App />, testUser);
+        const { container } = renderWithAuthProvider(App, testUser);
 
         await changePage(container, '/routes-history');
 

@@ -3,6 +3,7 @@
 from flask import Flask
 from flask_cors import CORS
 from backend.src.utils.helpers import get_logging_configuration
+from backend.src.utils.tracing import setup_tracing
 from backend.src.web_backend.controller import map_controller
 from backend.src.web_backend.controller import user_controller
 from backend.src.web_backend.controller import route_history_controller
@@ -18,6 +19,9 @@ def create_app():
     """Create and configure the Flask application."""
     app = Flask(__name__)
     CORS(app)
+
+    setup_tracing("web-backend")
+
     map_controller.init_map_routes(app)
     user_controller.init_user_routes(app)
     route_history_controller.init_path_routes(app)
