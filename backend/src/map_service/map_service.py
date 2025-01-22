@@ -1,5 +1,7 @@
 """Fetches data from map service and saves the data to a relational database"""
 
+from typing import cast
+
 import requests
 
 from backend.src.database.dao.city_dao import CityDao
@@ -16,7 +18,7 @@ MAP_URL = "https://maps.proxy.devops-pse.users.h-da.cloud/map?name=skyrim"
 
 
 def fetch_and_store_map_data_if_needed(session):
-    """fetch data from service and save in database if needed"""
+    """fetch data from service and save in the database if needed"""
     try:
         logger.info("Fetching map data.")
 
@@ -63,7 +65,8 @@ def fetch_and_store_map_data_if_needed(session):
                 )
                 if not db_connection:
                     db_connection = Connection(
-                        parent_city_id=parent_city_id, child_city_id=child_city_id
+                        parent_city_id=cast(int, parent_city_id),
+                        child_city_id=cast(int, child_city_id),
                     )
                     new_connections.append(db_connection)
                     logger.info(
