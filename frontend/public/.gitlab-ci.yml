@@ -109,9 +109,9 @@ sonarqube-scan:
 
 deploy-job:
     stage: deploy
-    image: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:27.5.0'
+    image: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:27.5.1'
     services:
-        - name: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:27.5.0-dind'
+        - name: '${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:27.5.1-dind'
           alias: docker
     variables:
         SECURE_FILES_DOWNLOAD_PATH: '$SECURE_FILES_PATH'
