@@ -29,7 +29,7 @@ class MetricsLogger:
 
     def log_execution_time(self, key, amount):
         """Log the execution time of a function."""
-        self.redis_client.incr_by_float(key, amount)
+        self.redis_client.incrbyfloat(key, amount)
 
     def decr(self, key, amount=1):
         """Decrement a metric in Redis and log the change."""
@@ -73,7 +73,7 @@ class MetricsLogger:
 
     def incr_by_float(self, key, amount):
         """Increment a metric by a float value in Redis and log the change."""
-        self.redis_client.incr_by_float(key, amount)
+        self.redis_client.incrbyfloat(key, amount)
 
         total_time = self.get(key) or 0
         total_count = self.get(f"m_{key}_calculation_count") or 1
