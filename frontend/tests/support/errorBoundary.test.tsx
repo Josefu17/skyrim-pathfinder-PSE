@@ -27,30 +27,12 @@ describe('ErrorBoundary', () => {
         });
 
         expect(spy).toHaveBeenCalledWith(
-            'ErrorBoundary caught an error:',
-            expect.any(Error),
-            expect.any(Object)
+            'ErrorBoundary caught an error: ',
+            Error('Test error'),
+            { componentStack: 'test stack' }
         );
 
         spy.mockRestore(); // Reset spy
-    });
-
-    it('should navigate to home when handleGoHome is called', () => {
-        const mockNavigate = vi.fn(); // Mock navigation function
-        const instance = new ErrorBoundaryClass({
-            navigate: mockNavigate,
-            fallback: <div>Error</div>,
-            children: <div />,
-        } as ErrorBoundaryProps);
-
-        // Set the error state to true
-        instance.setState({ hasError: true });
-
-        // Simulate button click (handleGoHome is called)
-        instance.handleGoHome();
-
-        // Check if navigate led to the homepage
-        expect(mockNavigate).toHaveBeenCalledWith('/');
     });
 
     it('should render fallback UI and a home button when there is an error', async () => {

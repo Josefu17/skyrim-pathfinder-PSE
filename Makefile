@@ -12,7 +12,7 @@ install:
 
 remove:
 	pip uninstall -y -r backend/requirements.txt
-	cd frontend && npm uninstall
+	@powershell -Command "Remove-Item -Path "./frontend/node_modules" -Recurse -Force"
 	@echo "Dependencies removed."
 
 # Docker management
@@ -66,7 +66,6 @@ coverage-backend:
 	python -m pytest --cov=backend/src --cov-report=html:backend/coverage-reports/htmlcov backend/src/tests/ --cov-config=backend/setup.cfg --cov-report=xml:backend/coverage-reports/coverage.xml
 
 coverage-frontend:
-#	@powershell -Command "Remove-Item -Path "frontend/coverage" -Recurse -Force"
 	@make npm run=coverage
 
 coverage-open-windows: coverage

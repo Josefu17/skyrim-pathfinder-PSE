@@ -18,7 +18,6 @@ describe('DisplayRoutes', () => {
     beforeEach(() => {
         (global.fetch as Mock).mockImplementation((url) => {
             if (url.includes('/cities')) {
-                console.error('Fetching cities');
                 return {
                     ok: true,
                     json: async () => mockCities,
