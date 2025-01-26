@@ -25,7 +25,10 @@ export const DisplayDocumentation = ({
             const text = await response.text();
             setContent(text);
         } catch (error) {
-            console.error('Error loading markdown file:', error);
+            console.error(
+                `Error loading markdown file [${filePath}]]: `,
+                error
+            );
             setContent('# Error\nCould not load the file.');
         }
     };

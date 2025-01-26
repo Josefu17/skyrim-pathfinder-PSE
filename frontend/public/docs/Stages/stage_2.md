@@ -103,7 +103,7 @@
     ✅ Completed
 
 2. **Convert Frontend**: Move the frontend to Node.js for better testing support.
-   ✅ Completed
+    ✅ Completed
 3. **Set Up Staging**: Implement a staging environment for pre-production testing.
 
     ❌ Pending

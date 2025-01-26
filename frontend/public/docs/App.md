@@ -149,6 +149,10 @@ Users can:
 - TODO: Ensure valid input by implementing restrictions to prevent duplicate or invalid city selections.
 - Create an account by entering a username and submitting it by clicking the "`Register`" button. Both options can be accessed by clicking the "`Register Now`" button in the left section.
 
+### Displaying the Documtentation
+
+Our application offers insight in its developement process by giving the user free access to this documentation in the Documentation section of the header navigation. It is designed, to navigate through the documentation as usually(without actually leaving the documentation page), so that there should'nt be anything the user has to get used to anew. Currently using the actual documentation is yet implemented, so the files are copied to the public folder of the frontend to enable access to it.
+
 ### Displaying the Route
 
 Once a route is calculated, the backend sends the route and distance back to the frontend. The frontend updates the relevant DOM to visually highlight the route and display the distance in a user-friendly format.

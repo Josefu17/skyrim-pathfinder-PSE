@@ -138,8 +138,10 @@ describe('DisplayDocumentation', () => {
     });
 
     it('displays an error message if a file cannot be loaded', async () => {
+        const spy = vi.spyOn(console, 'error');
         (global.fetch as Mock).mockResolvedValueOnce({
             ok: false,
+            text: () => Promise.resolve(''),
         });
 
         renderWithAuthProvider(DisplayDocumentation, null, {
@@ -147,6 +149,10 @@ describe('DisplayDocumentation', () => {
         });
 
         await waitFor(() => {
+            expect(spy).toHaveBeenCalledWith(
+                'Error loading markdown file [nonexistent.md]]: ',
+                expect.any(Error)
+            );
             expect(screen.getByText('Error')).toBeInTheDocument();
             expect(
                 screen.getByText('Could not load the file.')
@@ -219,11 +225,21 @@ describe('DisplayDocumentation', () => {
                     text: () => Promise.resolve('# Home Documentation'),
                 });
             }
+            if (url === 'other.md') {
+                return Promise.resolve({
+                    ok: true,
+                    text: () => Promise.resolve('# Other Documentation'),
+                });
+            }
             return Promise.reject(new Error('Not Found'));
         });
 
         renderWithAuthProvider(DisplayDocumentation, null, {
             initialFile: 'other.md',
+        });
+
+        await waitFor(() => {
+            expect(screen.getByText('Other Documentation')).toBeInTheDocument();
         });
 
         const homeButton = screen.getByRole('button', { name: 'Home' });
