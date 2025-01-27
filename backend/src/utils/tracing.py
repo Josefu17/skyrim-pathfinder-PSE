@@ -2,18 +2,23 @@
 This module sets up OpenTelemetry tracing for a service, including
 integration with Flask, Requests, and gRPC for automatic instrumentation.
 """
-
 import os
 
+import logging
 from dotenv import load_dotenv
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.grpc import GrpcInstrumentorServer, GrpcInstrumentorClient
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+from opentelemetry.propagate import set_global_textmap
+from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+from backend.src.database.db_connection import DatabaseConnection
 
 # getcwd(): path where the script was executed
 dotenv_path = os.path.join(os.getcwd(), ".env")
@@ -30,7 +35,11 @@ def setup_tracing(service_name: str):
     Returns:
         opentelemetry.trace.Tracer: The configured tracer instance.
     """
-    if os.getenv("ENABLE_TRACING", "false").lower() != "true":
+    tracing_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
+    logging.info(f"Tracing endpoint: {tracing_endpoint}")
+
+    if not tracing_endpoint:
+        logging.warning("ENABLE_TRACING is set to false, ignoring tracing.")
         return trace.get_tracer_provider().get_tracer(service_name)
 
     # Create a resource describing the service
@@ -42,16 +51,18 @@ def setup_tracing(service_name: str):
 
     # Configure Jaeger exporter
     exporter = OTLPSpanExporter(
-        endpoint="sre-backend.devops-pse.users.h-da.cloud:4319", insecure=True
+        endpoint=tracing_endpoint, insecure=True
     )
     provider.add_span_processor(BatchSpanProcessor(exporter))
 
+    # Set the global propagator -> to pass trace context info to consecutive alls
+    set_global_textmap(TraceContextTextMapPropagator())
+
     # Instrument Flask (for frontend-backend REST)
     FlaskInstrumentor().instrument()
-
     # Instrument Requests (for any HTTP calls)
     RequestsInstrumentor().instrument()
-
+    SQLAlchemyInstrumentor().instrument(engine=DatabaseConnection().get_engine())
     # Instrument gRPC
     GrpcInstrumentorServer().instrument()
     GrpcInstrumentorClient().instrument()

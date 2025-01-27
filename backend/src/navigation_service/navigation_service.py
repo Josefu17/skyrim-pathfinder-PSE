@@ -6,6 +6,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List
 
+from opentelemetry.propagate import extract
 from opentelemetry.trace import get_tracer
 from opentelemetry.trace.status import StatusCode
 
@@ -27,9 +28,11 @@ logger = get_logging_configuration()
 tracer = get_tracer("navigation-service")
 
 
-def get_route(start_city_name, end_city_name, data):
+def get_route(start_city_name, end_city_name, data, headers):
     """Calculates the route and returns the results."""
-    with tracer.start_as_current_span("get_route") as span:
+    context = extract(headers)
+    logger.info("Extracted context: %s", context)
+    with tracer.start_as_current_span("get_route", context=context) as span:
         try:
             logger.info("Calculating route from %s to %s.", start_city_name, end_city_name)
             span.set_attribute("start_city", start_city_name)
@@ -75,6 +78,7 @@ def get_route(start_city_name, end_city_name, data):
             logger.info(
                 "Route calculated successfully from %s to %s.", start_city_name, end_city_name
             )
+            span.set_status(StatusCode.OK)
             return result
 
         except ValueError as ve:

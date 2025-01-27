@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: group2-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_DATABASE}" ]
+      interval: 10s
+      retries: 5
+
+  web-backend:
+    environment:
+      FLASK_ENV: development
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4317"
+    volumes:
+      - ./backend/src/web_backend:/app/backend/src/web_backend
+      - ./backend:/app/backend
+
+  navigation-service:
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4317"
+
+  # TODO remove this before deployment?
+  jaeger:
+    image: jaegertracing/all-in-one:1.46
+    container_name: group2-jaeger
+    networks:
+      - app-network
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
