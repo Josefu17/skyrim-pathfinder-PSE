@@ -7,10 +7,6 @@ from xmlrpc.server import SimpleXMLRPCServer
 from backend.src.navigation_service.navigation_service import get_route
 
 from backend.src.utils.helpers import get_logging_configuration
-from backend.src.utils.tracing import setup_tracing
-
-
-tracer = setup_tracing("navigation-service")
 
 logger = get_logging_configuration()
 

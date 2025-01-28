@@ -12,6 +12,7 @@ logger = get_logging_configuration()
 
 # getcwd(): path where the script was executed
 dotenv_path = os.path.join(os.getcwd(), ".env")
+
 load_dotenv_if_exists(dotenv_path)
 
 

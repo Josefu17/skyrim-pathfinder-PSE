@@ -10,6 +10,24 @@ services:
     networks:
       - app-network
 
+  postgres:
+    image: postgres:latest
+    container_name: group2-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_DATABASE}"]
+      interval: 10s
+      retries: 5
+
   redis:
     image: redis:latest
     container_name: group2-redis
