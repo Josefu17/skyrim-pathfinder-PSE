@@ -3,22 +3,27 @@
 from backend.src.database.dao.connection_dao import ConnectionDao
 from backend.src.database.schema.city import City
 from backend.src.database.schema.connection import Connection
+from backend.src.database.schema.map import Map
 
 
 # Example test that includes setting up valid cities
 def test_save_and_get_connection(db):
     """test save and get connection"""
     # Arrange
-    city1 = City(name="Markarth", position_x=100, position_y=200)
-    city2 = City(name="Riften", position_x=300, position_y=400)
+    test_map = fabricate_and_commit_map(db)
+
+    city1 = City(map_id=test_map.id, name="Markarth", position_x=100, position_y=200)
+    city2 = City(map_id=test_map.id, name="Riften", position_x=300, position_y=400)
     db.add(city1)
     db.add(city2)
     db.flush()
 
     # Act
-    connection = Connection(parent_city_id=city1.id, child_city_id=city2.id)
-    ConnectionDao.save_connection(connection, db)
-    retrieved_connection = ConnectionDao.get_connection_by_parent_and_child(city1.id, city2.id, db)
+    connection = Connection(map_id=test_map.id, parent_city_id=city1.id, child_city_id=city2.id)
+    ConnectionDao.save_connections_bulk([connection], db)
+    retrieved_connection = ConnectionDao.get_connection_by_parent_and_child(
+        1, city1.id, city2.id, db
+    )
 
     # Assert
     assert retrieved_connection is not None
@@ -26,67 +31,41 @@ def test_save_and_get_connection(db):
     assert retrieved_connection.child_city_id == city2.id
 
 
-def test_get_all_connections(db):
-    """test get all connections"""
-    # Arrange
-    city1 = City(name="Whiterun", position_x=100, position_y=300)
-    city2 = City(name="Solitude", position_x=400, position_y=500)
-    db.add(city1)
-    db.add(city2)
+def fabricate_connections(city1, city2, test_map):
+    """fabricate and insert dummy connections"""
+    connection1 = Connection(map_id=test_map.id, parent_city_id=city1.id, child_city_id=city2.id)
+    connection2 = Connection(map_id=test_map.id, parent_city_id=city2.id, child_city_id=city1.id)
+    return [connection1, connection2]
+
+
+def fabricate_and_commit_map(db):
+    """fabricate and commit test map"""
+    test_map = Map(name="Test Map", size_x=100, size_y=100)
+    db.add(test_map)
     db.flush()
-
-    connection1 = Connection(parent_city_id=city1.id, child_city_id=city2.id)
-    connection2 = Connection(parent_city_id=city2.id, child_city_id=city1.id)
-    ConnectionDao.save_connection(connection1, db)
-    ConnectionDao.save_connection(connection2, db)
-
-    # Act
-    connections = ConnectionDao.get_all_connections(db)
-
-    # Assert
-    assert_connections_exist(connections, [(city1.id, city2.id), (city2.id, city1.id)])
+    return test_map
 
 
 def test_save_connections_bulk(db):
     """test save and get connections"""
     # Arrange
-    city1 = City(name="Falkreath", position_x=100, position_y=200)
-    city2 = City(name="Windhelm", position_x=500, position_y=600)
+    test_map = fabricate_and_commit_map(db)
+
+    city1 = City(map_id=test_map.id, name="Falkreath", position_x=100, position_y=200)
+    city2 = City(map_id=test_map.id, name="Windhelm", position_x=500, position_y=600)
+
     db.add(city1)
     db.add(city2)
     db.flush()
 
-    connection1 = Connection(parent_city_id=city1.id, child_city_id=city2.id)
-    connection2 = Connection(parent_city_id=city2.id, child_city_id=city1.id)
-    connections = [connection1, connection2]
+    connections = fabricate_connections(city1, city2, test_map)
 
     # Act
     ConnectionDao.save_connections_bulk(connections, db)
-    retrieved_connections = ConnectionDao.get_all_connections(db)
+    retrieved_connections = ConnectionDao.get_connections_by_map_id(1, db)
 
     # Assert
     assert_connections_exist(retrieved_connections, [(city1.id, city2.id), (city2.id, city1.id)])
-
-
-def test_delete_connection(db):
-    """test delete connection"""
-    # Arrange
-    city1 = City(name="Riverwood", position_x=200, position_y=300)
-    city2 = City(name="Helgen", position_x=400, position_y=500)
-    db.add(city1)
-    db.add(city2)
-    db.flush()
-
-    connection = Connection(parent_city_id=city1.id, child_city_id=city2.id)
-    ConnectionDao.save_connection(connection, db)
-    connection_id = connection.id
-
-    # Act
-    ConnectionDao.delete_connection(connection_id, db)
-    deleted_connection = db.get(Connection, connection_id)
-
-    # Assert
-    assert deleted_connection is None
 
 
 def assert_connections_exist(connections, expected_pairs):

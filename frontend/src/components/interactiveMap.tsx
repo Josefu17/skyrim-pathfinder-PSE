@@ -41,7 +41,7 @@ export const InteractiveMap = () => {
         const fetchMapData = async () => {
             try {
                 const response = await fetch(
-                    `${import.meta.env.VITE_URL}/maps`
+                    `${import.meta.env.VITE_URL}/maps?name=skyrim`
                 );
                 const data = await response.json();
                 setCities(data.cities);
@@ -61,8 +61,8 @@ export const InteractiveMap = () => {
                     console.log('Test user:', user); // Sollte null sein
                     const url =
                         user !== null && user !== undefined
-                            ? `${import.meta.env.VITE_URL}/users/${user?.id}/routes`
-                            : `${import.meta.env.VITE_URL}/routes`;
+                            ? `${import.meta.env.VITE_URL}/users/${user?.id}/maps/1/routes`
+                            : `${import.meta.env.VITE_URL}/maps/1/routes`;
                     const response = await fetch(url, {
                         method: 'POST',
                         headers: {

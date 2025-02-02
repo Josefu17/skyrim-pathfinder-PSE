@@ -1,5 +1,6 @@
 """This module contains all routes for the Flask app."""
 
+import json
 import time
 
 from flask import jsonify, request
@@ -18,10 +19,13 @@ from backend.src.web_backend.web_backend_service import (
 logger = get_logging_configuration()
 tracer = get_tracer("route-history-controller")
 
-USER_ROUTES = "/users/<int:user_id>/routes"
-ROUTES = "/routes"
+# TODO handle map_id or name in the requests
+USER_ROUTES = "/users/<int:user_id>/maps/<int:map_id>/routes"
+USER_ROUTES_HISTORY = "/users/<int:user_id>/routes"
+ROUTES = "/maps/<int:map_id>/routes"
 USER_ROUTES_ID = "/users/<int:user_id>/routes/<int:route_id>"
-USER_ROUTES_NAME = "/users/<string:user_name>/routes"
+USER_ROUTES_HISTORY_CLEAR_NAME = "/users/<string:user_name>/routes"
+USER_ROUTES_HISTORY_CLEAR_ID = "/users/<int:user_id>/routes"
 
 
 def init_path_routes(app):
@@ -29,30 +33,34 @@ def init_path_routes(app):
     app.route(USER_ROUTES, methods=["POST"])(calculate_route)
     app.route(ROUTES, methods=["POST"])(calculate_route_without_user)
     app.route(USER_ROUTES_ID, methods=["DELETE"])(delete_route)
-    app.route(USER_ROUTES, methods=["GET"])(get_user_history)
-    app.route(USER_ROUTES, methods=["DELETE"])(clear_user_history_by_id)
-    app.route(USER_ROUTES_NAME, methods=["DELETE"])(clear_user_history_by_name)
+    app.route(USER_ROUTES_HISTORY, methods=["GET"])(get_user_history)
+    app.route(USER_ROUTES_HISTORY_CLEAR_NAME, methods=["DELETE"])(clear_user_history_by_name)
+    app.route(USER_ROUTES_HISTORY_CLEAR_ID, methods=["DELETE"])(clear_user_history_by_id)
 
 
-def calculate_route_without_user():
+def calculate_route_without_user(map_id):
     """Calculate the shortest route for given two endpoints without saving to user's route history."""
     with tracer.start_as_current_span("calculate_route_without_user"):
-        return calculate_route(None)
+        return calculate_route(None, map_id)
 
 
 def clear_user_history_by_id(user_id):
     """Clear the route history for a user by user_id."""
+    map_id = request.args.get("map_id")
+    logger.info("Clearing route history for user %s.", user_id)
     with tracer.start_as_current_span("clear_user_history_by_id"):
-        return clear_user_history(user_id, None)
+        return clear_user_history(user_id=user_id, map_id=map_id)
 
 
 def clear_user_history_by_name(user_name):
     """Clear the route history for a user by user_name."""
+    map_id = request.args.get("map_id")
+    logger.info("Clearing route history for user %s.", user_name)
     with tracer.start_as_current_span("clear_user_history_by_name"):
-        return clear_user_history(None, user_name)
+        return clear_user_history(user_name=user_name, map_id=map_id)
 
 
-def calculate_route(user_id):
+def calculate_route(user_id, map_id):
     """
     Calculate the shortest route for given two endpoints and save to
     user's route history if user_id is provided.
@@ -89,7 +97,7 @@ def calculate_route(user_id):
         logger.info("Calculating route from %s to %s.", start_city_name, end_city_name)
         with get_db_session() as session:
             route_result = fetch_route_from_navigation_service(
-                start_city_name, end_city_name, session
+                map_id, start_city_name, end_city_name, session
             )
 
             if "error" in route_result:
@@ -104,9 +112,10 @@ def calculate_route(user_id):
             if user_id:
                 route = Route(
                     user_id=user_id,
+                    map_id=map_id,
                     startpoint=start_city_name,
                     endpoint=end_city_name,
-                    route=route_result,
+                    route=json.dumps(route_result),
                 )
                 saved_route = RouteDao.save_route(route, session)
                 route_id = saved_route.id
@@ -175,6 +184,7 @@ def get_user_history(user_id):
         limit = int(request.args.get("limit", 10))
         descending = request.args.get("descending", "true").lower() == "true"
         from_date = request.args.get("from_date")
+        map_id = request.args.get("map_id")
         to_date = request.args.get("to_date")
         startpoint = request.args.get("startpoint")
         endpoint = request.args.get("endpoint")
@@ -185,9 +195,12 @@ def get_user_history(user_id):
             logger.error("user_id is required but missing")
             return jsonify({"error": "user_id is required"}), 400
 
+        map_id_int = int(map_id) if map_id is not None else None
+
         optional_filters = OptionalRouteFilters(
             from_date=from_date,
             to_date=to_date,
+            map_id=map_id_int,
             startpoint=startpoint,
             endpoint=endpoint,
         )
@@ -221,11 +234,14 @@ def get_user_history(user_id):
         return jsonify({"routes": routes_data}), 200
 
 
-def clear_user_history(user_id=None, user_name=None):
-    """Clear the route history for a user by user_id or user_name."""
+def clear_user_history(user_id=None, user_name=None, map_id=None):
+    """Clear the route history for a user by user_id, user_name, or map_id."""
     with tracer.start_as_current_span("clear_user_history") as span:
         span.set_attribute("user_id", user_id)
         span.set_attribute("user_name", user_name)
+        span.set_attribute("map_id", map_id)
+
+        logger.info("Clearing user history function %s.", user_id or user_name)
 
         if not user_id and not user_name:
             logger.error("Either user_id or user_name is required but both are missing")
@@ -233,7 +249,22 @@ def clear_user_history(user_id=None, user_name=None):
 
         with get_db_session() as session:
             try:
-                deleted_count = RouteDao.delete_user_route_history(session, user_id, user_name)
+                if map_id:
+                    if user_id:
+                        deleted_count = RouteDao.delete_user_route_history(
+                            session, user_id=user_id, map_id=map_id
+                        )
+                    else:
+                        deleted_count = RouteDao.delete_user_route_history(
+                            session, username=user_name, map_id=map_id
+                        )
+                else:
+                    if user_id:
+                        deleted_count = RouteDao.delete_user_route_history(session, user_id=user_id)
+                    else:
+                        deleted_count = RouteDao.delete_user_route_history(
+                            session, username=user_name
+                        )
             except ValueError as e:
                 logger.error(str(e))
                 metrics_logger.incr("m_error_clearing_route_history")
