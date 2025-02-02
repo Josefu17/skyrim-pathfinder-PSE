@@ -111,3 +111,11 @@ def service_get_cities_data(map_id, session):
         }
         for city in cities
     ]
+
+
+def service_get_maps(session):
+    """Fetch maps data for controller"""
+    maps = MapDao.get_all_maps(session)
+    return [
+        {"id": map_info.id, "name": map_info.name} for map_info in sorted(maps, key=lambda x: x.id)
+    ]
