@@ -31,3 +31,8 @@ class MapDao:
         """get map_id by map name"""
         map_obj = MapDao.get_map_by_name(session, map_name)
         return map_obj.id
+
+    @staticmethod
+    def get_all_maps(session: Session) -> list[Map]:
+        """get all maps"""
+        return session.query(Map).all()

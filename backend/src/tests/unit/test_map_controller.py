@@ -42,9 +42,14 @@ def test_get_maps_with_name(
     assert data["connections"][0]["connection"] == "Whiterun-Solitude"
 
 
-@patch("backend.src.web_backend.controller.map_controller.get_maps_from_service")
-def test_get_maps_without_name(mock_get_maps_from_service, client: FlaskClient):
+@patch("backend.src.web_backend.controller.map_controller.get_db_session")
+@patch("backend.src.web_backend.controller.map_controller.service_get_maps")
+def test_get_maps_without_name(mock_get_maps_from_service, mock_get_db_session, client: FlaskClient):
     """Test the get_maps endpoint without a map name."""
+    # Mock the database session
+    mock_session = MagicMock()
+    mock_get_db_session.return_value.__enter__.return_value = mock_session
+
     # Mock service data
     mock_get_maps_from_service.return_value = ["Skyrim", "germany"]
 
@@ -162,10 +167,12 @@ def test_get_maps_sqlalchemy_error(
     assert data["error"] == "Internal server error"
 
 
-@patch("backend.src.web_backend.controller.map_controller.get_maps_from_service")
-def test_get_maps_request_exception(mock_get_maps_from_service, client: FlaskClient):
+@patch("backend.src.web_backend.controller.map_controller.get_db_session")
+@patch("backend.src.web_backend.controller.map_controller.service_get_maps")
+def test_get_maps_request_exception(mock_get_maps_from_service, mock_db_connection, client: FlaskClient):
     """Test the get_maps endpoint when a RequestException occurs."""
     mock_get_maps_from_service.side_effect = RequestException("Request error")
+    mock_db_connection.return_value.__enter__.return_value = MagicMock()
 
     response = client.get("/maps")
 

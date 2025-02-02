@@ -7,11 +7,11 @@ from requests.exceptions import RequestException
 from sqlalchemy.exc import SQLAlchemyError
 
 from backend.src.database.db_connection import get_db_session
-from backend.src.map_service.map_service import get_maps_from_service
 from backend.src.utils.helpers import get_logging_configuration
 from backend.src.web_backend.web_backend_service import (
     service_get_cities_data,
     service_get_map_data_by_name,
+    service_get_maps,
 )
 
 logger = get_logging_configuration()
@@ -49,7 +49,8 @@ def get_maps():
                 )
 
             logger.info("Fetching all map names.")
-            maps = get_maps_from_service()
+            with get_db_session() as session:
+                maps = service_get_maps(session)
             return jsonify({"maps": maps})
 
         except (SQLAlchemyError, RequestException) as specific_error:
