@@ -26,12 +26,12 @@ def client(app):
     "backend.src.web_backend.controller.route_history_controller.fetch_route_from_navigation_service"
 )
 def test_calculate_route(mock_fetch_route, mock_get_db_session, client):
-    """Test the calculate route endpoint."""
+    """Test the calculate-route endpoint."""
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
     mock_fetch_route.return_value = {"route": "mocked_route"}
 
-    response = client.post("/routes", json={"startpoint": "CityA", "endpoint": "CityB"})
+    response = client.post("/maps/1/routes", json={"startpoint": "CityA", "endpoint": "CityB"})
     assert response.status_code == 201
     data = response.get_json()
     assert data["route"] == "mocked_route"
@@ -63,7 +63,7 @@ def test_get_user_history(mock_route_dao, mock_get_db_session, client):
         )
     ]
 
-    response = client.get("/users/1/routes")
+    response = client.get("/users/1/routes?map_id=1")
     assert response.status_code == 200
     data = response.get_json()
     assert len(data["routes"]) == 1
@@ -79,7 +79,7 @@ def test_clear_user_history_by_id(mock_route_dao, mock_get_db_session, client):
     mock_get_db_session.return_value.__enter__.return_value = mock_session
     mock_route_dao.delete_user_route_history.return_value = 1
 
-    response = client.delete("/users/1/routes")
+    response = client.delete("/users/1/routes?map_id=1")
     assert response.status_code == 200
     data = response.get_json()
     assert data["success"] == "Route history cleared"
@@ -88,11 +88,11 @@ def test_clear_user_history_by_id(mock_route_dao, mock_get_db_session, client):
 
 @patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
 def test_calculate_route_missing_startpoint(mock_get_db_session, client):
-    """Test the calculate route endpoint with missing startpoint."""
+    """Test the route calculation endpoint with missing startpoint."""
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
 
-    response = client.post("/routes", json={"endpoint": "CityB"})
+    response = client.post("/maps/1/routes", json={"endpoint": "CityB"})
     assert response.status_code == 400
     data = response.get_json()
     assert data["error"] == "Start and end cities are required"
@@ -100,11 +100,11 @@ def test_calculate_route_missing_startpoint(mock_get_db_session, client):
 
 @patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
 def test_calculate_route_missing_endpoint(mock_get_db_session, client):
-    """Test the calculate route endpoint with missing endpoint."""
+    """Test the calculate-route endpoint with missing endpoint."""
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
 
-    response = client.post("/routes", json={"startpoint": "CityA"})
+    response = client.post("/maps/1/routes", json={"startpoint": "CityA"})
     assert response.status_code == 400
     data = response.get_json()
     assert data["error"] == "Start and end cities are required"
@@ -120,7 +120,7 @@ def test_calculate_route_error(mock_fetch_route, mock_get_db_session, client):
     mock_get_db_session.return_value.__enter__.return_value = mock_session
     mock_fetch_route.return_value = {"error": "mocked_error"}
 
-    response = client.post("/routes", json={"startpoint": "CityA", "endpoint": "CityB"})
+    response = client.post("/maps/1/routes", json={"startpoint": "CityA", "endpoint": "CityB"})
     assert response.status_code == 400
     data = response.get_json()
     assert data["error"] == "mocked_error"
@@ -134,30 +134,45 @@ def test_calculate_route_error(mock_fetch_route, mock_get_db_session, client):
 def test_calculate_route_registered_user(
     mock_route_dao, mock_fetch_route, mock_get_db_session, client
 ):
-    """Test the calculate route endpoint for a registered user."""
+    """Test the calculate-route endpoint for a registered user."""
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
     mock_fetch_route.return_value = {"route": "mocked_route"}
     mock_saved_route = MagicMock(id=1)
     mock_route_dao.save_route.return_value = mock_saved_route
 
-    response = client.post("/users/1/routes", json={"startpoint": "CityA", "endpoint": "CityB"})
-    assert response.status_code == 201
+    response = client.post(
+        "/users/1/maps/1/routes", json={"startpoint": "CityA", "endpoint": "CityB"}
+    )
+    assert response.status_code == 201, f"Expected status code 201 but got {response.status_code}"
     data = response.get_json()
     assert data["route"] == "mocked_route"
 
 
 @patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
-@patch(
-    "backend.src.web_backend.controller.route_history_controller.fetch_route_from_navigation_service"
-)
-def test_calculate_route_anonymous_user(mock_fetch_route, mock_get_db_session, client):
-    """Test the calculate route endpoint for an anonymous user."""
+@patch("backend.src.web_backend.controller.route_history_controller.RouteDao")
+def test_clear_user_history_by_name(mock_route_dao, mock_get_db_session, client):
+    """Test the clear user history by name endpoint"""
     mock_session = MagicMock()
     mock_get_db_session.return_value.__enter__.return_value = mock_session
-    mock_fetch_route.return_value = {"route": "mocked_route"}
+    mock_route_dao.delete_user_route_history.return_value = 1
 
-    response = client.post("/routes", json={"startpoint": "CityA", "endpoint": "CityB"})
-    assert response.status_code == 201
+    response = client.delete("/users/test_user/routes?map_id=1")
+    assert response.status_code == 200
     data = response.get_json()
-    assert data["route"] == "mocked_route"
+    assert data["success"] == "Route history cleared"
+    assert data["deleted_count"] == 1
+
+
+@patch("backend.src.web_backend.controller.route_history_controller.get_db_session")
+@patch("backend.src.web_backend.controller.route_history_controller.RouteDao")
+def test_delete_route_not_found(mock_route_dao, mock_get_db_session, client):
+    """Test the delete route endpoint when route is not found"""
+    mock_session = MagicMock()
+    mock_get_db_session.return_value.__enter__.return_value = mock_session
+    mock_route_dao.get_route_by_id.return_value = None
+
+    response = client.delete("/users/1/routes/1")
+    assert response.status_code == 404
+    data = response.get_json()
+    assert data["error"] == "Route not found"

@@ -11,7 +11,7 @@ def test_save_and_get_map(db):
 
     # Act
     MapDao.save_map(map_obj, db)
-    retrieved_map = MapDao.get_map(db)
+    retrieved_map = MapDao.get_map_by_name(db, "Tamriel")
 
     # Assert
     assert retrieved_map is not None
@@ -29,7 +29,7 @@ def test_save_multiple_maps_and_get_first(db):
     # Act
     MapDao.save_map(map1, db)
     MapDao.save_map(map2, db)
-    retrieved_map = MapDao.get_map(db)
+    retrieved_map = MapDao.get_map_by_name(db, "Tamriel")
 
     # Assert
     assert retrieved_map is not None

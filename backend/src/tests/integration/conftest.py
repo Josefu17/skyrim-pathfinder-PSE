@@ -6,6 +6,9 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from backend.src.database.schema.base import Base
+from backend.src.database.schema.models import register_models
+
+register_models()
 
 # Create a new engine for the in-memory SQLite database with foreign keys enabled
 engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
@@ -14,7 +17,7 @@ SESSION_LOCAL = sessionmaker(bind=engine)
 
 @pytest.fixture(scope="function", name="db")
 def test_db():
-    """Create a RAM-Database with foreign keys enforced and scoped to each individual test"""
+    """Create a RAM-Database with foreign keys enforced and scoped to each test"""
     # Set up the test database (create all tables)
     with engine.connect() as connection:
         # Enable foreign key support for SQLite

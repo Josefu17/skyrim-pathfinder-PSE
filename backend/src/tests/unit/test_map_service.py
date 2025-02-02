@@ -1,153 +1,145 @@
-"""Unit tests for map service"""
+"""test file to test the external map service integration"""
 
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import MagicMock, patch
 
 import pytest
 from requests.exceptions import RequestException
+from sqlalchemy.orm import Session
 
-from backend.src.database.schema.city import City
-from backend.src.database.schema.connection import Connection
-from backend.src.map_service.map_service import fetch_and_store_map_data_if_needed
+from backend.src.database.schema.map import Map
+from backend.src.map_service.map_service import (
+    get_maps_from_service,
+    fetch_and_store_map_data_if_needed,
+)
+
+# Mock-Daten für die Tests
+MOCK_MAP_LIST = ["10000", "20000", "50000"]
+MOCK_MAP_DATA = {
+    "mapsizeX": 100,
+    "mapsizeY": 100,
+    "cities": [
+        {"name": "City1", "positionX": 10, "positionY": 20},
+        {"name": "City2", "positionX": 30, "positionY": 40},
+    ],
+    "connections": [
+        {"parent": "City1", "child": "City2"},
+    ],
+}
 
 
-@pytest.fixture(name="session_mock")
+@pytest.fixture
 def mock_session():
-    """Fixture for the SQLAlchemy session mock."""
-    return MagicMock()
+    """mock session"""
+    return MagicMock(spec=Session)
 
 
-@pytest.fixture(name="map_service_response_mock")
-def mock_map_service_response():
-    """Fixture for the mock map service response."""
-    return {
-        "cities": [
-            {"name": "Whiterun", "positionX": 10, "positionY": 20},
-            {"name": "Riverwood", "positionX": 15, "positionY": 25},
-        ],
-        "connections": [
-            {"parent": "Whiterun", "child": "Riverwood"},
-        ],
-    }
+@pytest.fixture
+def mock_requests_get():
+    """mock requests get"""
+    with patch("requests.get") as mock_get:
+        yield mock_get
 
 
-@patch("backend.src.map_service.map_service.requests.get")
-@patch("backend.src.map_service.map_service.CityDao")
-@patch("backend.src.map_service.map_service.ConnectionDao")
-def test_fetch_and_store_map_data_success(
-    connection_dao_mock,
-    city_dao_mock,
-    requests_mock,
-    session_mock,
-    map_service_response_mock,
-):
-    """Test successful data fetch and store."""
-    # Mock HTTP response
-    requests_mock.return_value.status_code = 200
-    requests_mock.return_value.json.return_value = map_service_response_mock
+@pytest.fixture
+def mock_map_dao():
+    """mock map dao"""
+    with patch("backend.src.map_service.map_service.MapDao") as mock:
+        yield mock
 
-    # Mock DAO behaviors
-    city_dao_mock.get_city_by_name.return_value = None
-    connection_dao_mock.get_connection_by_parent_and_child.return_value = None
 
-    # Simulate ID assignment for saved cities
-    id_counter = iter(range(1, 100))  # Mock sequential ID generation
+@pytest.fixture
+def mock_city_dao():
+    """mock city dao"""
+    with patch("backend.src.map_service.map_service.CityDao") as mock:
+        yield mock
 
-    def mock_save_city(city, _):
-        city.id = next(id_counter)  # Assign a unique ID
 
-    city_dao_mock.save_city.side_effect = mock_save_city
+@pytest.fixture
+def mock_connection_dao():
+    """mock connection dao"""
+    with patch("backend.src.map_service.map_service.ConnectionDao") as mock:
+        yield mock
 
-    # Call the function
-    fetch_and_store_map_data_if_needed(session_mock)
 
-    # Verify city saving
-    assert city_dao_mock.save_city.call_count == 2  # 2 cities
-    city_dao_mock.save_city.assert_has_calls(
-        [
-            call(City(id=1, name="Whiterun", position_x=10, position_y=20), session_mock),
-            call(City(id=2, name="Riverwood", position_x=15, position_y=25), session_mock),
-        ],
-        any_order=True,  # If the order of calls doesn't matter
-    )
+def test_get_maps_from_service_success(mock_requests_get):
+    """test success scenario for maps list retrieval"""
+    mock_requests_get.return_value.status_code = 200
+    mock_requests_get.return_value.json.return_value = MOCK_MAP_LIST
 
-    # Verify connection saving
-    assert connection_dao_mock.save_connections_bulk.call_count == 1
-    connection_dao_mock.save_connections_bulk.assert_called_with(
-        [Connection(parent_city_id=1, child_city_id=2)], session_mock
+    result = get_maps_from_service()
+    assert result == MOCK_MAP_LIST
+    mock_requests_get.assert_called_once_with(
+        "https://maps.proxy.devops-pse.users.h-da.cloud/maps", timeout=10
     )
 
 
-@patch("backend.src.map_service.map_service.requests.get")
-@patch("backend.src.map_service.map_service.CityDao")
-@patch("backend.src.map_service.map_service.ConnectionDao")
-def test_fetch_and_store_existing_data(
-    connection_dao_mock,
-    city_dao_mock,
-    requests_mock,
-    session_mock,
-    map_service_response_mock,
+def test_get_maps_from_service_failure(mock_requests_get):
+    """test failure scenario for maps list retrieval"""
+    mock_requests_get.side_effect = RequestException("Connection error")
+
+    result = get_maps_from_service()
+    assert not result
+
+
+def test_fetch_and_store_map_data_if_needed_existing_map(mock_session, mock_map_dao):
+    """test handling of fetching of existing map entry"""
+    mock_map = MagicMock(spec=Map)
+    mock_map_dao.get_map_by_name.return_value = mock_map
+
+    fetch_and_store_map_data_if_needed(mock_session)
+
+    mock_map_dao.save_map.assert_not_called()
+
+
+def test_fetch_and_store_map_data_if_needed_large_map(
+    mock_session, mock_requests_get, mock_map_dao
 ):
-    """Test handling of existing cities and connections."""
-    # Mock HTTP response
-    requests_mock.return_value.status_code = 200
-    requests_mock.return_value.json.return_value = map_service_response_mock
+    """test handling of fetching of large map entry"""
+    mock_map_dao.get_map_by_name.return_value = None
 
-    # Mock DAO behaviors for existing data
-    city_dao_mock.get_city_by_name.side_effect = [
-        MagicMock(id=1),  # Whiterun exists
-        MagicMock(id=2),  # Riverwood exists
-    ]
-    connection_dao_mock.get_connection_by_parent_and_child.return_value = MagicMock()
+    mock_requests_get.return_value.status_code = 200
+    mock_requests_get.return_value.json.return_value = ["50000"]
 
-    # Call the function
-    fetch_and_store_map_data_if_needed(session_mock)
+    fetch_and_store_map_data_if_needed(mock_session)
 
-    # Verify no new cities or connections are saved
-    assert city_dao_mock.save_city.call_count == 0
-    assert connection_dao_mock.save_connections_bulk.call_count == 0
+    mock_map_dao.save_map.assert_not_called()
 
 
-@patch("backend.src.map_service.map_service.requests.get")
-def test_fetch_and_store_map_data_network_error(requests_mock, session_mock):
-    """Test network error handling."""
-    # Mock HTTP request to raise an exception
-    requests_mock.side_effect = RequestException("Network error")
+def test_fetch_and_store_map_data_if_needed_request_failure(
+    mock_session, mock_requests_get, mock_map_dao
+):
+    """test failure scenario for maps list retrieval"""
+    mock_map_dao.get_map_by_name.return_value = None
 
-    # Call the function
-    fetch_and_store_map_data_if_needed(session_mock)
+    mock_requests_get.side_effect = RequestException("Connection error")
 
-    # Verify no database actions are performed
-    session_mock.query.assert_not_called()
+    fetch_and_store_map_data_if_needed(mock_session)
 
-
-@patch("backend.src.map_service.map_service.requests.get")
-def test_fetch_and_store_map_data_http_error(requests_mock, session_mock):
-    """Test HTTP error handling."""
-    # Mock HTTP response with an error status
-    requests_mock.return_value.status_code = 500
-    requests_mock.return_value.raise_for_status.side_effect = RequestException("HTTP error")
-
-    # Call the function
-    fetch_and_store_map_data_if_needed(session_mock)
-
-    # Verify no database actions are performed
-    session_mock.query.assert_not_called()
+    mock_map_dao.save_map.assert_not_called()
 
 
-@patch("backend.src.map_service.map_service.requests.get")
-@patch("backend.src.map_service.map_service.CityDao")
-def test_partial_city_data_handling(city_dao_mock, requests_mock, session_mock):
-    """Test handling of incomplete city data."""
-    # Mock HTTP response with missing city fields
-    incomplete_response = {
-        "cities": [{"name": "Whiterun"}],  # Missing positionX and positionY
-        "connections": [],
-    }
-    requests_mock.return_value.status_code = 200
-    requests_mock.return_value.json.return_value = incomplete_response
+def test_fetch_and_store_map_data_if_needed_fetch_map_data(
+    mock_session, mock_requests_get, mock_map_dao, mock_city_dao, mock_connection_dao
+):
+    """test the successful fetch map data scenario"""
+    mock_map_dao.get_map_by_name.return_value = None
+    mock_requests_get.return_value.status_code = 200
+    mock_requests_get.return_value.json.return_value = MOCK_MAP_DATA
 
-    # Call the function
-    fetch_and_store_map_data_if_needed(session_mock)
+    # Ensure get_city_by_name returns None for each city
+    mock_city_dao.get_city_by_name.side_effect = lambda map_id, name, session: None
 
-    # Verify no cities are saved
-    city_dao_mock.save_city.assert_not_called()
+    # Ensure get_connection_by_parent_and_child returns None for each connection
+    mock_connection_dao.get_connection_by_parent_and_child.side_effect = (
+        lambda map_id, parent_city_id, child_city_id, session: None
+    )
+
+    # Mock the get_maps_from_service function to return the expected map name
+    with patch("backend.src.map_service.map_service.get_maps_from_service", return_value=["10000"]):
+        fetch_and_store_map_data_if_needed(mock_session)
+
+    mock_requests_get.assert_called_with(
+        "https://maps.proxy.devops-pse.users.h-da.cloud/map?name=10000", timeout=60
+    )
+    mock_map_dao.save_map.assert_called_once()
+    mock_city_dao.save_cities_bulk.assert_called_once()

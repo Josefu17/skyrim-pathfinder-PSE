@@ -1,0 +1,309 @@
+{
+	"info": {
+		"_postman_id": "99d80b4b-4300-45cf-a92d-d55eaaa4a2bc",
+		"name": "PSE API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39620507",
+		"_collection_link": "https://pse-skyrim-map-group2.postman.co/workspace/PSE-Skyrim-Map-Group2~88e063d0-70f9-421d-8b9a-7d87e35379d4/collection/39620507-99d80b4b-4300-45cf-a92d-d55eaaa4a2bc?action=share&source=collection_link&creator=39620507"
+	},
+	"item": [
+		{
+			"name": "Map Controller",
+			"item": [
+				{
+					"name": "Get Maps",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4243/maps",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4243",
+							"path": [
+								"maps"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4243/cities?map_id=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4243",
+							"path": [
+								"cities"
+							],
+							"query": [
+								{
+									"key": "map_id",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get map by name",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health Controller",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4243/healthz",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4243",
+							"path": [
+								"healthz"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Metrics Controller",
+			"item": [
+				{
+					"name": "Get Metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4243/metrics",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4243",
+							"path": [
+								"metrics"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Route History Controller",
+			"item": [
+				{
+					"name": "Calculate Route",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"startpoint\": \"CityA\",\n  \"endpoint\": \"CityB\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:4243/users/1/maps/1/routes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4243",
+							"path": [
+								"users",
+								"1",
+								"maps",
+								"1",
+								"routes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4243/users/1/routes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4243",
+							"path": [
+								"users",
+								"1",
+								"routes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Route",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4243/users/1/routes/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4243",
+							"path": [
+								"users",
+								"1",
+								"routes",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear User History by ID",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4243/users/1/routes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4243",
+							"path": [
+								"users",
+								"1",
+								"routes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear User History by Name",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4243/users/username/routes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4243",
+							"path": [
+								"users",
+								"username",
+								"routes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Calculate Route (anonymous))",
+					"request": {
+						"method": "POST",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Controller",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"newuser\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:4243/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4243",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"existinguser\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:4243/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4243",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

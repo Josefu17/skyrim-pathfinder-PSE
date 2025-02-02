@@ -21,9 +21,16 @@ class RouteDao:
         return route
 
     @staticmethod
-    def get_route_by_id(route_id: int, session: Session) -> Route | None:
-        """Retrieve a route by its ID"""
-        return session.query(Route).filter_by(id=route_id).first()
+    def get_route_by_id(route_id: int, session: Session, map_id: int = None) -> Route | None:
+        """
+        retrieve a route by its ID, optionally filtered by map_id.
+        route_id: The ID of the route to retrieve.
+        map_id: (Optional) The ID of the map to restrict the query to.
+        """
+        query = session.query(Route).filter_by(id=route_id)
+        if map_id:
+            query = query.filter_by(map_id=map_id)
+        return query.first()
 
     @staticmethod
     def get_routes(filter_params: RouteFilter, session: Session) -> list[Route]:
@@ -36,6 +43,8 @@ class RouteDao:
 
         :param filter_params: An instance of RouteFilter containing:
             - user_id: The ID of the user whose routes are being queried.
+            - map_id: The ID referencing to which map the desired route belongs to. (optional, if not provided
+            return all the routes belonging to the user)
             - field: The field to sort by ("created_at" (default), "startpoint", or "endpoint").
             - limit: Maximum number of results to return (default: 10, capped at 100).
             - descending: Whether to sort in descending order (default: True).
@@ -53,6 +62,7 @@ class RouteDao:
             field,
             limit,
             descending,
+            map_id,
             from_date,
             to_date,
             startpoint,
@@ -73,6 +83,8 @@ class RouteDao:
         # Build dynamic filter conditions
         conditions = [Route.user_id == user_id]
 
+        if map_id:
+            conditions.append(Route.map_id == map_id)
         if from_date:
             conditions.append(Route.created_at >= from_date)
         if to_date:
@@ -90,9 +102,20 @@ class RouteDao:
         )
 
     @staticmethod
-    def delete_route_by_id(route_id: int, session: Session) -> bool:
-        """Delete a specific route by its ID, return True if deleted, else False"""
-        route = session.query(Route).filter_by(id=route_id).first()
+    def delete_route_by_id(route_id: int, session: Session, map_id: int = None) -> bool:
+        """
+        delete a specific route by its ID, optionally filtered by map_id.
+
+        route_id: The ID of the route to retrieve.
+        map_id: (Optional) The ID of the map to restrict the query to.
+        return True if a route is found and deleted, else False
+        """
+        query = session.query(Route).filter_by(id=route_id)
+        if map_id:
+            query = query.filter_by(map_id=map_id)
+
+        route = query.first()
+
         if route:
             session.delete(route)
             session.commit()
@@ -111,7 +134,7 @@ class RouteDao:
 
     @staticmethod
     def delete_user_route_history(
-        session: Session, user_id: int = None, username: str = None
+        session: Session, user_id: int = None, username: str = None, map_id: int = None
     ) -> int:
         """
         Delete all routes for a user by user_id or username and return the number of routes deleted.
@@ -125,6 +148,10 @@ class RouteDao:
                 raise ValueError(f"User with username '{username}' does not exist.")
             user_id = user.id
 
-        deleted_count = session.query(Route).filter_by(user_id=user_id).delete()
+        query = session.query(Route).filter(Route.user_id == user_id)
+        if map_id:
+            query = query.filter(Route.map_id == map_id)
+
+        deleted_count = query.delete()
         session.commit()
         return deleted_count

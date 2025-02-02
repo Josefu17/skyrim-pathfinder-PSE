@@ -1,0 +1,7 @@
+services:
+  web-backend:
+    environment:
+      FLASK_ENV: development
+    volumes:
+      - ./backend/src/web_backend:/app/backend/src/web_backend
+      - ./backend:/app/backend

@@ -10,7 +10,7 @@ class UserDao:
 
     @staticmethod
     def get_all_users(session):
-        """get all users as list"""
+        """get all users as a list"""
         return session.query(User).all()
 
     @staticmethod

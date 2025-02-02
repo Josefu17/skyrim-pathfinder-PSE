@@ -5,18 +5,23 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from backend.src.database.dao.route_dao import RouteDao
+from backend.src.database.schema.map import Map
 from backend.src.database.schema.route import Route, RouteFilter, OptionalRouteFilters
 from backend.src.database.schema.user import User
+from backend.src.tests.integration.dao_tests.test_connection_dao_it import fabricate_and_commit_map
 
 
 def test_save_route(db):
     """Test saving a new route."""
     # Arrange
+    test_map = fabricate_and_commit_map(db)
+
     user = User(username="test_user")
     db.add(user)
     db.commit()
 
     route = Route(
+        map_id=test_map.id,
         user_id=user.id,
         startpoint="Whiterun",
         endpoint="Riften",
@@ -34,16 +39,18 @@ def test_save_route(db):
 def test_get_route_by_id(db):
     """Test retrieving a route by its ID."""
     # Arrange
+    test_map = fabricate_and_commit_map(db)
+
     user = User(username="test_user")
     db.add(user)
     db.commit()
 
     fabricate_basic_routes_and_commit(
-        db, datetime.now(timezone.utc), datetime.now(timezone.utc), user
+        db, test_map, datetime.now(timezone.utc), datetime.now(timezone.utc), user
     )
 
     # Act - retrieve the first one
-    retrieved_route = RouteDao.get_route_by_id(1, db)
+    retrieved_route = RouteDao.get_route_by_id(1, db, test_map.id)
 
     # Assert
     assert retrieved_route is not None
@@ -53,11 +60,14 @@ def test_get_route_by_id(db):
 def test_delete_route_by_id_success(db):
     """Test deleting a route by its ID."""
     # Arrange
+    test_map = fabricate_and_commit_map(db)
+
     user = User(username="test_user")
     db.add(user)
     db.commit()
 
     route = Route(
+        map_id=test_map.id,
         user_id=user.id,
         startpoint="Riften",
         endpoint="Markarth",
@@ -78,11 +88,14 @@ def test_delete_route_by_id_success(db):
 def test_delete_route_by_id_no_match(db):
     """Test delete_route_by_id returns False when no route matches the given ID."""
     # Arrange
+    test_map = fabricate_and_commit_map(db)
+
     user = User(username="test_user")
     db.add(user)
     db.commit()
 
     route = Route(
+        map_id=test_map.id,
         user_id=user.id,
         startpoint="Solitude",
         endpoint="Whiterun",
@@ -103,12 +116,16 @@ def test_delete_route_by_id_no_match(db):
 def test_delete_user_route_history_by_user_id(db):
     """Test deleting all routes for a user by user_id."""
     # Arrange
+    test_map = fabricate_and_commit_map(db)
+
     user = User(username="test_user")
     db.add(user)
     db.commit()
+    db.flush()
 
     routes = [
         Route(
+            map_id=test_map.id,
             user_id=user.id,
             startpoint="Whiterun",
             endpoint="Riften",
@@ -116,6 +133,7 @@ def test_delete_user_route_history_by_user_id(db):
             route={"route": {}, "distance": 100},
         ),
         Route(
+            map_id=test_map.id,
             user_id=user.id,
             startpoint="Markarth",
             endpoint="Solitude",
@@ -137,11 +155,14 @@ def test_delete_user_route_history_by_user_id(db):
 def test_delete_user_route_history_by_username(db):
     """Test deleting all routes for a user by username."""
     # Arrange
+    test_map = fabricate_and_commit_map(db)
+
     user = User(username="test_user")
     db.add(user)
     db.commit()
 
     route = Route(
+        map_id=test_map.id,
         user_id=user.id,
         startpoint="Riverwood",
         endpoint="Helgen",
@@ -180,6 +201,8 @@ def test_delete_user_route_history_invalid_username(db):
 def test_get_routes_with_to_date(db):
     """Test filtering routes by to_date."""
     # Arrange
+    test_map = fabricate_and_commit_map(db)
+
     user = User(username="test_user")
     db.add(user)
     db.commit()
@@ -187,7 +210,7 @@ def test_get_routes_with_to_date(db):
     recent_date = datetime.now(timezone.utc)
     old_date = recent_date - timedelta(days=5)
 
-    fabricate_basic_routes_and_commit(db, old_date, recent_date, user)
+    fabricate_basic_routes_and_commit(db, test_map, old_date, recent_date, user)
 
     optional_filters = OptionalRouteFilters(to_date=recent_date - timedelta(days=3))
     filter_params = RouteFilter(user_id=user.id, optional_filters=optional_filters)
@@ -203,6 +226,8 @@ def test_get_routes_with_to_date(db):
 def test_get_routes_with_combination_filters(db):
     """Test filtering routes by startpoint and endpoint."""
     # Arrange
+    test_map = fabricate_and_commit_map(db)
+
     user1 = User(username="user1")
     user2 = User(username="user2")
     db.add_all([user1, user2])
@@ -210,6 +235,7 @@ def test_get_routes_with_combination_filters(db):
 
     routes = [
         Route(
+            map_id=test_map.id,
             user_id=user1.id,
             startpoint="Whiterun",
             endpoint="Riften",
@@ -217,6 +243,7 @@ def test_get_routes_with_combination_filters(db):
             route={"route": {}, "distance": 100},
         ),
         Route(
+            map_id=test_map.id,
             user_id=user1.id,
             startpoint="Markarth",
             endpoint="Solitude",
@@ -224,6 +251,7 @@ def test_get_routes_with_combination_filters(db):
             route={"route": {}, "distance": 200},
         ),
         Route(
+            map_id=test_map.id,
             user_id=user2.id,
             startpoint="Riverwood",
             endpoint="Falkreath",
@@ -231,6 +259,7 @@ def test_get_routes_with_combination_filters(db):
             route={"route": {}, "distance": 50},
         ),
         Route(
+            map_id=test_map.id,
             user_id=user2.id,
             startpoint="Whiterun",
             endpoint="Riften",
@@ -256,6 +285,8 @@ def test_get_routes_with_combination_filters(db):
 def test_get_routes_with_date_range(db):
     """Test retrieving routes within a specific date range."""
     # Arrange
+    test_map = fabricate_and_commit_map(db)
+
     user = User(username="test_user")
     db.add(user)
     db.commit()
@@ -263,7 +294,7 @@ def test_get_routes_with_date_range(db):
     recent_date = datetime.now(timezone.utc)
     old_date = recent_date - timedelta(days=10)
 
-    fabricate_basic_routes_and_commit(db, old_date, recent_date, user)
+    fabricate_basic_routes_and_commit(db, test_map, old_date, recent_date, user)
 
     optional_filters = OptionalRouteFilters(from_date=recent_date)
     filter_params = RouteFilter(user_id=user.id, optional_filters=optional_filters)
@@ -279,12 +310,15 @@ def test_get_routes_with_date_range(db):
 def test_get_routes_sorted_by_endpoint(db):
     """Test retrieving routes sorted by endpoint."""
     # Arrange
+    test_map = fabricate_and_commit_map(db)
+
     user = User(username="test_user")
     db.add(user)
     db.commit()
 
     routes = [
         Route(
+            map_id=test_map.id,
             user_id=user.id,
             startpoint="Falkreath",
             endpoint="Alduin's Wall",
@@ -292,6 +326,7 @@ def test_get_routes_sorted_by_endpoint(db):
             route={"route": {}, "distance": 500},
         ),
         Route(
+            map_id=test_map.id,
             user_id=user.id,
             startpoint="Falkreath",
             endpoint="Ivarstead",
@@ -315,12 +350,15 @@ def test_get_routes_sorted_by_endpoint(db):
 def test_get_routes_limit_and_sorting(db):
     """Test limiting the number of routes returned and sorting by created_at."""
     # Arrange
+    test_map = fabricate_and_commit_map(db)
+
     user = User(username="test_user")
     db.add(user)
     db.commit()
 
     routes = [
         Route(
+            map_id=test_map.id,
             user_id=user.id,
             startpoint="Markarth",
             endpoint="Riften",
@@ -328,6 +366,7 @@ def test_get_routes_limit_and_sorting(db):
             route={"route": {}, "distance": 150},
         ),
         Route(
+            map_id=test_map.id,
             user_id=user.id,
             startpoint="Whiterun",
             endpoint="Winterhold",
@@ -367,12 +406,15 @@ def test_get_routes_with_invalid_sort_field(db):
 def test_delete_routes_by_ids(db):
     """Test deleting multiple routes by their IDs."""
     # Arrange
+    test_map = fabricate_and_commit_map(db)
+
     user = User(username="test_user")
     db.add(user)
     db.commit()
 
     routes = [
         Route(
+            map_id=test_map.id,
             user_id=user.id,
             startpoint="Markarth",
             endpoint="Riften",
@@ -380,6 +422,7 @@ def test_delete_routes_by_ids(db):
             route={"route": {}, "distance": 150},
         ),
         Route(
+            map_id=test_map.id,
             user_id=user.id,
             startpoint="Whiterun",
             endpoint="Winterhold",
@@ -387,6 +430,7 @@ def test_delete_routes_by_ids(db):
             route={"route": {}, "distance": 250},
         ),
         Route(
+            map_id=test_map.id,
             user_id=user.id,
             startpoint="Riverwood",
             endpoint="Helgen",
@@ -412,11 +456,12 @@ def test_delete_routes_by_ids(db):
     assert remaining_routes[0].id == routes[2].id
 
 
-def fabricate_basic_routes_and_commit(db, old_date, recent_date, user):
+def fabricate_basic_routes_and_commit(db, test_map: Map, old_date, recent_date, user):
     """Helper to create routes and commit them to the RAM-Database"""
     routes = [
         Route(
             user_id=user.id,
+            map_id=test_map.id,
             startpoint="Riverwood",
             endpoint="Helgen",
             created_at=recent_date,
@@ -424,6 +469,7 @@ def fabricate_basic_routes_and_commit(db, old_date, recent_date, user):
         ),
         Route(
             user_id=user.id,
+            map_id=test_map.id,
             startpoint="Winterhold",
             endpoint="Dawnstar",
             created_at=old_date,

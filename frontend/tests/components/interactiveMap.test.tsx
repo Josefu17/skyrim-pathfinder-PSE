@@ -254,7 +254,7 @@ describe('InteractiveMap Component', () => {
 
             expect(globalThis.fetch).toHaveBeenLastCalledWith(
                 // @ts-expect-error - TS doesn't know about env variables
-                `${import.meta.env.VITE_URL}/routes`,
+                `${import.meta.env.VITE_URL}/maps/1/routes`,
                 {
                     body: '{"startpoint":"City A","endpoint":"City B"}',
                     headers: {
@@ -309,7 +309,7 @@ describe('InteractiveMap Component', () => {
             expect(routeLine).toBeInTheDocument();
             expect(globalThis.fetch).toHaveBeenLastCalledWith(
                 // @ts-expect-error - TS doesn't know about env variables
-                `${import.meta.env.VITE_URL}/users/${testUser.id}/routes`,
+                `${import.meta.env.VITE_URL}/users/${testUser.id}/maps/1/routes`,
                 {
                     body: '{"startpoint":"City A","endpoint":"City B"}',
                     headers: {

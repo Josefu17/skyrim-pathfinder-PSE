@@ -43,7 +43,9 @@ export const DisplayRoutes = ({
             { startpoint: options.startpoint, endpoint: options.endpoint },
         ],
         queryFn: async () => {
-            const response = await fetch(`${import.meta.env.VITE_URL}/cities`);
+            const response = await fetch(
+                `${import.meta.env.VITE_URL}/cities?map_id=10`
+            );
             const data = await response.json();
             return data.cities;
         },
