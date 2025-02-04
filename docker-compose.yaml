@@ -1,8 +1,5 @@
 services:
   web-frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: registry.code.fbi.h-da.de/bpse-wise2425/group2/web-frontend:latest
     container_name: group2-web-frontend
     ports:
@@ -10,40 +7,7 @@ services:
     networks:
       - app-network
 
-  postgres:
-    image: postgres:latest
-    container_name: group2-postgres
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_DATABASE}
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_DATABASE}"]
-      interval: 10s
-      retries: 5
-
-  redis:
-    image: redis:latest
-    container_name: group2-redis
-    ports:
-      - "6379:6379"
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      retries: 5
-
   navigation-service:
-    build:
-      context: .
-      dockerfile: backend/src/navigation_service/Dockerfile
     image: registry.code.fbi.h-da.de/bpse-wise2425/group2/navigation-service:latest
     container_name: group2-navigation-service
     ports:
@@ -52,20 +16,15 @@ services:
     networks:
       - app-network
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
         condition: service_healthy
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
 
   web-backend:
-    build:
-      context: .
-      dockerfile: backend/src/web_backend/Dockerfile
     image: registry.code.fbi.h-da.de/bpse-wise2425/group2/web-backend:latest
     container_name: group2-web-backend
     depends_on:
-      postgres:
-        condition: service_healthy
       navigation-service:
         condition: service_started
       redis:
@@ -75,9 +34,27 @@ services:
       - "5679:5678"
     networks:
       - app-network
+    environment:
+      FLASK_ENV: "production"
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
 
-volumes:
-  postgres_data:
+
+  redis:
+    image: redis:latest
+    container_name: group2-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      retries: 5
 
 networks:
   app-network:

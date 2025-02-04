@@ -1,16 +1,19 @@
 """Main module to start the backend application."""
 
+import os
+
 from flask import Flask
 from flask_cors import CORS
-from backend.src.utils.helpers import get_logging_configuration
-from backend.src.utils.tracing import setup_tracing
-from backend.src.web_backend.controller import map_controller
-from backend.src.web_backend.controller import user_controller
-from backend.src.web_backend.controller import route_history_controller
-from backend.src.web_backend.controller import health_controller
-from backend.src.web_backend.controller import metrics_controller
+
 from backend.src.database.db_connection import get_db_session
 from backend.src.map_service.map_service import fetch_and_store_map_data_if_needed
+from backend.src.utils.helpers import get_logging_configuration
+from backend.src.utils.tracing import setup_tracing
+from backend.src.web_backend.controller import health_controller
+from backend.src.web_backend.controller import map_controller
+from backend.src.web_backend.controller import metrics_controller
+from backend.src.web_backend.controller import route_history_controller
+from backend.src.web_backend.controller import user_controller
 
 logger = get_logging_configuration()
 
@@ -20,7 +23,7 @@ def create_app():
     app = Flask(__name__)
     CORS(app)
 
-    setup_tracing("web-backend")
+    setup_tracing("web-backend", True)
 
     map_controller.init_map_routes(app)
     user_controller.init_user_routes(app)
@@ -38,7 +41,8 @@ def main():
     with get_db_session() as db_session:
         fetch_and_store_map_data_if_needed(session=db_session)
 
-    app.run(debug=True, host="0.0.0.0", port=4243)
+    debug_mode = os.environ.get("FLASK_ENV") == "development"
+    app.run(debug=debug_mode, host="0.0.0.0", port=4243)
 
 
 if __name__ == "__main__":

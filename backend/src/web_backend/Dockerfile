@@ -18,9 +18,6 @@ COPY backend/src /app/backend/src
 # Copy alembic.ini for database migration
 COPY backend/alembic.ini /app/backend/alembic.ini
 
-# Copy environment variables file
-COPY .env /app/.env
-
 # Switch to newly created non-root user for better security
 USER appuser
 

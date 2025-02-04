@@ -4,6 +4,7 @@ import os
 import secrets
 from datetime import datetime, timedelta, timezone
 
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
@@ -11,13 +12,11 @@ from sqlalchemy.orm import sessionmaker
 from backend.src.database.schema.models import register_models
 from backend.src.database.schema.route import Route
 from backend.src.database.schema.user import User
-from backend.src.utils.helpers import load_dotenv_if_exists
 
 register_models()
 
-dotenv_path = os.path.join(os.getcwd(), ".env")
-load_dotenv_if_exists(dotenv_path)
-
+path = os.path.join(os.getcwd(), ".env")
+load_dotenv(path)
 
 # Database credentials
 DB_USER = os.getenv("DB_USER")

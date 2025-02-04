@@ -2,40 +2,32 @@
 
 import xmlrpc.client
 
+from opentelemetry.propagate import inject
+from opentelemetry.trace import get_tracer
+
 from backend.src.database.dao.city_dao import CityDao
 from backend.src.database.dao.connection_dao import ConnectionDao
 from backend.src.database.dao.map_dao import MapDao
 from backend.src.utils.helpers import get_logging_configuration
 
 logger = get_logging_configuration()
+tracer = get_tracer("backend-service")
 
 
 def fetch_route_from_navigation_service(map_id, start_city_name, end_city_name, session):
     """Fetch the shortest route from the navigation service by providing two cities"""
     try:
+        with tracer.start_as_current_span("fetch_route_from_navigation_service") as span:
+            span.set_attribute("start_city", start_city_name)
+            span.set_attribute("end_city", end_city_name)
+
+            data = marshall_data_for_navigation_service(map_id, session)
+
+            headers = {}
+            inject(headers)
 
         with xmlrpc.client.ServerProxy("http://navigation-service:8000/") as proxy:
-            cities, connections = (
-                CityDao.get_cities_by_map_id(map_id, session),
-                ConnectionDao.get_connections_by_map_id(map_id, session),
-            )
-
-            # convert objects to dicts to work with RPC-API
-            cities_data = [city.to_dict() for city in cities]
-            connections_data = [
-                {
-                    "parent_city_id": conn.parent_city_id,
-                    "child_city_id": conn.child_city_id,
-                }
-                for conn in connections
-            ]
-
-            data = {
-                "cities": cities_data,
-                "connections": connections_data,
-            }
-
-            result = proxy.get_route(start_city_name, end_city_name, data)
+            result = proxy.get_route(start_city_name, end_city_name, data, headers)
 
             if result:
                 logger.info("Route fetched successfully between the two endpoints.")
@@ -49,6 +41,31 @@ def fetch_route_from_navigation_service(map_id, start_city_name, end_city_name, 
     except ConnectionError as e:
         logger.error("Connection error: %s", e)
         return f"Connection error: {e}"
+
+
+def marshall_data_for_navigation_service(map_id, session):
+    """
+    convert cities and connections information to the expected rpc format
+    for navigation service
+    """
+    cities, connections = (
+        CityDao.get_cities_by_map_id(map_id, session),
+        ConnectionDao.get_connections_by_map_id(map_id, session),
+    )
+    # convert objects to dicts to work with RPC-API
+    cities_data = [city.to_dict() for city in cities]
+    connections_data = [
+        {
+            "parent_city_id": conn.parent_city_id,
+            "child_city_id": conn.child_city_id,
+        }
+        for conn in connections
+    ]
+    data = {
+        "cities": cities_data,
+        "connections": connections_data,
+    }
+    return data
 
 
 def fetch_cities_as_dicts(map_id, session):

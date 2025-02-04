@@ -1,14 +1,14 @@
 """test file for the tracing functionality"""
 
 import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, ANY
 
 from opentelemetry import trace
 
 from backend.src.utils.tracing import setup_tracing
 
 
-@patch.dict(os.environ, {"ENABLE_TRACING": "true"})
+@patch.dict(os.environ, {"OTEL_EXPORTER_OTLP_ENDPOINT": "dummy_value"})
 @patch("backend.src.utils.tracing.OTLPSpanExporter")
 @patch("backend.src.utils.tracing.BatchSpanProcessor")
 @patch("backend.src.utils.tracing.FlaskInstrumentor")
@@ -34,9 +34,7 @@ def test_tracing_enabled(
     tracer = setup_tracing("test_service")
     assert isinstance(tracer, trace.Tracer)
 
-    mock_otlp_exporter.assert_called_once_with(
-        endpoint="sre-backend.devops-pse.users.h-da.cloud:4319", insecure=True
-    )
+    mock_otlp_exporter.assert_called_once_with(endpoint=ANY, insecure=True)
     mock_batch_processor.assert_called_once_with(mock_otlp_exporter_instance)
     mock_flask().instrument.assert_called_once()
     mock_requests().instrument.assert_called_once()

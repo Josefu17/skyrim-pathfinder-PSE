@@ -1,7 +1,50 @@
 services:
+  postgres:
+    image: postgres:latest
+    container_name: group2-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_DATABASE}" ]
+      interval: 10s
+      retries: 5
+
   web-backend:
+    build:
+      context: .
+      dockerfile: backend/src/web_backend/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       FLASK_ENV: development
     volumes:
-      - ./backend/src/web_backend:/app/backend/src/web_backend
       - ./backend:/app/backend
+
+  navigation-service:
+    build:
+      context: .
+      dockerfile: backend/src/navigation_service/Dockerfile
+    volumes:
+      - ./backend:/app/backend
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.46
+    container_name: group2-jaeger
+    networks:
+      - app-network
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+
+volumes:
+  postgres_data:
