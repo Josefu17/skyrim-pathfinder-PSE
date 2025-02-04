@@ -54,7 +54,7 @@ def test_get_route_valid_route(mocker):
         side_effect=mock_dijkstra,
     )
 
-    result = get_route("CityA", "CityC", data)
+    result = get_route("CityA", "CityC", data, headers={})
     assert result == {
         "route": {"0": "CityA", "1": "CityB", "2": "CityC"},
         "distance": 25,
@@ -77,7 +77,7 @@ def test_get_route_no_connection(mocker):
         side_effect=mock_dijkstra,
     )
 
-    result = get_route("CityA", "CityE", data)
+    result = get_route("CityA", "CityE", data, headers={})
     assert result == {"error": "City not found: CityA or CityE"}
 
 
@@ -95,5 +95,5 @@ def test_get_route_no_connection_between_cities(mocker):
         return_value=([], float("inf"), [], float("inf")),
     )
 
-    result = get_route("CityA", "CityD", data)
+    result = get_route("CityA", "CityD", data, headers={})
     assert result == {"error": "No connection found between CityA and CityD"}

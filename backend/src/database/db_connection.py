@@ -6,14 +6,9 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
-from backend.src.utils.helpers import load_dotenv_if_exists, get_logging_configuration
+from backend.src.utils.helpers import get_logging_configuration
 
 logger = get_logging_configuration()
-
-# getcwd(): path where the script was executed
-dotenv_path = os.path.join(os.getcwd(), ".env")
-
-load_dotenv_if_exists(dotenv_path)
 
 
 class DatabaseConnection:

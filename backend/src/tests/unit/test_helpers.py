@@ -1,10 +1,11 @@
 """Unit tests for helpers.py"""
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
+
 import pytest
+
 from backend.src.utils.helpers import (
     MetricsLogger,
-    load_dotenv_if_exists,
 )
 
 
@@ -50,12 +51,3 @@ def test_get(mock_metrics_logger):
     value = mock_metrics_logger.get("test_metric")
     assert value == 100
     mock_metrics_logger.redis_client.get.assert_called_once_with("test_metric")
-
-
-@patch("backend.src.utils.helpers.os.path.exists")
-@patch("backend.src.utils.helpers.load_dotenv")
-def test_load_dotenv_if_exists(mock_load_dotenv, mock_exists):
-    """Test the load_dotenv_if_exists function"""
-    mock_exists.return_value = True
-    load_dotenv_if_exists(".env")
-    mock_load_dotenv.assert_called_once_with(".env")

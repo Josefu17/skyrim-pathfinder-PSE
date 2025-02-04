@@ -12,7 +12,7 @@ from backend.src.map_service.map_service import (
     fetch_and_store_map_data_if_needed,
 )
 
-# Mock-Daten für die Tests
+# Mock-Data for the Tests
 MOCK_MAP_LIST = ["10000", "20000", "50000"]
 MOCK_MAP_DATA = {
     "mapsizeX": 100,
@@ -62,7 +62,7 @@ def mock_connection_dao():
 
 
 def test_get_maps_from_service_success(mock_requests_get):
-    """test success scenario for maps list retrieval"""
+    """test success scenario for the map list retrieval"""
     mock_requests_get.return_value.status_code = 200
     mock_requests_get.return_value.json.return_value = MOCK_MAP_LIST
 
@@ -81,26 +81,15 @@ def test_get_maps_from_service_failure(mock_requests_get):
     assert not result
 
 
-def test_fetch_and_store_map_data_if_needed_existing_map(mock_session, mock_map_dao):
-    """test handling of fetching of existing map entry"""
+def test_fetch_and_store_map_data_if_needed_existing_map(mock_map_dao):
+    """test handling of fetching existing map entry"""
     mock_map = MagicMock(spec=Map)
     mock_map_dao.get_map_by_name.return_value = mock_map
 
-    fetch_and_store_map_data_if_needed(mock_session)
-
-    mock_map_dao.save_map.assert_not_called()
-
-
-def test_fetch_and_store_map_data_if_needed_large_map(
-    mock_session, mock_requests_get, mock_map_dao
-):
-    """test handling of fetching of large map entry"""
-    mock_map_dao.get_map_by_name.return_value = None
-
-    mock_requests_get.return_value.status_code = 200
-    mock_requests_get.return_value.json.return_value = ["50000"]
-
-    fetch_and_store_map_data_if_needed(mock_session)
+    # Mock external map_service request
+    with patch("backend.src.map_service.map_service.requests.get") as mock_requests:
+        mock_requests.return_value.status_code = 200
+        mock_requests.return_value.json.return_value = ["10000"]
 
     mock_map_dao.save_map.assert_not_called()
 

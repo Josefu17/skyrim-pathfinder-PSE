@@ -263,7 +263,7 @@ def test_service_get_map_data_by_name(mock_connection_dao, mock_city_dao, mock_m
 
 @patch("backend.src.web_backend.web_backend_service.MapDao")
 def test_service_get_map_data_by_name_not_found(mock_map_dao):
-    """Test fetching map data by map name when map is not found."""
+    """Test fetching map data by map name when the map is not found."""
     # Create a mock SQLAlchemy session
     mock_session = MagicMock(spec=Session)
 
