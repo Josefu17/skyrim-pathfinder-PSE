@@ -1,6 +1,7 @@
 """Service for web backend, works with backend controller."""
 
 import xmlrpc.client
+import socket
 
 from opentelemetry.propagate import inject
 from opentelemetry.trace import get_tracer
@@ -9,13 +10,14 @@ from backend.src.database.dao.city_dao import CityDao
 from backend.src.database.dao.connection_dao import ConnectionDao
 from backend.src.database.dao.map_dao import MapDao
 from backend.src.utils.helpers import get_logging_configuration
+from backend.src.utils.timeout_transport import TimeoutTransport
 
 logger = get_logging_configuration()
 tracer = get_tracer("backend-service")
 
 
 def fetch_route_from_navigation_service(map_id, start_city_name, end_city_name, session):
-    """Fetch the shortest route from the navigation service by providing two cities"""
+    """Fetch route from navigation service"""
     try:
         with tracer.start_as_current_span("fetch_route_from_navigation_service") as span:
             span.set_attribute("start_city", start_city_name)
@@ -26,14 +28,17 @@ def fetch_route_from_navigation_service(map_id, start_city_name, end_city_name, 
             headers = {}
             inject(headers)
 
-        with xmlrpc.client.ServerProxy("http://navigation-service:8000/") as proxy:
-            result = proxy.get_route(start_city_name, end_city_name, data, headers)
-
-            if result:
-                logger.info("Route fetched successfully between the two endpoints.")
+            try:
+                result = _fetch_route_internal(
+                    start_city_name, end_city_name, data=data, headers=headers
+                )
                 return result
-            logger.error("Error occurred while calculation the route between endpoints.")
-            return {"error": "Error during Route Calculation"}
+            except socket.timeout as e:
+                logger.error("Timeout error occurred while fetching the route: %s", e)
+                return {"error": "Timeout error occurred while fetching the route"}
+            except Exception as e:
+                logger.error("Error occurred while fetching the route: %s", e)
+                return {"error": f"Error occurred while fetching the route: {e}"}
 
     except xmlrpc.client.Error as e:
         logger.error("XML-RPC error: %s", e)
@@ -66,6 +71,19 @@ def marshall_data_for_navigation_service(map_id, session):
         "connections": connections_data,
     }
     return data
+
+
+def _fetch_route_internal(start_city_name, end_city_name, data, headers):
+    """Fetch route from navigation service"""
+    transport = TimeoutTransport(timeout=30)
+    with xmlrpc.client.ServerProxy("http://navigation-service:8000/", transport=transport) as proxy:
+        result = proxy.get_route(start_city_name, end_city_name, data, headers)
+
+        if result:
+            logger.info("Route fetched successfully between the two endpoints.")
+            return result
+        logger.error("Error occurred while calculation the route between endpoints.")
+        return {"error": "Error during Route Calculation"}
 
 
 def fetch_cities_as_dicts(map_id, session):
@@ -136,3 +154,9 @@ def service_get_maps(session):
     return [
         {"id": map_info.id, "name": map_info.name} for map_info in sorted(maps, key=lambda x: x.id)
     ]
+
+
+def service_get_city_suggestions(map_id, session, query):
+    """Fetch city suggestions for controller"""
+    cities = CityDao.get_city_suggestions(session, map_id, query)
+    return [{"name": city.name} for city in cities]

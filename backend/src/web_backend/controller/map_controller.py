@@ -1,7 +1,7 @@
 """Flask Controller to expose endpoints related to maps"""
 
 from flask import request, jsonify
-from opentelemetry.trace import get_tracer
+from opentelemetry.trace import get_tracer, StatusCode
 from requests.exceptions import RequestException
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -12,6 +12,7 @@ from backend.src.web_backend.web_backend_service import (
     service_get_cities_data,
     service_get_map_data_by_name,
     service_get_maps,
+    service_get_city_suggestions,
 )
 
 logger = get_logging_configuration()
@@ -19,12 +20,14 @@ tracer = get_tracer("map-controller")
 
 MAPS = "/maps"
 CITIES = "/cities"
+SUGGESTIONS = "/suggestions/maps/<int:map_id>"
 
 
 def init_map_routes(app):
     """Initialize all routes for the Flask app."""
     app.route(MAPS, methods=["GET"])(get_maps)
     app.route(CITIES, methods=["GET"])(get_cities)
+    app.route(SUGGESTIONS, methods=["GET"])(get_city_suggestions_while_input)
 
 
 def get_maps():
@@ -84,4 +87,27 @@ def get_cities():
         except (SQLAlchemyError, RequestException) as specific_error:
             logger.error("Error fetching cities data: %s", specific_error)
             set_span_error_flags(span, specific_error)
+            return jsonify({"error": "Internal server error"}), 500
+
+
+def get_city_suggestions_while_input(map_id):
+    """Fetch and return city suggestions for a specific map ID."""
+    with tracer.start_as_current_span("get_city_suggestions") as span:
+        try:
+            query = request.args.get("query")
+            if not query:
+                logger.error("Query parameter not provided.")
+                return jsonify({"error": "Query parameter is required"}), 400
+
+            logger.info("Fetching city suggestions for map ID: %s", map_id)
+            with get_db_session() as session:
+                suggestions = service_get_city_suggestions(map_id, session, query)
+
+            logger.info("City suggestions fetched successfully for map ID: %s", map_id)
+            return jsonify({"suggestions": suggestions})
+
+        except (SQLAlchemyError, RequestException) as specific_error:
+            logger.error("Error fetching city suggestions: %s", specific_error)
+            span.set_status(StatusCode.ERROR)
+            span.record_exception(specific_error)
             return jsonify({"error": "Internal server error"}), 500

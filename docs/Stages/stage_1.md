@@ -7,8 +7,7 @@
 # **Stage 1 Requirements**
 
 ## Remaining Tasks:
-### [Startup test for frontend](#cicd-and-operation)
-
+### All done ✅
 ## **Project Management**
 - **[Merge Request Definition](../DoD.md#definition-of-done-dod)**  
   ✅ Completed  
@@ -45,7 +44,7 @@
 - **[Automated Tests](../ci-cd.md#automated-tests)**  
   - **[Unit Tests for Navigation Service](../../backend/src/tests/unit)** ✅ Completed  
   - **[Unit Tests for Backend](../../backend/src/tests/unit)** ✅ Completed  
-  - **[Startup Test for Separated Frontend](../ci-cd.md#automated-tests)** ❌ Pending  
+  - **[Startup Test for Separated Frontend](../ci-cd.md#automated-tests)** ✅ Completed  
   - **[Display Code Coverage in GitLab](../ci-cd.md#code-coverage-and-displaying-the-badge-in-gitlab)** ✅ Completed  
 - **[Linting and Formatting](../../README.md#linting-and-formatting)**  
   ✅ Completed  

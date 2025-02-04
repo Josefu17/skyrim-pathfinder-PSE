@@ -183,3 +183,77 @@ def test_get_maps_request_exception(
     assert response.status_code == 500
     data = response.get_json()
     assert data["error"] == "Internal server error"
+
+
+@patch("backend.src.web_backend.controller.map_controller.get_db_session")
+@patch("backend.src.web_backend.controller.map_controller.service_get_city_suggestions")
+def test_get_city_suggestions_success(
+    mock_service_get_city_suggestions, mock_get_db_session, client: FlaskClient
+):
+    """Test the get_city_suggestions_while_input endpoint successfully."""
+    # Mock the database session
+    mock_session = MagicMock()
+    mock_get_db_session.return_value.__enter__.return_value = mock_session
+
+    # Mock service data
+    mock_service_get_city_suggestions.return_value = [{"name": "City1"}, {"name": "City2"}]
+
+    # Call endpoint
+    response = client.get("/suggestions/maps/1?query=City")
+
+    # Assert response
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "suggestions" in data and len(data["suggestions"]) > 0
+    assert data["suggestions"][0]["name"] == "City1"
+    assert data["suggestions"][1]["name"] == "City2"
+
+
+@patch("backend.src.web_backend.controller.map_controller.get_db_session")
+def test_get_city_suggestions_missing_query(mock_get_db_session, client: FlaskClient):
+    """Test the get_city_suggestions_while_input endpoint with missing query parameter."""
+    # Mock the database session
+    mock_session = MagicMock()
+    mock_get_db_session.return_value.__enter__.return_value = mock_session
+
+    # Call endpoint without query parameter
+    response = client.get("/suggestions/maps/1")
+
+    # Assert response
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data["error"] == "Query parameter is required"
+
+
+@patch("backend.src.web_backend.controller.map_controller.get_db_session")
+@patch("backend.src.web_backend.controller.map_controller.service_get_city_suggestions")
+def test_get_city_suggestions_sqlalchemy_error(
+    mock_service_get_city_suggestions, mock_get_db_session, client: FlaskClient
+):
+    """Test the get_city_suggestions_while_input endpoint when a SQLAlchemyError occurs."""
+    mock_session = MagicMock()
+    mock_get_db_session.return_value.__enter__.return_value = mock_session
+    mock_service_get_city_suggestions.side_effect = SQLAlchemyError("Database error")
+
+    response = client.get("/suggestions/maps/1?query=City")
+
+    assert response.status_code == 500
+    data = response.get_json()
+    assert data["error"] == "Internal server error"
+
+
+@patch("backend.src.web_backend.controller.map_controller.get_db_session")
+@patch("backend.src.web_backend.controller.map_controller.service_get_city_suggestions")
+def test_get_city_suggestions_request_exception(
+    mock_service_get_city_suggestions, mock_get_db_session, client: FlaskClient
+):
+    """Test the get_city_suggestions_while_input endpoint when a RequestException occurs."""
+    mock_session = MagicMock()
+    mock_get_db_session.return_value.__enter__.return_value = mock_session
+    mock_service_get_city_suggestions.side_effect = RequestException("Request error")
+
+    response = client.get("/suggestions/maps/1?query=City")
+
+    assert response.status_code == 500
+    data = response.get_json()
+    assert data["error"] == "Internal server error"

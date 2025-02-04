@@ -36,3 +36,17 @@ def test_save_multiple_maps_and_get_first(db):
     assert retrieved_map.name == "Tamriel"
     assert retrieved_map.size_x == 1000
     assert retrieved_map.size_y == 2000
+
+
+def test_get_map_id_by_name(db):
+    """Test get_map_id_by_name method"""
+    # Arrange
+    map_name = "Tamriel"
+    map_obj = Map(name=map_name, size_x=1000, size_y=2000)
+    MapDao.save_map(map_obj, db)
+
+    # Act
+    map_id = MapDao.get_map_id_by_name(db, map_name)
+
+    # Assert
+    assert map_id == map_obj.id

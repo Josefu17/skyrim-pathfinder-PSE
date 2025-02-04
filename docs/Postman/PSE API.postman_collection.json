@@ -61,6 +61,33 @@
 						"header": []
 					},
 					"response": []
+				},
+				{
+				  "name": "Get City Suggestions",
+				  "request": {
+					"method": "GET",
+					"header": [],
+					"url": {
+					  "raw": "http://localhost:4243/suggestions/maps/1?query=Mark",
+					  "protocol": "http",
+					  "host": [
+						"localhost"
+					  ],
+					  "port": "4243",
+					  "path": [
+						"suggestions",
+					    "maps",
+						"1"
+					  ],
+					  "query": [
+						{
+						  "key": "query",
+						  "value": "Mark"
+						}
+					  ]
+					}
+				  },
+				  "response": []
 				}
 			]
 		},

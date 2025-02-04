@@ -99,7 +99,6 @@ The CI pipeline includes automated tests to ensure the application functions cor
   - **Backend**: [Unit Tests for Backend](../backend/src/tests/unit)
 - **Code Coverage**: Verified as part of the pipeline, and a badge is displayed in the repository.
 - **Startup Test for Separated Frontend**:
-// TODO
 
 ### Test Job Configuration
 

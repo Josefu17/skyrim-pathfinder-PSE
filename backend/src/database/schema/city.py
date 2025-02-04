@@ -1,4 +1,4 @@
-""" Python file for database class City"""
+"""Python file for database class City"""
 
 from sqlalchemy import ForeignKey, String, Column, Integer
 

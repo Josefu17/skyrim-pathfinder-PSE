@@ -67,6 +67,8 @@ def get_route(start_city_name, end_city_name, data, headers):
                 else {}
             )
 
+            second_distance = -1 if second_distance == float("inf") else second_distance
+
             result = {
                 "route": path_names,
                 "distance": round(distance, 2),

@@ -3,7 +3,6 @@
 # Requirements of Stage 2
 
 ## **Requirements from Previous Stage**
-- **Complete any missing requirements from Stage 1.**  
   For remaining tasks, kindly refer to: [Stage 2](stage_2.md)  
 
 ---

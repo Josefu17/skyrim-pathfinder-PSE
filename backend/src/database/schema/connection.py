@@ -1,4 +1,4 @@
-""" Python file for database class Connection"""
+"""Python file for database class Connection"""
 
 from sqlalchemy import ForeignKey, Column, Integer
 

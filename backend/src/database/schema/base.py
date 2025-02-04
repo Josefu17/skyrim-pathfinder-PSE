@@ -1,4 +1,4 @@
-""" Python file for database base class Base"""
+"""Python file for database base class Base"""
 
 from sqlalchemy.orm import declarative_base
 
