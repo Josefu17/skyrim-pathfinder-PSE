@@ -114,22 +114,41 @@ deploy-job:
   - name: "${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:27.5.1-dind"
     alias: docker
   variables:
-    SECURE_FILES_DOWNLOAD_PATH: "$SECURE_FILES_PATH"
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ''
   before_script:
     - apk add --no-cache curl bash
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer"
       | bash
-    - apk add --no-cache make openssh-client
-    - mv $SECURE_FILES_DOWNLOAD_PATH/.env.production ./frontend/.env.production
-    - docker info
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    # Prepare SSH configuration
+    - echo "Setting up SSH for deployment..."
+    - mkdir -p ~/.ssh
+    - mv "$SECURE_FILES_PATH/ci_ssh" ~/.ssh/
+    - chmod 600 ~/.ssh/ci_ssh
+    - ssh-keyscan -H group2.osnet.h-da.cloud >> ~/.ssh/known_hosts
+    - mv $SECURE_FILES_PATH/.env.production ./frontend/.env.production
   script:
-    - echo "Deploying to production server"
-    - chmod +x ./scripts/establish_ssh_connection.sh
-    - "./scripts/establish_ssh_connection.sh"
-    - ssh -v -i ~/.ssh/ci_ssh debian@group2.osnet.h-da.cloud "make update && echo 'Successfully
-      deployed' && exit"
+    - echo "Building and pushing Docker images..."
+    - docker-compose build
+    - docker-compose push
+
+    - echo "Transferring docker-compose.yaml and .env to deployment server..."
+    - scp -i ~/.ssh/ci_ssh ./docker-compose.yaml debian@group2.osnet.h-da.cloud:/home/debian/app/
+    - scp -i ~/.ssh/ci_ssh $SECURE_FILES_PATH/.env debian@group2.osnet.h-da.cloud:/home/debian/app/
+    - echo "Connecting to the deployment server..."
+    - ssh -i ~/.ssh/ci_ssh debian@group2.osnet.h-da.cloud "
+        cd /home/debian/app &&
+        docker-compose pull &&
+        docker-compose down &&
+        docker-compose up -d --remove-orphans &&
+        
+        rm -f .env &&
+        echo 'Deployment successful!'
+      "
+  after_script:
+    # Cleanup SSH key
+    - rm -rf ~/.ssh
   needs:
     - analyze-backend
     - analyze-frontend

@@ -5,13 +5,13 @@ import time
 
 from flask import jsonify, request
 from opentelemetry.trace import get_tracer
-from opentelemetry.trace.status import StatusCode
 
 from backend.src.database.dao.route_dao import RouteDao
 from backend.src.database.db_connection import get_db_session
 from backend.src.database.schema.route import Route, RouteFilter, OptionalRouteFilters
 from backend.src.utils.helpers import get_logging_configuration, metrics_logger
 from backend.src.utils.prometheus_converter import make_prometheus_conform
+from backend.src.utils.tracing import set_span_attributes, set_span_error_flags
 from backend.src.web_backend.web_backend_service import (
     fetch_route_from_navigation_service,
 )
@@ -86,8 +86,7 @@ def calculate_route(user_id, map_id):
             logger.error("Start and end cities are required but at least one of them is missing")
             metrics_logger.incr("m_error_missing_city")
             metrics_logger.decr("m_concurrent_requests")
-            span.set_status(StatusCode.ERROR)
-            span.record_exception(ValueError("Start and end cities are required"))
+            set_span_error_flags(span, ValueError("Start and end cities are required"))
 
             return (
                 jsonify({"error": "Start and end cities are required"}),
@@ -104,8 +103,7 @@ def calculate_route(user_id, map_id):
                 logger.error("Error calculating route: %s", route_result["error"])
                 metrics_logger.incr("m_error_calculating_route")
                 metrics_logger.decr("m_concurrent_requests")
-                span.set_status(StatusCode.ERROR)
-                span.record_exception(Exception(route_result["error"]))
+                set_span_error_flags(span, Exception(route_result["error"]))
 
                 return jsonify(route_result), 400
 
@@ -151,13 +149,11 @@ def calculate_route(user_id, map_id):
 def delete_route(user_id, route_id):
     """Delete a route from a user's route history."""
     with tracer.start_as_current_span("delete_route") as span:
-        span.set_attribute("user_id", user_id)
-        span.set_attribute("route_id", route_id)
+        set_span_attributes(span, {"user_id": user_id, "route_id": route_id})
 
         if not user_id or not route_id:
             logger.error("user_id and route_id are required but at least one of them is missing")
-            span.set_status(StatusCode.ERROR)
-            span.record_exception(ValueError("user_id and route_id are required"))
+            set_span_error_flags(span, ValueError("user_id and route_id are required"))
 
             return jsonify({"error": "user_id and route_id are required"}), 400
 
@@ -166,8 +162,7 @@ def delete_route(user_id, route_id):
             if not route or route.user_id != int(user_id):
                 logger.error("Route with id %s not found.", route_id)
                 metrics_logger.incr("m_error_route_not_found")
-                span.set_status(StatusCode.ERROR)
-                span.record_exception(ValueError("Route not found"))
+                set_span_error_flags(span, ValueError("Route not found"))
 
                 return jsonify({"error": "Route not found"}), 404
 
@@ -237,11 +232,7 @@ def get_user_history(user_id):
 def clear_user_history(user_id=None, user_name=None, map_id=None):
     """Clear the route history for a user by user_id, user_name, or map_id."""
     with tracer.start_as_current_span("clear_user_history") as span:
-        span.set_attribute("user_id", user_id)
-        span.set_attribute("user_name", user_name)
-        span.set_attribute("map_id", map_id)
-
-        logger.info("Clearing user history function %s.", user_id or user_name)
+        set_span_attributes(span, {"user_id": user_id, "user_name": user_name, "map_id": map_id})
 
         if not user_id and not user_name:
             logger.error("Either user_id or user_name is required but both are missing")

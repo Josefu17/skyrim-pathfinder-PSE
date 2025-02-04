@@ -24,3 +24,4 @@ opentelemetry-instrumentation-flask
 opentelemetry-instrumentation-grpc
 opentelemetry-instrumentation-requests
 opentelemetry-semantic-conventions
+opentelemetry-instrumentation-sqlalchemy

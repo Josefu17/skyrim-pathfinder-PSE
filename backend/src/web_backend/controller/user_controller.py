@@ -2,13 +2,12 @@
 
 from flask import request, jsonify
 from opentelemetry.trace import get_tracer
-from opentelemetry.trace.status import StatusCode
-
 
 from backend.src.database.dao.user_dao import UserDao
 from backend.src.database.db_connection import get_db_session
 from backend.src.database.schema.user import User
 from backend.src.utils.helpers import get_logging_configuration, metrics_logger
+from backend.src.utils.tracing import set_span_error_flags
 
 logger = get_logging_configuration()
 tracer = get_tracer("user-controller")
@@ -33,16 +32,12 @@ def register_user():
         span.set_attribute("username", username)
 
         if not username:
-            metrics_logger.incr("m_error_missing_username")
-            span.set_status(StatusCode.ERROR)
-            span.record_exception(ValueError(USER_NAME_REQUIRED))
-            return jsonify({"error": USER_NAME_REQUIRED}), 400
+            return handle_user_name_required(span)
 
         with get_db_session() as session:
             if UserDao.user_exists_by_username(username, session):
                 metrics_logger.incr("m_error_existing_username")
-                span.set_status(StatusCode.ERROR)
-                span.record_exception(ValueError("Username already exists"))
+                set_span_error_flags(span, ValueError("Username already exists"))
                 return jsonify({"error": "Username already exists"}), 400
 
             user = User(username=username)
@@ -69,18 +64,14 @@ def login_user():
         span.set_attribute("username", username)
 
         if not username:
-            metrics_logger.incr("m_error_missing_username")
-            span.set_status(StatusCode.ERROR)
-            span.record_exception(ValueError("Username is required"))
-            return jsonify({"error": USER_NAME_REQUIRED}), 400
+            return handle_user_name_required(span)
 
         with get_db_session() as session:
             user = UserDao.get_user_by_username(username, session)
 
             if not user:
                 metrics_logger.incr("m_error_user_not_found")
-                span.set_status(StatusCode.ERROR)
-                span.record_exception(ValueError("User not found"))
+                set_span_error_flags(span, ValueError("User not found"))
                 return jsonify({"error": "User not found"}), 404
 
         logger.info("Logging in user: %s", username)
@@ -94,3 +85,10 @@ def login_user():
             ),
             200,
         )
+
+
+def handle_user_name_required(span):
+    """missing username handler"""
+    metrics_logger.incr("m_error_missing_username")
+    set_span_error_flags(span, ValueError(USER_NAME_REQUIRED))
+    return jsonify({"error": USER_NAME_REQUIRED}), 400

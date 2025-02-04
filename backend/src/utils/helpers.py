@@ -1,10 +1,9 @@
 """Python file for general-purpose helper functions"""
 
-import logging
-import os
 from datetime import datetime
+
+import logging
 import redis
-from dotenv import load_dotenv
 
 redis_instance = redis.StrictRedis(host="redis", port=6379, db=0)
 
@@ -101,15 +100,5 @@ def get_logging_configuration():
 
 
 logger = get_logging_configuration()
-
-
-def load_dotenv_if_exists(path):
-    """Load .env file if it exists"""
-    if os.path.exists(path):
-        load_dotenv(path)
-        logger.info("Loaded .env file", extra={"path": path, "timestamp": datetime.now()})
-    else:
-        logger.warning(".env file not found", extra={"path": path, "timestamp": datetime.now()})
-
 
 metrics_logger = MetricsLogger(redis_instance)
