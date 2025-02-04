@@ -77,7 +77,9 @@ def test_fetch_route_xmlrpc_error(mock_connection_dao, mock_city_dao, mock_serve
 
     # Call the function with mock session and assert results
     result = fetch_route_from_navigation_service(1, "Markarth", "Riften", mock_session)
-    assert result == "XML-RPC error: Error('An XML-RPC error occurred')"
+    assert result == {
+        "error": "Error occurred while fetching the route: Error('An XML-RPC error occurred')"
+    }
 
 
 @patch("backend.src.web_backend.web_backend_service.xmlrpc.client.ServerProxy")
@@ -96,7 +98,7 @@ def test_fetch_route_network_error(mock_connection_dao, mock_city_dao, mock_serv
 
     # Call the function with mock session and assert results
     result = fetch_route_from_navigation_service(1, "Markarth", "Riften", mock_session)
-    assert result == "Connection error: A network error occurred"
+    assert result == {"error": "Error occurred while fetching the route: A network error occurred"}
 
 
 @patch("backend.src.web_backend.web_backend_service.CityDao")

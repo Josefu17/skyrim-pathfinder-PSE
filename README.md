@@ -186,7 +186,7 @@ The seeding script relies on environment variables for database credentials. Add
 
 **Note**: Ensure the environment variables are set correctly to allow communication with the database from your local machine.
 
-By default:
+By default,
 - `DB_PORT` is set to `5433` (as per the current Docker Compose configuration).
 - `DB_HOST` is set to `localhost` for local connections.
 
@@ -239,7 +239,7 @@ DB_DATABASE=<your_db_name>
    - example curl commands:
      - `curl -X GET http://localhost:4243/maps`
      - `curl -X GET http://localhost:4243/cities`
-   - For our postman collection, please refer to [Postman Collection](docs/Postman/PSE.postman_collection.json)
+   - For our postman collection, please refer to [Postman Collection](docs/Postman/PSE%20API.postman_collection.json)
    or [Documentation.](#postman-collection)
 
 [back to top](#table-of-contents)

@@ -1,5 +1,5 @@
 """
-Registers the `get_route` function as an XML-RPC method and starts the server 
+Registers the `get_route` function as an XML-RPC method and starts the server
 to listen for incoming requests.
 """
 

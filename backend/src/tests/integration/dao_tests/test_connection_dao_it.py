@@ -1,5 +1,8 @@
 """integration tests for Connection and ConnectionDao"""
 
+from unittest.mock import Mock
+import pytest
+from sqlalchemy.orm import Session
 from backend.src.database.dao.connection_dao import ConnectionDao
 from backend.src.database.schema.city import City
 from backend.src.database.schema.connection import Connection
@@ -66,6 +69,21 @@ def test_save_connections_bulk(db):
 
     # Assert
     assert_connections_exist(retrieved_connections, [(city1.id, city2.id), (city2.id, city1.id)])
+
+
+def test_save_connections_bulk_exception_handling():
+    """Test exception handling in save_connections_bulk method."""
+    # Arrange
+    session = Mock(spec=Session)
+    connections = [Mock(spec=Connection)]
+    session.bulk_save_objects.side_effect = Exception("Test exception")
+
+    # Act & Assert
+    with pytest.raises(Exception, match="Test exception"):
+        ConnectionDao.save_connections_bulk(connections, session)
+
+    session.rollback.assert_called_once()
+    session.commit.assert_not_called()
 
 
 def assert_connections_exist(connections, expected_pairs):

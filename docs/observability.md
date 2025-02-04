@@ -92,7 +92,7 @@ Now, that we can see the execution time, which is `0.02926...` seconds in this c
 
 This question is theoretically as easy as the last one. We just have to look at the Grafana panel, which `sums the anonymous and registered route-calculation count and takes the last/highest value of its interval-time-frame which is set to one day`. Sadly we are currently struggling to set the rules for the panel as just described. (The problem in this case is the time-interval-setting.)
 
-For now we have a graph for the time frame of one day:
+For now, we have a graph for the time frame of one day:
 ![grafana_traffic_daily_calculation_count_dashboard](./images/grafana_traffic_daily_calculation_count_dashboard.png)
 
 ### Question 3
@@ -109,7 +109,7 @@ As we can see there are `4 users logged` in.
 
 `What is the average time taken for route calculations?`
 
-Since we have _two different metrics for route calculations_(ananymous and registered) we will have to answer it for both respectively:
+Since we have _two different metrics for route calculations_(anonymous and registered) we will have to answer it for both respectively:
 
 The average time for `anonymous route calculation`:
 ![grafana_latency_anonymous_calculation_count_dashboard](./images/grafana_latency_anonymous_calculation_count_dashboard.png)

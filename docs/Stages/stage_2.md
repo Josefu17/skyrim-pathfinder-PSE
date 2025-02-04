@@ -7,12 +7,14 @@
 # Requirements of Stage 2
 
 ## **Requirements from Previous Stage**
-- **Complete any missing requirements from Stage 1.**  
-  For remaining tasks, kindly refer to: [Stage 1](stage_1.md#remaining-tasks)  
+
+### All done ✅
 
 ---
 
-## **New Requirements**
+### **New Requirements**
+- **[Integration Tests (Optional, Bonus Points)](#testing)** ❌ Pending 
+---
 
 ### **Dependency Management**
 - **[Regular Updates via Renovate Tool](../DevExp.md#automated-dependency-updates-with-renovate)**  
@@ -29,7 +31,7 @@
 ---
 
 ### **Testing**
-- **[Integration Tests (Optional, Bonus Points)](../ci-cd.md#integration-tests)**  
+- **[Integration Tests (Optional, Bonus Points)]()**  
   - **Automate a test that starts all services and performs at least one route calculation**  
     ❌ Pending  
 

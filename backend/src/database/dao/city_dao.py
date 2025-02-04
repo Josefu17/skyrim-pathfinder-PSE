@@ -54,3 +54,10 @@ class CityDao:
             session.commit()
             return True
         return False
+
+    @staticmethod
+    def get_city_suggestions(session: Session, map_id: int, query: str):
+        """Get city suggestions based on the query."""
+        return (
+            session.query(City).filter(City.map_id == map_id, City.name.ilike(f"%{query}%")).all()
+        )
