@@ -4,16 +4,14 @@ import '@testing-library/jest-dom'; // For better matcher like `toBeInTheDocumen
 import React from 'react';
 
 import { useAuth } from '../../src/contexts/authContext';
-import { renderWithAuthProvider } from '../skip.support.test';
-
-// Mock localStorage
-const mockUser = { id: 1, username: 'test_user' };
+import { renderWithContextProviders, testUser } from '../skip.support.test';
+import { USER } from '../../src/support/support';
 
 describe('AuthContext', () => {
     beforeEach(() => {
         vi.spyOn(Storage.prototype, 'getItem').mockImplementation((key) => {
-            if (key === 'user') {
-                return JSON.stringify(mockUser); // Return a mock user
+            if (key === USER) {
+                return JSON.stringify(testUser); // Return a mock user
             }
             return null;
         });
@@ -30,31 +28,33 @@ describe('AuthContext', () => {
         // Custom Test Component to consume the context
         const TestComponent = () => {
             const { user } = useAuth();
-            return <div>{user ? `Hello, ${user.username}` : 'No user'}</div>;
+            return <p>{user ? `Hello, ${user.username}` : 'No user'}</p>;
         };
 
-        renderWithAuthProvider(TestComponent);
+        renderWithContextProviders(TestComponent, testUser);
 
         // Expect the user to be loaded from localStorage
-        expect(screen.getByText('Hello, test_user')).toBeInTheDocument();
+        expect(screen.getByText('Hello, test')).toBeInTheDocument();
     });
 
     it('should set user to null if localStorage contains invalid JSON', () => {
-        // Mock localStorage to return invalid JSON
-        vi.spyOn(Storage.prototype, 'getItem').mockImplementation(
-            () => 'invalid-json'
-        );
-
         const consoleErrorSpy = vi
             .spyOn(console, 'error')
             .mockImplementation(() => {});
 
         const TestComponent = () => {
             const { user } = useAuth();
-            return <div>{user ? `User: ${user.username}` : 'No user'}</div>;
+            return <p>{user ? `User: ${user.username}` : 'No user'}</p>;
         };
 
-        renderWithAuthProvider(TestComponent);
+        // Mock localStorage to return invalid JSON
+        renderWithContextProviders(
+            TestComponent,
+            null,
+            null,
+            {},
+            { useLocal: true, localStorage: 'invalid JSON' }
+        );
 
         // Expect the user to be null due to invalid JSON
         expect(screen.getByText('No user')).toBeInTheDocument();
@@ -74,10 +74,10 @@ describe('AuthContext', () => {
 
         const TestComponent = () => {
             const { user } = useAuth();
-            return <div>{user ? `User: ${user.username}` : 'No user'}</div>;
+            return <p>{user ? `User: ${user.username}` : 'No user'}</p>;
         };
 
-        renderWithAuthProvider(TestComponent);
+        renderWithContextProviders(TestComponent);
 
         // Expect the user to be null and "No user" to be displayed
         expect(screen.getByText('No user')).toBeInTheDocument();
@@ -86,7 +86,7 @@ describe('AuthContext', () => {
     it('should throw an error if useAuth is used outside of AuthProvider', () => {
         const TestComponent = () => {
             useAuth();
-            return <div>Test</div>;
+            return <p>Test</p>;
         };
 
         // Render die Komponente ohne den AuthProvider

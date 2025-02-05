@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { act } from 'react';
 
 import {
-    renderWithAuthProvider,
+    renderWithContextProviders,
     testUser,
     mockRoutesData,
     mockCities,
@@ -35,7 +35,7 @@ describe('DisplayRoutes', () => {
     });
 
     it('should show login request when user is loading', () => {
-        renderWithAuthProvider(DisplayRoutes); // Kein User, um den Ladezustand zu testen
+        renderWithContextProviders(DisplayRoutes); // Kein User, um den Ladezustand zu testen
 
         expect(
             screen.getByText('Please log in to view routes.')
@@ -43,7 +43,7 @@ describe('DisplayRoutes', () => {
     });
 
     it('should render routes when user is logged in and routes are fetched', async () => {
-        renderWithAuthProvider(DisplayRoutes, testUser);
+        renderWithContextProviders(DisplayRoutes, testUser);
 
         // Check if the user-specific message is present
         expect(
@@ -59,7 +59,7 @@ describe('DisplayRoutes', () => {
     });
 
     it('should allow deleting a route when in deletion mode', async () => {
-        renderWithAuthProvider(DisplayRoutes, testUser);
+        renderWithContextProviders(DisplayRoutes, testUser);
 
         // Enter deletion mode
         act(() => {
@@ -87,7 +87,7 @@ describe('DisplayRoutes', () => {
     });
 
     it('should render optional parameters when the button is clicked', async () => {
-        renderWithAuthProvider(DisplayRoutes, testUser); // testUser wird gesetzt
+        renderWithContextProviders(DisplayRoutes, testUser); // testUser wird gesetzt
 
         act(() => {
             fireEvent.click(screen.getByText('Show more options'));
@@ -105,7 +105,7 @@ describe('DisplayRoutes', () => {
             .spyOn(console, 'log')
             .mockImplementationOnce(() => {});
 
-        renderWithAuthProvider(DisplayRoutes, testUser); // testUser is provided
+        renderWithContextProviders(DisplayRoutes, testUser); // testUser is provided
 
         // Enter deletion mode
         act(() => {
@@ -145,7 +145,7 @@ describe('DisplayRoutes', () => {
             .mockImplementation(() => {});
 
         // Render the component with mocked auth
-        renderWithAuthProvider(DisplayRoutes, testUser);
+        renderWithContextProviders(DisplayRoutes, testUser);
 
         expect(
             screen.getByText(`Routes History of ${testUser.username}`)
@@ -185,7 +185,7 @@ describe('DisplayRoutes', () => {
             .mockImplementation(() => {});
 
         // Render the component with mocked auth
-        renderWithAuthProvider(DisplayRoutes, testUser);
+        renderWithContextProviders(DisplayRoutes, testUser);
 
         // Wait for routes to load
         await waitFor(() => screen.getByText('Karthwasten to Rorikstead'));
@@ -248,7 +248,7 @@ describe('DisplayRoutes', () => {
             .mockImplementation(() => {});
 
         // Render the component with mocked auth
-        renderWithAuthProvider(DisplayRoutes, testUser);
+        renderWithContextProviders(DisplayRoutes, testUser);
 
         // Wait for routes to load
         await waitFor(() => screen.getByText('Karthwasten to Rorikstead'));
@@ -287,7 +287,7 @@ describe('DisplayRoutes', () => {
     });
 
     it('renders dropdowns with all options initially', async () => {
-        renderWithAuthProvider(DisplayRoutes, testUser, {
+        renderWithContextProviders(DisplayRoutes, testUser, null, {
             defaultOptionalParametersVisible: true,
         });
 
@@ -305,7 +305,7 @@ describe('DisplayRoutes', () => {
     });
 
     it.skip('sorts routes ascending when the checkbox is unchecked', async () => {
-        renderWithAuthProvider(DisplayRoutes, testUser, {
+        renderWithContextProviders(DisplayRoutes, testUser, null, {
             defaultOptionalParametersVisible: false,
             defaultFilterOptions: {
                 limit: 1,
@@ -355,7 +355,7 @@ describe('DisplayRoutes', () => {
     });
 
     it.skip('excludes the startpoint from endpoint options when selected', async () => {
-        renderWithAuthProvider(DisplayRoutes, testUser, {
+        renderWithContextProviders(DisplayRoutes, testUser, null, {
             defaultOptionalParametersVisible: true,
         });
 
@@ -384,7 +384,7 @@ describe('DisplayRoutes', () => {
     });
 
     it.skip('excludes the endpoint from startpoint options when selected', async () => {
-        renderWithAuthProvider(DisplayRoutes, testUser, {
+        renderWithContextProviders(DisplayRoutes, testUser, null, {
             defaultOptionalParametersVisible: true,
         });
 
@@ -423,7 +423,7 @@ describe('DisplayRoutes', () => {
     });
 
     it.skip('restores options correctly when dropdowns are cleared', async () => {
-        renderWithAuthProvider(DisplayRoutes, testUser, {
+        renderWithContextProviders(DisplayRoutes, testUser, null, {
             defaultOptionalParametersVisible: true,
         });
 

@@ -1,32 +1,26 @@
-#map {
-    background-image: url('../assets/skyrim_map.svg');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
+#map-selector {
+    /* self */
+    pointer-events: none;
+    z-index: 1;
+
+    /* size */
+    max-height: 5%;
+    min-height: fit-content;
+
+    /* text */
+    text-align: center;
+
+    /* visual */
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 0.1rem;
 }
 
-#map > g > text {
-    font-size: 5rem;
-    color: black;
-    font-weight: bold;
-    pointer-events: 'none';
-    user-select: none;
+#map-selector > * {
+    /* self */
+    margin: 0rem;
 }
 
-#map > g > circle {
-    cursor: pointer;
-}
-
-#distance {
-    margin-top: 0.5rem;
-    margin-bottom: 0rem;
-    font-size: 1.5rem;
-}
-
-#toggle-route {
-    margin-top: 1rem;
-}
-
-#endpoint {
-    cursor: pointer;
+#map-selector > select {
+    /* self */
+    pointer-events: auto;
 }

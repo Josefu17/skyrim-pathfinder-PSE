@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { App } from './App.tsx';
 import { AuthProvider } from './contexts/authContext.tsx';
+import { MapProvider } from './contexts/mapContext.tsx';
 import './styles/index.css';
 
 const queryClient = new QueryClient();
@@ -11,9 +12,11 @@ const queryClient = new QueryClient();
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <AuthProvider>
-            <QueryClientProvider client={queryClient}>
-                <App />
-            </QueryClientProvider>
+            <MapProvider>
+                <QueryClientProvider client={queryClient}>
+                    <App />
+                </QueryClientProvider>
+            </MapProvider>
         </AuthProvider>
     </StrictMode>
 );

@@ -5,12 +5,18 @@ import {
     TRouteData,
     TConnection,
     TCity,
+    TMap,
 } from '../types';
 import { useAuth } from '../contexts/authContext';
+import { useMap } from '../contexts/mapContext';
+import '../styles/interactiveMap.css';
 
 export const InteractiveMap = () => {
+    const { user } = useAuth();
+    const { currentMap } = useMap();
     const [cities, setCities] = useState<TCities | null>(null);
     const [connections, setConnections] = useState<TConnections | null>(null);
+    const [mapData, setMapData] = useState<TMap | null>(null);
     const [startpoint, setStartpoint] = useState('');
     const [endpoint, setEndpoint] = useState('');
     const [routeData, setRouteData] = useState<TRouteData | null>(null);
@@ -18,7 +24,7 @@ export const InteractiveMap = () => {
     const routeDistance = alternative
         ? routeData?.alternative_distance
         : routeData?.distance;
-    const { user } = useAuth();
+    let keyCounter = 0;
 
     const getCityCoordinates = (id: number | undefined): TCity | null => {
         const city = cities?.find((city) => city.id === id);
@@ -41,28 +47,28 @@ export const InteractiveMap = () => {
         const fetchMapData = async () => {
             try {
                 const response = await fetch(
-                    `${import.meta.env.VITE_URL}/maps?name=skyrim`
+                    `${import.meta.env.VITE_URL}/maps?name=${currentMap?.name}`
                 );
                 const data = await response.json();
                 setCities(data.cities);
+                setMapData(data.map);
                 setConnections(data.connections);
             } catch (error) {
                 console.error('Error fetching map data:', error);
             }
         };
         fetchMapData();
-    }, []);
+    }, [currentMap]);
 
     useEffect(() => {
         const fetchRouteData = async () => {
-            if (user === undefined) return; // Warten, bis der Benutzerstatus feststeht
+            if (user === undefined) return;
             if (startpoint && endpoint) {
                 try {
-                    console.log('Test user:', user); // Sollte null sein
                     const url =
                         user !== null && user !== undefined
-                            ? `${import.meta.env.VITE_URL}/users/${user?.id}/maps/1/routes`
-                            : `${import.meta.env.VITE_URL}/maps/1/routes`;
+                            ? `${import.meta.env.VITE_URL}/users/${user?.id}/maps/${currentMap?.id}/routes`
+                            : `${import.meta.env.VITE_URL}/maps/${currentMap?.id}/routes`;
                     const response = await fetch(url, {
                         method: 'POST',
                         headers: {
@@ -86,12 +92,19 @@ export const InteractiveMap = () => {
         fetchRouteData();
     }, [startpoint, endpoint]);
 
+    const handleTextSize = (): string => {
+        // TODO: dynamic textSize calculation for all maps
+        const mapSizeFactor = ((mapData?.size_x ?? 1000) * (mapData?.size_y ?? 1000) % 1000);
+        console.log('mapSizeFactor:', mapSizeFactor);
+        return `calc(5rem + 0.5vw)`;
+    };
+
     return (
-        <>
+        <section id="interactive-map">
             <svg
                 id="map"
                 xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 3066 2326"
+                viewBox={`0 0 ${mapData?.size_x ?? 1000} ${mapData?.size_y ?? 1000}`}
             >
                 {/* draw connections */}
                 {connections?.map((connection: TConnection) => {
@@ -104,7 +117,7 @@ export const InteractiveMap = () => {
 
                     return (
                         <line
-                            key={`${connection.parent_city_id}-${connection.child_city_id}`}
+                            key={`${connection.parent_city_id}-${connection.child_city_id}-${keyCounter++}`}
                             x1={fromCity.position_x}
                             y1={fromCity.position_y}
                             x2={toCity.position_x}
@@ -138,7 +151,7 @@ export const InteractiveMap = () => {
 
                         return (
                             <line
-                                key={`route-${fromCity.id}-${toCity.id}`}
+                                key={`route-${fromCity.id}-${toCity.id}-${keyCounter++}`}
                                 x1={fromCity.position_x}
                                 y1={fromCity.position_y}
                                 x2={toCity.position_x}
@@ -167,12 +180,11 @@ export const InteractiveMap = () => {
                         return 'brown'; // Default color
                     };
                     return (
-                        <g key={city.id}>
+                        <g key={`${city.id}-${keyCounter++}`}>
                             <text
-                                fontSize={90}
+                                fontSize={handleTextSize()}
                                 x={city.position_x}
                                 y={city.position_y + 80}
-                                textAnchor="middle"
                             >
                                 {city.name}
                             </text>
@@ -180,7 +192,7 @@ export const InteractiveMap = () => {
                                 id={`endpoint-${city.id}`}
                                 cx={city.position_x}
                                 cy={city.position_y}
-                                r="1.5rem"
+                                r={`calc(5rem * ${(mapData?.size_x ?? 10000) / 10000})`}
                                 fill={getCityColor()}
                                 onClick={() => {
                                     if (!startpoint) {
@@ -220,6 +232,6 @@ export const InteractiveMap = () => {
                     setAlternative(!alternative);
                 }}
             />
-        </>
+        </section>
     );
 };

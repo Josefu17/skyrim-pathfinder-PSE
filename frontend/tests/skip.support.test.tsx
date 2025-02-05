@@ -1,30 +1,54 @@
 import { AuthProvider, useAuth } from '../src/contexts/authContext';
+import { MapProvider, useMap } from '../src/contexts/mapContext';
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import React, { act, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import { TUser } from '../src/types';
+import { TMap, TUser } from '../src/types';
 import { vi } from 'vitest';
 
 // Rendering function that wraps the component in the AuthProvider
-export const renderWithAuthProvider = (
+export const renderWithContextProviders = (
     Component: React.ElementType,
     user: TUser | null = null,
-    props: Record<string, string | number | boolean | object> = {}
+    map: TMap | null = null,
+    props: Record<string, string | number | boolean | object> = {},
+    mockLocal: TUseLocal = { useLocal: false, localStorage: null },
 ) => {
     const queryClient = createMockQueryClient();
+
     return render(
         <QueryClientProvider client={queryClient}>
             <AuthProvider>
-                {user ? (
-                    <AuthProviderWithUser user={user}>
-                        <Component {...props} />
+                {user || mockLocal.useLocal ? (
+                    <AuthProviderWithUser user={user} mockLocal={mockLocal}>
+                        <MapProvider>
+                            {map || mockLocal.useLocal ? (
+                                <MapProviderWithMap
+                                    map={map}
+                                    mockLocal={mockLocal}
+                                >
+                                    <Component {...props} />
+                                </MapProviderWithMap>
+                            ) : (
+                                <Component {...props} />
+                            )}
+                        </MapProvider>
                     </AuthProviderWithUser>
                 ) : (
-                    <Component {...props} />
+                    <MapProvider>
+                        {map || mockLocal.useLocal ? (
+                            <MapProviderWithMap map={map} mockLocal={mockLocal}>
+                                <Component {...props} />
+                            </MapProviderWithMap>
+                        ) : (
+                            <Component {...props} />
+                        )}
+                    </MapProvider>
                 )}
             </AuthProvider>
-        </QueryClientProvider>
+        </QueryClientProvider>,
+        {}
     );
 };
 
@@ -32,11 +56,20 @@ export const renderWithAuthProvider = (
 const AuthProviderWithUser = ({
     children,
     user,
+    mockLocal,
 }: {
     children: React.ReactNode;
-    user: TUser;
+    user: TUser | null;
+    mockLocal: TUseLocal;
 }) => {
     const { setUser, loading } = useAuth();
+
+    if (mockLocal.useLocal) {
+        vi.spyOn(
+            Object.getPrototypeOf(window.localStorage),
+            'getItem'
+        ).mockImplementation(() => mockLocal.localStorage);
+    }
 
     useEffect(() => {
         setUser(user); // Set the user in the context
@@ -49,6 +82,41 @@ const AuthProviderWithUser = ({
     return <>{children}</>;
 };
 
+// MapProviderWithMap sets the map context for the test
+const MapProviderWithMap = ({
+    children,
+    map,
+    mockLocal,
+}: {
+    children: React.ReactNode;
+    map: TMap | null;
+    mockLocal: TUseLocal;
+}) => {
+    const { setCurrentMap, loading } = useMap();
+
+    if (mockLocal.useLocal) {
+        vi.spyOn(
+            Object.getPrototypeOf(window.localStorage),
+            'getItem'
+        ).mockImplementation(() => mockLocal.localStorage);
+    }
+
+    useEffect(() => {
+        setCurrentMap(map); // Set the map in the context
+    }, [loading]);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    return <>{children}</>;
+};
+
+type TUseLocal = {
+    useLocal: boolean;
+    localStorage: TUser | TMap | string | null | undefined;
+};
+
 // Mocks for the tests
 
 export const testUser: TUser = {
@@ -56,21 +124,26 @@ export const testUser: TUser = {
     username: 'test',
 };
 
+export const testMap: TMap = {
+    id: 1,
+    name: 'skyrim',
+};
+
 // Mock data for the map and routes
 export const mockFetch = vi.fn().mockImplementation(async (url) => {
-    if (url.includes('/users/1/routes')) {
+    if (url.includes('/users/1/maps/1/routes')) {
         return {
             ok: true,
             json: async () => mockRoutesData,
         };
-    } else if (url.includes('/cities')) {
+    } else if (url.includes('/cities?map_id=')) {
         return {
             ok: true,
             json: async () => ({
                 cities: mockCitiesWithoutConnections,
             }),
         };
-    } else if (url.includes('/maps')) {
+    } else if (url.includes('/maps?name')) {
         return {
             ok: true,
             json: async () => mockMapData,
@@ -80,6 +153,11 @@ export const mockFetch = vi.fn().mockImplementation(async (url) => {
             ok: true,
             text: () => Promise.resolve('[Main Documentation](../other.md)'),
         });
+    } else if (url.includes('/maps')) {
+        return {
+            ok: true,
+            json: async () => mockMapList,
+        };
     }
     return Promise.reject(new Error('Not Found'));
 });
@@ -146,6 +224,19 @@ export const mockMapData = {
         size_x: 3066,
         size_y: 2326,
     },
+};
+
+export const mockMapList = {
+    maps: [
+        {
+            id: 1,
+            name: 'skyrim',
+        },
+        {
+            id: 2,
+            name: '10',
+        },
+    ],
 };
 
 export const mockRouteData = {
@@ -217,6 +308,7 @@ export const changePage = async (container: HTMLElement, href: string) => {
     act(() => {
         fireEvent.click(routePageButton);
     });
+    console.log('Page changed to:', href);
 };
 
 // Error throwing component

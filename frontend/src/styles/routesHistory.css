@@ -1,4 +1,5 @@
 #manage-routes-section {
+    /* self */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -7,50 +8,75 @@
 }
 
 #manage-routes-section > * {
+    /* self */
     margin-bottom: 0.7rem;
 }
 
 #manage-routes-section > article {
-    flex-shrink: 0;
+    /* self */
     display: flex;
     flex-direction: row;
+    flex-shrink: 0;
 }
 
 #manage-routes-section > article > * {
-    margin-right: 0.7rem;
+    /* self */
+    margin-right: 0.5rem;
 }
+
 #routes-section {
-    text-align: center;
+    /* self */
     border-top: solid 0.1rem white;
-    max-height: parent;
-    max-width: parent;
-    width: inherit;
     flex-grow: 3;
-    padding: 1.5rem;
-    overflow-y: auto;
+    max-height: inherit;
+    min-width: fit-content;
     overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0 3rem;
+    text-align: center;
+    scrollbar-width: none;
 }
 
 #routes-list {
+    /* self */
+    align-items: center;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: left;
     padding: 0;
+    text-align: left;
 }
 
 #routes-list > * {
+    /* self */
     list-style-type: none;
-    margin-bottom: 0.7rem;
+    margin-bottom: 0.5rem;
 }
 
 #routes-list > li > .selectable {
+    /* self */
     background-color: darkred;
 }
 
 #limit {
+    /* self */
+    padding: 0.2rem;
     width: 1.5rem;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 0.3rem;
+}
+
+@media (min-width: 1024px), (min-aspect-ratio: 1/1) {
+    #manage-routes-section > article > * {
+        /* self */
+        margin-right: 0.7rem;
+    }
+
+    #routes-list > * {
+        /* self */
+        margin-bottom: 0.7rem;
+    }
+
+    #limit {
+        /* self */
+        padding: 0.3rem;
+        width: 2rem;
+    }
 }

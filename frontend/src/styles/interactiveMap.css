@@ -1,0 +1,112 @@
+#interactive-map {
+    /* self */
+    display: flex;
+    flex-direction: column;
+
+    /* alignment */
+    align-items: center;
+    justify-content: center;
+
+    /* size */
+    height: 85%;
+    width: 99%;
+
+    /* spacing */
+    margin-bottom: 5rem;
+}
+
+#map {
+    /* self */
+    overflow-y: auto;
+
+    /* background */
+    background-image: url('../assets/skyrim_map2.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#map > g > text {
+    /* text */
+    color: black;
+    font-family: 'Old English Text MT', 'Times New Roman', serif;
+    font-weight: bold;
+    text-anchor: middle;
+    text-shadow:
+        -0.1rem -0.1rem 1rem rgba(255, 255, 255, 0.9),
+        0.1rem -0.1rem 1rem rgba(255, 255, 255, 0.9),
+        -0.1rem 0.1rem 1rem rgba(255, 255, 255, 0.9),
+        0.1rem 0.1rem 1rem rgba(255, 255, 255, 0.9);
+
+    /* interaction */
+    pointer-events: 'none';
+    user-select: none;
+}
+
+#map > g > circle {
+    /* interaction */
+    cursor: pointer;
+}
+
+#distance {
+    /* spacing */
+    margin-bottom: 0rem;
+    margin-top: 0.5rem;
+}
+
+#toggle-route {
+    /* spacing */
+    margin-top: 1rem;
+}
+
+#endpoint {
+    /* interaction */
+    cursor: pointer;
+}
+
+@media (min-width: 1024px), (min-aspect-ratio: 1/1) {
+    #map {
+        /* self */
+        overflow-y: auto;
+
+        /* background */
+        background-image: url('../assets/skyrim_map2.svg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    #map > g > text {
+        /* text */
+        color: black;
+        font-weight: bold;
+
+        /* interaction */
+        pointer-events: 'none';
+        user-select: none;
+    }
+
+    #map > g > circle {
+        /* interaction */
+        cursor: pointer;
+    }
+
+    #distance {
+        /* spacing */
+        margin-bottom: 0rem;
+        margin-top: 0.5rem;
+
+        /* text */
+        font-size: 1.5rem;
+    }
+
+    #toggle-route {
+        /* spacing */
+        margin-top: 1rem;
+    }
+
+    #endpoint {
+        /* interaction */
+        cursor: pointer;
+    }
+}

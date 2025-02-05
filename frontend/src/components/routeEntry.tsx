@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { TStrRouteData } from '../types';
+import { JSONObject, TStrRouteData } from '../types';
+import { DisplayJSON } from './displayJSON';
 
 export const RouteEntry = ({
     routeId,
@@ -33,7 +34,7 @@ export const RouteEntry = ({
                     value={`${routeData.startpoint} to ${routeData.endpoint}`}
                 />
                 {isExpanded && (
-                    <pre>{JSON.stringify(routeData.route, null, 2)}</pre>
+                    <DisplayJSON json={routeData.route as JSONObject} />
                 )}
             </li>
         );
@@ -47,9 +48,7 @@ export const RouteEntry = ({
                 onClick={toggleExpand}
                 value={`${routeData.startpoint} to ${routeData.endpoint}`}
             />
-            {isExpanded && (
-                <pre>{JSON.stringify(routeData.route, null, 2)}</pre>
-            )}
+            {isExpanded && <DisplayJSON json={routeData.route as JSONObject} />}
         </li>
     );
 };

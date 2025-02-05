@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { act } from 'react';
 
-import { renderWithAuthProvider, testUser } from '../skip.support.test';
+import { renderWithContextProviders, testUser } from '../skip.support.test';
 import { Register } from '../../src/components/register';
 import { MESSAGETIMER } from '../../src/support/support';
 
@@ -18,7 +18,7 @@ const renderAndSubmitTestUser = async (): Promise<{
 
     // Use act to wrap rendering
     await act(async () => {
-        ({ container } = renderWithAuthProvider(Register));
+        ({ container } = renderWithContextProviders(Register));
     });
 
     // Find the username input field
@@ -57,7 +57,7 @@ describe('Register', () => {
 
     it('should render correctly', async () => {
         await act(async () => {
-            renderWithAuthProvider(Register);
+            renderWithContextProviders(Register);
         });
 
         const submitUsernameButton = await screen.findByRole('button', {
@@ -147,7 +147,7 @@ describe('Register', () => {
                 }),
             });
 
-        renderWithAuthProvider(Register);
+        renderWithContextProviders(Register);
 
         // Simulate filling the form
         const input = screen.getByLabelText(/Username/i);

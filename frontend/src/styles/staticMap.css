@@ -1,0 +1,169 @@
+#static-map {
+    /* self */
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    text-align: center;
+
+    /* size */
+    height: 100%;
+    max-height: 100%;
+    width: 100%;
+}
+
+#static-cityListArticle,
+#static-citySuggestionsArticle {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: 99.9%;
+    height: fit-content;
+    max-width: 99.9%;
+    gap: 0.5rem;
+
+    /* positioning */
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+
+    /* border */
+    border: 0.1rem solid #ccc;
+}
+
+.listTitle {
+    /* self */
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    z-index: 1;
+
+    /* size */
+    width: 100%;
+}
+
+#static-routeSection {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+#static-selectPoints {
+    /* self */
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+
+    /* size */
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    /* border */
+    border-bottom: 0.1rem solid #ccc;
+}
+
+#static-selectArticle {
+    /* size */
+    height: fit-content;
+    max-height: fit-content;
+    min-height: fit-content;
+}
+
+#static-selectArticle > * {
+    /* margin */
+    margin: 0 0 0rem 0;
+}
+
+#static-routeArticle {
+    /* self */
+    align-items: center;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: flex-start;
+
+    /* size */
+    height: fit-content;
+    max-height: 80%;
+}
+
+#static-routeArticle > * {
+    /* margin */
+    margin: 0rem;
+}
+
+#static-calculated-route {
+    /* self */
+    text-align: left;
+
+    /* size */
+    height: fit-content;
+    max-width: inherit;
+
+    /* overflow */
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    /* scrollbar */
+    scrollbar-width: none;
+}
+
+@media (min-width: 1024px), (min-aspect-ratio: 1/1) {
+    #static-map {
+        /* self */
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        text-align: center;
+    }
+
+    #static-cityListArticle,
+    #static-citySuggestionsArticle {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        width: fit-content;
+        height: 100%;
+        max-height: 100%;
+
+        /* positioning */
+        overflow-x: hidden;
+        overflow-y: auto;
+        scrollbar-width: none;
+
+        /* border */
+        border: 0.1rem solid #ccc;
+    }
+
+    #static-routeSection {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+    }
+
+    #static-selectPoints {
+        /* self */
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+
+        /* size */
+        gap: 1rem;
+        padding-bottom: 0.5rem;
+
+        /* border */
+        border-bottom: 0.1rem solid #ccc;
+    }
+
+    #static-selectArticle > * {
+        /* margin */
+        margin: 0 0 0.3rem 0;
+    }
+}

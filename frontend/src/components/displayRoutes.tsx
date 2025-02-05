@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {
@@ -12,6 +12,7 @@ import { useAuth } from '../contexts/authContext';
 import { RouteEntry } from './routeEntry';
 
 import '../styles/routesHistory.css';
+import { useMap } from '../contexts/mapContext';
 
 export const DisplayRoutes = ({
     defaultOptionalParametersVisible = false,
@@ -21,6 +22,7 @@ export const DisplayRoutes = ({
     defaultFilterOptions?: TFilterOptions;
 }) => {
     const { user, loading } = useAuth();
+    const { currentMap } = useMap();
     const queryClient = useQueryClient();
     const [startpoint, setStartpoint] = useState<string>('');
     const [endpoint, setEndpoint] = useState<string>('');
@@ -28,6 +30,7 @@ export const DisplayRoutes = ({
         limit: 10,
         descending: true,
         from_date: '',
+        map_id: currentMap?.id ?? 1,
         to_date: '',
         startpoint: '',
         endpoint: '',
@@ -44,7 +47,7 @@ export const DisplayRoutes = ({
         ],
         queryFn: async () => {
             const response = await fetch(
-                `${import.meta.env.VITE_URL}/cities?map_id=10`
+                `${import.meta.env.VITE_URL}/cities?map_id=${currentMap?.id}`
             );
             const data = await response.json();
             return data.cities;
@@ -76,6 +79,14 @@ export const DisplayRoutes = ({
         },
         enabled: !!user, // Start query only when user is defined
     });
+
+    useEffect(() => {
+        console.log('Changing map to ', currentMap);
+        setOptions((prevOptions) => ({
+            ...prevOptions,
+            map_id: currentMap?.id ?? 1,
+        }));
+    }, [currentMap]);
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
