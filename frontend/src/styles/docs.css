@@ -1,34 +1,142 @@
 #documentation {
-    text-align: left;
-    max-height: parent;
-    max-width: parent;
-    width: 100%;
-    overflow-y: auto;
+    /* overflow */
     overflow-x: hidden;
+    overflow-y: auto;
+
+    /* scrollbar */
+    scrollbar-width: none;
+
+    /* size */
+    max-width: inherit;
+    width: 100%;
+
+    /* text */
+    text-align: left;
+}
+
+#homeButton {
+    /* margin */
+    margin-top: 0.7rem;
+
+    /* positioning */
+    position: absolute;
 }
 
 a,
 a:hover,
 a:focus {
-    text-decoration: none;
+    /* text */
     color: burlywood;
+    text-decoration: none;
 }
 
 code {
-    color: white;
+    /* background */
     background-color: #ffffff1e;
-    padding: 0.2em 0.4em;
+
+    /* border */
     border-radius: 0.3em;
+
+    /* padding */
+    padding: 0.2em 0.4em;
+
+    /* text */
+    color: white;
 }
 
 pre {
+    /* background */
+    background: none;
+
+    /* border */
+    border: none;
+
+    /* font */
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
-    color: inherit;
+
+    /* margin */
     margin: 0;
+
+    /* padding */
     padding: 0;
-    background: none;
-    border: none;
+
+    /* text */
+    color: inherit;
+
+    /* white-space */
     white-space: pre-wrap;
+}
+
+@media (min-width: 1024px), (min-aspect-ratio: 1/1) {
+    #documentation {
+        /* overflow */
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        /* scrollbar */
+        scrollbar-width: none;
+
+        /* size */
+        width: 100%;
+
+        /* text */
+        text-align: left;
+    }
+
+    #homeButton {
+        /* margin */
+        margin-top: 0.7rem;
+
+        /* positioning */
+        position: absolute;
+    }
+
+    a,
+    a:hover,
+    a:focus {
+        /* text */
+        color: burlywood;
+        text-decoration: none;
+    }
+
+    code {
+        /* background */
+        background-color: #ffffff1e;
+
+        /* border */
+        border-radius: 0.3em;
+
+        /* padding */
+        padding: 0.2em 0.4em;
+
+        /* text */
+        color: white;
+    }
+
+    pre {
+        /* background */
+        background: none;
+
+        /* border */
+        border: none;
+
+        /* font */
+        font-family: inherit;
+        font-size: inherit;
+        line-height: inherit;
+
+        /* margin */
+        margin: 0;
+
+        /* padding */
+        padding: 0;
+
+        /* text */
+        color: inherit;
+
+        /* white-space */
+        white-space: pre-wrap;
+    }
 }

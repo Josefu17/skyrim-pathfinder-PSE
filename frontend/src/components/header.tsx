@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/authContext';
 import mapImage from '../assets/map.svg';
 import { UserSection } from './userSection';
 import '../styles/header.css';
+import { MapSelector } from './mapSelector';
 
 export const Header = () => {
     const { user } = useAuth();
@@ -11,9 +12,10 @@ export const Header = () => {
         <header role="banner">
             <h1>Path finder</h1>
             <img id="header-logo" src={mapImage} alt="" />
+            <MapSelector />
             <ul>
                 <li>
-                    <Link to="/">Startpage</Link>
+                    <Link to="/">Path Finder</Link>
                 </li>
                 <li>
                     <Link to="/docs">Documentation</Link>

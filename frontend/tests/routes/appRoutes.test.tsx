@@ -7,7 +7,8 @@ import React from 'react';
 import {
     changePage,
     mockFetch,
-    renderWithAuthProvider,
+    renderWithContextProviders,
+    testMap,
     testUser,
 } from '../skip.support.test';
 import { AppRoutes } from '../../src/routes/appRoutes';
@@ -17,7 +18,7 @@ global.fetch = mockFetch;
 
 describe('App Routes', () => {
     it('should render the Home page', async () => {
-        const { container } = renderWithAuthProvider(() => (
+        const { container } = renderWithContextProviders(() => (
             <MemoryRouter initialEntries={['/']}>
                 <AppRoutes />
             </MemoryRouter>
@@ -28,7 +29,7 @@ describe('App Routes', () => {
     });
 
     it('should render the Docs page', async () => {
-        renderWithAuthProvider(() => (
+        renderWithContextProviders(() => (
             <MemoryRouter initialEntries={['/Docs']}>
                 <AppRoutes />
             </MemoryRouter>
@@ -39,7 +40,7 @@ describe('App Routes', () => {
     });
 
     it('should render the Routes History page', async () => {
-        const { container } = renderWithAuthProvider(App, testUser);
+        const { container } = renderWithContextProviders(App, testUser, testMap);
 
         await changePage(container, '/routes-history');
 

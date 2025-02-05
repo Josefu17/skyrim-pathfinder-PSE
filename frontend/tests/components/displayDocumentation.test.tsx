@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach, Mock } from 'vitest';
 import { act } from 'react';
 
 import { DisplayDocumentation } from '../../src/components/displayDocumentation';
-import { renderWithAuthProvider } from '../skip.support.test';
+import { renderWithContextProviders } from '../skip.support.test';
 
 describe('DisplayDocumentation', () => {
     beforeEach(() => {
@@ -18,7 +18,7 @@ describe('DisplayDocumentation', () => {
             text: () => Promise.resolve('# Test Documentation'),
         });
 
-        renderWithAuthProvider(DisplayDocumentation, null, {
+        renderWithContextProviders(DisplayDocumentation, null, {
             initialFile: 'README.md',
         });
 
@@ -47,7 +47,7 @@ describe('DisplayDocumentation', () => {
             return Promise.reject(new Error('Not Found'));
         });
 
-        renderWithAuthProvider(DisplayDocumentation, null, {
+        renderWithContextProviders(DisplayDocumentation, null, null, {
             initialFile: 'test/README.md',
         });
 
@@ -74,7 +74,9 @@ describe('DisplayDocumentation', () => {
             text: () => Promise.resolve('# Home Documentation'),
         });
 
-        renderWithAuthProvider(DisplayDocumentation, null, { initialFile: '' });
+        renderWithContextProviders(DisplayDocumentation, null, {
+            initialFile: '',
+        });
 
         await waitFor(() => {
             expect(screen.getByText('Home Documentation')).toBeInTheDocument();
@@ -89,7 +91,7 @@ describe('DisplayDocumentation', () => {
             text: () => Promise.resolve('[Test Documentation]()'),
         });
 
-        renderWithAuthProvider(DisplayDocumentation, null, {
+        renderWithContextProviders(DisplayDocumentation, null, {
             initialFile: 'README.md',
         });
 
@@ -118,7 +120,7 @@ describe('DisplayDocumentation', () => {
             return Promise.reject(new Error('Not Found'));
         });
 
-        renderWithAuthProvider(DisplayDocumentation, null, {
+        renderWithContextProviders(DisplayDocumentation, null, {
             initialFile: 'README.md',
         });
 
@@ -144,7 +146,7 @@ describe('DisplayDocumentation', () => {
             text: () => Promise.resolve(''),
         });
 
-        renderWithAuthProvider(DisplayDocumentation, null, {
+        renderWithContextProviders(DisplayDocumentation, null, null, {
             initialFile: 'nonexistent.md',
         });
 
@@ -166,7 +168,7 @@ describe('DisplayDocumentation', () => {
             text: () => Promise.resolve('[Internal](#anchor)\n\n# anchor'),
         });
 
-        renderWithAuthProvider(DisplayDocumentation, null, {
+        renderWithContextProviders(DisplayDocumentation, null, {
             initialFile: 'README.md',
         });
 
@@ -185,7 +187,7 @@ describe('DisplayDocumentation', () => {
                 ),
         });
 
-        renderWithAuthProvider(DisplayDocumentation, null, {
+        renderWithContextProviders(DisplayDocumentation, null, {
             initialFile: 'README.md',
         });
 
@@ -207,7 +209,7 @@ describe('DisplayDocumentation', () => {
             text: () => Promise.resolve('A short text'),
         });
 
-        renderWithAuthProvider(DisplayDocumentation, null, {
+        renderWithContextProviders(DisplayDocumentation, null, {
             initialFile: 'README.md',
         });
 
@@ -234,7 +236,7 @@ describe('DisplayDocumentation', () => {
             return Promise.reject(new Error('Not Found'));
         });
 
-        renderWithAuthProvider(DisplayDocumentation, null, {
+        renderWithContextProviders(DisplayDocumentation, null, null, {
             initialFile: 'other.md',
         });
 
@@ -260,7 +262,7 @@ describe('DisplayDocumentation', () => {
                 text: () => Promise.resolve('A long\ntext block'),
             });
 
-            renderWithAuthProvider(DisplayDocumentation, null, {
+            renderWithContextProviders(DisplayDocumentation, null, null, {
                 initialFile: 'README.txt',
             });
 
@@ -276,7 +278,7 @@ describe('DisplayDocumentation', () => {
                 text: () => Promise.resolve('A single text line'),
             });
 
-            renderWithAuthProvider(DisplayDocumentation, null, {
+            renderWithContextProviders(DisplayDocumentation, null, null, {
                 initialFile: 'README.txt',
             });
 

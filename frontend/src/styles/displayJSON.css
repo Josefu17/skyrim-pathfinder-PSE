@@ -1,0 +1,12 @@
+.json-display {
+    margin: 0.7rem 0;
+}
+
+.json-display * strong {
+    color: rgb(222, 137, 0);
+    text-shadow:
+        -0.1rem -0.1rem 0.7rem rgba(255, 255, 255, 0.25),
+        0.1rem -0.1rem 0.7rem rgba(255, 255, 255, 0.25),
+        -0.1rem 0.1rem 0.7rem rgba(255, 255, 255, 0.25),
+        0.1rem 0.1rem 0.7rem rgba(255, 255, 255, 0.25);
+}

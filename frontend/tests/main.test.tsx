@@ -6,6 +6,7 @@ import React, { StrictMode } from 'react';
 import { AuthProvider } from '../src/contexts/authContext';
 import { App } from '../src/App';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MapProvider } from '../src/contexts/mapContext';
 
 // Mock the `react-dom/client` module
 vi.mock('react-dom/client', () => ({
@@ -35,9 +36,11 @@ describe('Root rendering', () => {
             expect(renderMock).toHaveBeenCalledWith(
                 <StrictMode>
                     <AuthProvider>
-                        <QueryClientProvider client={queryClient}>
-                            <App />
-                        </QueryClientProvider>
+                        <MapProvider>
+                            <QueryClientProvider client={queryClient}>
+                                <App />
+                            </QueryClientProvider>
+                        </MapProvider>
                     </AuthProvider>
                 </StrictMode>
             );

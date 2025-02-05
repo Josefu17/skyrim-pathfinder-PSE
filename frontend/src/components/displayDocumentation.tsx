@@ -65,6 +65,7 @@ export const DisplayDocumentation = ({
     return (
         <>
             <input
+                id="homeButton"
                 type="button"
                 value="Home"
                 onClick={() => setCurrentFile('README.md')}

@@ -1,6 +1,14 @@
 import { ReactNode } from 'react';
 import { NavigateFunction } from 'react-router-dom';
 
+export type JSONValue = string | number | boolean | JSONObject | JSONArray;
+
+export type JSONObject = {
+    [key: string]: JSONValue;
+};
+
+export type JSONArray = JSONValue[];
+
 export type TConnection = {
     child_city_id: number;
     parent_city_id: number;
@@ -46,6 +54,7 @@ export type TFilterOptions = {
     limit: number;
     descending: boolean;
     from_date: string;
+    map_id: number;
     to_date: string;
     startpoint: string;
     endpoint: string;
@@ -56,9 +65,22 @@ export type TUser = {
     username: string;
 };
 
+export type TMap = {
+    id: number;
+    name: string;
+    size_x?: number;
+    size_y?: number;
+};
+
 export type TAuthContext = {
     user: TUser | null;
     setUser: (user: TUser | null) => void; // Function to update user
+    loading: boolean;
+};
+
+export type TMapContext = {
+    currentMap: TMap | null;
+    setCurrentMap: (map: TMap | null) => void;
     loading: boolean;
 };
 

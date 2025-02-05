@@ -75,7 +75,7 @@ def marshall_data_for_navigation_service(map_id, session):
 
 def _fetch_route_internal(start_city_name, end_city_name, data, headers):
     """Fetch route from navigation service"""
-    transport = TimeoutTransport(timeout=30)
+    transport = TimeoutTransport(timeout=300)
     with xmlrpc.client.ServerProxy("http://navigation-service:8000/", transport=transport) as proxy:
         result = proxy.get_route(start_city_name, end_city_name, data, headers)
 

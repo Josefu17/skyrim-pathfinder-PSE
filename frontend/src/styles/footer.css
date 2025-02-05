@@ -1,16 +1,27 @@
 footer {
-    width: 100%;
+    /* self */
+    pointer-events: none;
+    position: absolute;
     text-align: center;
-    margin-top: 0.5rem;
-    margin-bottom: 0rem;
+
+    /* size */
+    height: fit-content;
+    min-height: 5%;
+    width: 100%;
+
+    /* positioning */
+    bottom: 0;
+    margin: 0rem;
 }
 
 footer * {
+    /* self */
     margin: 0rem 0rem 0rem 0rem;
     padding: 0rem 0rem 0rem 0rem;
 }
 
 #developers {
+    /* self */
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;

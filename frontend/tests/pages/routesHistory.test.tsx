@@ -3,7 +3,7 @@ import { findByText, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom'; // For better matcher like `toBeInTheDocument`
 
 import {
-    renderWithAuthProvider,
+    renderWithContextProviders,
     testUser,
     mockFetch,
 } from '../skip.support.test';
@@ -14,7 +14,10 @@ global.fetch = mockFetch;
 describe('Routes History Page', () => {
     it('should render a page with routes history', async () => {
         // Arrange
-        const { container } = renderWithAuthProvider(RoutesHistory, testUser);
+        const { container } = renderWithContextProviders(
+            RoutesHistory,
+            testUser
+        );
 
         // Act
         const element = await waitFor(() => {

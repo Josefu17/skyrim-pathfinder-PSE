@@ -11,19 +11,21 @@ const fallback = <h1>Something went wrong!</h1>;
 export const App = () => {
     return (
         <BrowserRouter>
-            <section id="left">
-                <ErrorBoundary fallback={fallback}>
-                    <Header />
-                </ErrorBoundary>
+            <section id="top">
+                <section id="left">
+                    <ErrorBoundary fallback={fallback}>
+                        <Header />
+                    </ErrorBoundary>
+                </section>
+                <section id="right">
+                    <ErrorBoundary fallback={fallback}>
+                        <AppRoutes />
+                    </ErrorBoundary>
+                </section>
             </section>
-            <section id="right">
-                <ErrorBoundary fallback={fallback}>
-                    <AppRoutes />
-                </ErrorBoundary>
-                <ErrorBoundary fallback={fallback}>
-                    <Footer />
-                </ErrorBoundary>
-            </section>
+            <ErrorBoundary fallback={fallback}>
+                <Footer />
+            </ErrorBoundary>
         </BrowserRouter>
     );
 };

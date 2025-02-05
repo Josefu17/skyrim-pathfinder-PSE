@@ -9,7 +9,10 @@ import {
     ErrorBoundaryClass,
 } from '../../src/support/errorBoundary';
 import { ErrorBoundaryProps } from '../../src/types';
-import { ErrorComponent, renderWithAuthProvider } from '../skip.support.test';
+import {
+    ErrorComponent,
+    renderWithContextProviders,
+} from '../skip.support.test';
 
 describe('ErrorBoundary', () => {
     it('should set hasError state to true when getDerivedStateFromError is called', () => {
@@ -38,7 +41,7 @@ describe('ErrorBoundary', () => {
     it('should render fallback UI and a home button when there is an error', async () => {
         const mockNavigate = vi.fn();
 
-        renderWithAuthProvider(() => (
+        renderWithContextProviders(() => (
             <ErrorBoundaryClass
                 navigate={mockNavigate}
                 fallback={<p>Error Occurred</p>}
@@ -76,7 +79,7 @@ describe('ErrorBoundary (HOC(Higher-Order Component))', () => {
         });
         (useNavigate as Mock).mockReturnValue(vi.fn());
 
-        const { container } = renderWithAuthProvider(() => (
+        const { container } = renderWithContextProviders(() => (
             <ErrorBoundary fallback={<p>Error Occurred</p>}>
                 <ErrorComponent />
             </ErrorBoundary>

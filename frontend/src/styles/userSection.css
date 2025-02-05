@@ -1,15 +1,52 @@
 #user-section {
-    margin: 0rem;
+    /* self */
     display: flex;
     flex-direction: column;
+
+    /* alignment */
     align-items: center;
     justify-content: center;
+
+    /* margin and padding */
+    margin: 0rem;
+    padding-bottom: 0.5rem;
+
+    /* visual */
+    border-top: 1px solid #ccc;
+    padding-top: 0.1rem;
 }
 
 #user-section > * {
-    margin: 0.7rem 0;
+    /* margin */
+    margin: 0.3rem 0;
 }
 
 #userSection-activeForm {
+    /* margin */
     margin: 0rem;
+}
+
+@media (min-width: 1024px), (min-aspect-ratio: 1/1) {
+    #user-section {
+        /* self */
+        display: flex;
+        flex-direction: column;
+
+        /* alignment */
+        align-items: center;
+        justify-content: center;
+
+        /* margin */
+        margin: 0rem;
+    }
+
+    #user-section > * {
+        /* margin */
+        margin: 0.7rem 0;
+    }
+
+    #userSection-activeForm {
+        /* margin */
+        margin: 0rem;
+    }
 }
