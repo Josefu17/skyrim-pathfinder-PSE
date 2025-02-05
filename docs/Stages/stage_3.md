@@ -2,7 +2,7 @@
 
 # Requirements of Stage 2
 
-## **Requirements from Previous Stage**
+## **Requirements from the Previous Stage**
   For remaining tasks, kindly refer to: [Stage 2](stage_2.md)  
 
 ---

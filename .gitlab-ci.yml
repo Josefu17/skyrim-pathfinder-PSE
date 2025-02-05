@@ -130,8 +130,8 @@ deploy-job:
     - mv $SECURE_FILES_PATH/.env.production ./frontend/.env.production
   script:
     - echo "Building and pushing Docker images..."
-    - docker-compose build
-    - docker-compose push
+    - docker compose -f docker-compose.yaml build
+    - docker compose push
 
     - echo "Transferring docker-compose.yaml and .env to deployment server..."
     - scp -i ~/.ssh/ci_ssh ./docker-compose.yaml debian@group2.osnet.h-da.cloud:/home/debian/app/

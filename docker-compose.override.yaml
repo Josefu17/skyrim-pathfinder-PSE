@@ -18,9 +18,6 @@ services:
       retries: 5
 
   web-backend:
-    build:
-      context: .
-      dockerfile: backend/src/web_backend/Dockerfile
     depends_on:
       postgres:
         condition: service_healthy
@@ -30,9 +27,6 @@ services:
       - ./backend:/app/backend
 
   navigation-service:
-    build:
-      context: .
-      dockerfile: backend/src/navigation_service/Dockerfile
     volumes:
       - ./backend:/app/backend
 

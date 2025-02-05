@@ -1,8 +1,7 @@
 import os
-from logging.config import fileConfig
 
 from alembic import context
-from dotenv import load_dotenv
+from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
@@ -14,16 +13,6 @@ logger = get_logging_configuration()
 
 register_models()
 
-dotenv_path = os.path.join(os.getcwd(), ".env")
-if os.path.exists(dotenv_path):
-    load_dotenv(dotenv_path)
-    logger.info("Loaded .env from %s", dotenv_path)
-else:
-    logger.warning(
-        ".env file not found at %s; ensure environment variables are set manually",
-        dotenv_path,
-    )
-
 DB_NAME = os.getenv("DB_DATABASE")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
@@ -33,7 +22,6 @@ DB_PORT = os.getenv("DB_PORT")
 SQLALCHEMY_DATABASE_URI = (
     f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 )
-
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
