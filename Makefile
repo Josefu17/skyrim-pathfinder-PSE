@@ -1,5 +1,7 @@
-.PHONY: help install remove build build-ci push start login stop restart update test coverage \
-coverage-open-windows lint format nav-enter backend-enter connect-to-database pre-commit
+.PHONY: help install remove build build-ci push start stop restart test-backend test-frontend test \
+ coverage coverage-backend coverage-frontend coverage-open lint lint-backend lint-frontend \
+ format format format-backend format-frontend pre-commit pre-commit-backend pre-commit-frontend \
+ nav-enter backend-enter db-migrate db-connect db-seed db-clear npm dev \
 
 .DEFAULT_GOAL := help
 help:
@@ -45,7 +47,6 @@ stop:
 	docker compose down
 
 restart: stop start
-
 
 update: login build push
 

@@ -2,6 +2,9 @@ services:
   web-frontend:
     image: registry.code.fbi.h-da.de/bpse-wise2425/group2/web-frontend:latest
     container_name: group2-web-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "4242:80"
     networks:
@@ -10,6 +13,9 @@ services:
   navigation-service:
     image: registry.code.fbi.h-da.de/bpse-wise2425/group2/navigation-service:latest
     container_name: group2-navigation-service
+    build:
+      context: .
+      dockerfile: backend/src/navigation_service/Dockerfile
     ports:
       - "8000:8000"
       - "5678:5678"
@@ -24,6 +30,9 @@ services:
   web-backend:
     image: registry.code.fbi.h-da.de/bpse-wise2425/group2/web-backend:latest
     container_name: group2-web-backend
+    build:
+      context: .
+      dockerfile: backend/src/web_backend/Dockerfile
     depends_on:
       navigation-service:
         condition: service_started
@@ -42,7 +51,6 @@ services:
       DB_PORT: ${DB_PORT}
       DB_DATABASE: ${DB_DATABASE}
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
-
 
   redis:
     image: redis:latest
