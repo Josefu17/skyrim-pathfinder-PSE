@@ -6,9 +6,9 @@ export const Footer = () => {
             <fieldset>
                 <legend>Developers</legend>
                 <section id="developers">
-                    <p>Arian Farzad</p>
-                    <p>Târik-Cemal Atis</p>
-                    <p>Yusuf Birdane</p>
+                    <p>[REDACTED]</p>
+                    <p>[REDACTED]</p>
+                    <p>[Yusuf Birdane]</p>
                 </section>
             </fieldset>
         </footer>

@@ -23,10 +23,10 @@ describe('renders the App component without crashing', async () => {
             expect(screen.getByText('Developers')).toBeInTheDocument();
         });
         await waitFor(() => {
-            expect(screen.getByText('Arian Farzad')).toBeInTheDocument();
+            expect(screen.getByText('[REDACTED]')).toBeInTheDocument();
         });
         await waitFor(() => {
-            expect(screen.getByText('Târik-Cemal Atis')).toBeInTheDocument();
+            expect(screen.getByText('[REDACTED]')).toBeInTheDocument();
         });
         await waitFor(() => {
             expect(screen.getByText('Yusuf Birdane')).toBeInTheDocument();
