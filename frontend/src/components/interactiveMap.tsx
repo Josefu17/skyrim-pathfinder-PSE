@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
     TCities,
-    TConnections,
-    TRouteData,
-    TConnection,
     TCity,
+    TConnection,
+    TConnections,
     TMap,
+    TRouteData,
 } from '../types';
 import { useAuth } from '../contexts/authContext';
 import { useMap } from '../contexts/mapContext';
 import '../styles/interactiveMap.css';
+import { apiFetch } from '../api.ts';
 
 export const InteractiveMap = () => {
     const { user } = useAuth();
@@ -46,9 +47,10 @@ export const InteractiveMap = () => {
     useEffect(() => {
         const fetchMapData = async () => {
             try {
-                const response = await fetch(
-                    `${import.meta.env.VITE_URL}/maps?name=${currentMap?.name}`
+                const response = await apiFetch(
+                    `/maps?name=${encodeURIComponent(currentMap?.name ?? '')}`
                 );
+
                 const data = await response.json();
                 setCities(data.cities);
                 setMapData(data.map);
@@ -66,19 +68,16 @@ export const InteractiveMap = () => {
             if (startpoint && endpoint) {
                 try {
                     const url =
-                        user !== null && user !== undefined
-                            ? `${import.meta.env.VITE_URL}/users/${user?.id}/maps/${currentMap?.id}/routes`
-                            : `${import.meta.env.VITE_URL}/maps/${currentMap?.id}/routes`;
-                    const response = await fetch(url, {
+                        user !== null
+                            ? `/users/${user?.id}/maps/${currentMap?.id}/routes`
+                            : `/maps/${currentMap?.id}/routes`;
+
+                    const response = await apiFetch(url, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            startpoint,
-                            endpoint,
-                        }),
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ startpoint, endpoint }),
                     });
+
                     const data = await response.json();
                     console.log('Route data:', data);
                     setRouteData(data);
@@ -94,7 +93,8 @@ export const InteractiveMap = () => {
 
     const handleTextSize = (): string => {
         // TODO: dynamic textSize calculation for all maps
-        const mapSizeFactor = ((mapData?.size_x ?? 1000) * (mapData?.size_y ?? 1000) % 1000);
+        const mapSizeFactor =
+            ((mapData?.size_x ?? 1000) * (mapData?.size_y ?? 1000)) % 1000;
         console.log('mapSizeFactor:', mapSizeFactor);
         return `calc(5rem + 0.5vw)`;
     };

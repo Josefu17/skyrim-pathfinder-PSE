@@ -1,6 +1,7 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMap } from '../contexts/mapContext';
 import { TMap } from '../types';
+import { apiFetch } from '../api.ts';
 
 export const MapSelector = () => {
     const { currentMap, setCurrentMap } = useMap();
@@ -21,12 +22,9 @@ export const MapSelector = () => {
 
             try {
                 console.log('Fetching map list...');
-                const response = await fetch(
-                    `${import.meta.env.VITE_URL}/maps`,
-                    {
-                        signal: controller.signal,
-                    }
-                );
+                const response = await apiFetch('/maps', {
+                    signal: controller.signal,
+                });
 
                 if (!response.ok) {
                     throw new Error(

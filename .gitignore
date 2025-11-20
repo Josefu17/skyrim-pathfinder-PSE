@@ -7,7 +7,6 @@
 .coverage
 venv
 env
-*.env**
 frontend/coverage
 /**/*.env
 .venv

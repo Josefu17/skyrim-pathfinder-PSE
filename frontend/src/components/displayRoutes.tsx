@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
     TCities,
@@ -13,6 +13,7 @@ import { RouteEntry } from './routeEntry';
 
 import '../styles/routesHistory.css';
 import { useMap } from '../contexts/mapContext';
+import { apiFetch } from '../api.ts';
 
 export const DisplayRoutes = ({
     defaultOptionalParametersVisible = false,
@@ -46,9 +47,8 @@ export const DisplayRoutes = ({
             { startpoint: options.startpoint, endpoint: options.endpoint },
         ],
         queryFn: async () => {
-            const response = await fetch(
-                `${import.meta.env.VITE_URL}/cities?map_id=${currentMap?.id}`
-            );
+            const response = await apiFetch(`/cities?map_id=${currentMap?.id}`);
+
             const data = await response.json();
             return data.cities;
         },
@@ -63,9 +63,11 @@ export const DisplayRoutes = ({
                 for (const [key, value] of Object.entries(options)) {
                     parameters += `${key}=${value}&`;
                 }
-                const response = await fetch(
-                    `${import.meta.env.VITE_URL}/users/${user?.id}/routes${parameters}`
+
+                const response = await apiFetch(
+                    `/users/${user?.id}/routes${parameters}`
                 );
+
                 const data = await response.json();
                 if (!response.ok) {
                     console.error('Error fetching routes');
@@ -103,12 +105,11 @@ export const DisplayRoutes = ({
         const route = routes?.find((route) => route.id === key);
         console.log('Deleting route:', route);
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_URL}/users/${user?.id}/routes/${key}`,
-                {
-                    method: 'DELETE',
-                }
+            const response = await apiFetch(
+                `/users/${user?.id}/routes/${key}`,
+                { method: 'DELETE' }
             );
+
             const data = await response.json();
             if (response.ok) {
                 console.log(data);
@@ -124,7 +125,7 @@ export const DisplayRoutes = ({
     const { mutateAsync: deleteSelectedRoute } = useMutation({
         mutationFn: handleDeleteSelectedRoute,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['routes'] });
+            void queryClient.invalidateQueries({ queryKey: ['routes'] });
         },
     });
 
@@ -132,12 +133,10 @@ export const DisplayRoutes = ({
         mutationFn: async () => {
             console.log('Deleting all routes');
             try {
-                const response = await fetch(
-                    `${import.meta.env.VITE_URL}/users/${user?.id}/routes`,
-                    {
-                        method: 'DELETE',
-                    }
-                );
+                const response = await apiFetch(`/users/${user?.id}/routes`, {
+                    method: 'DELETE',
+                });
+
                 const data = await response.json();
                 if (response.ok) {
                     console.log(data);
@@ -150,7 +149,7 @@ export const DisplayRoutes = ({
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['routes'] });
+            void queryClient.invalidateQueries({ queryKey: ['routes'] });
         },
     });
 

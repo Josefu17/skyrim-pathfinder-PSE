@@ -1,12 +1,13 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useAuth } from '../contexts/authContext';
 import { useMap } from '../contexts/mapContext';
 import { CityEntry } from './cityEntry';
-import { useScreenOrientation, MESSAGETIMER } from '../support/support';
+import { MESSAGETIMER, useScreenOrientation } from '../support/support';
 import { JSONObject, TCities } from '../types';
 import '../styles/staticMap.css';
 import { DisplayJSON } from './displayJSON';
+import { apiFetch } from '../api.ts';
 
 export const StaticMap = () => {
     const { user } = useAuth();
@@ -53,8 +54,10 @@ export const StaticMap = () => {
         setLoadingMap(true);
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_URL}/maps?name=${currentMap?.name}`,
+            if (!currentMap?.name) return;
+
+            const response = await apiFetch(
+                `/maps?name=${encodeURIComponent(currentMap.name)}`,
                 { signal: controller.signal }
             );
 
@@ -139,19 +142,24 @@ export const StaticMap = () => {
     // Fetch suggested cities based on the start and endpoint
     const fetchSuggestedCities = useCallback(async () => {
         if (!startpoint && !endpoint) return;
-        const getQueryFor = () => {
-            if (isActive !== '')
-                return isActive === 'start' ? startpoint : endpoint;
-            else return startpoint || endpoint;
-        };
-
-        const queryFor = getQueryFor();
 
         setLoadingSuggestedCities(true);
         try {
+            if (!currentMap?.id) return;
+
+            const queryFor =
+                isActive === 'start'
+                    ? startpoint
+                    : isActive === 'end'
+                      ? endpoint
+                      : startpoint || endpoint;
+
+            if (!queryFor) return;
+
             console.log('Fetching suggested cities for:', queryFor);
-            const response = await fetch(
-                `${import.meta.env.VITE_URL}/suggestions/maps/${currentMap?.id}?query=${isActive === 'start' ? startpoint : endpoint}`
+
+            const response = await apiFetch(
+                `/suggestions/maps/${currentMap.id}?query=${encodeURIComponent(queryFor)}`
             );
 
             if (!response.ok)
@@ -180,16 +188,20 @@ export const StaticMap = () => {
         setLoadingRoute(true);
         console.log('Fetching route data for:', startpoint, ', ', endpoint);
         try {
-            const url = user
-                ? `${import.meta.env.VITE_URL}/users/${user.id}/maps/${currentMap?.id}/routes`
-                : `${import.meta.env.VITE_URL}/maps/${currentMap?.id}/routes`;
+            if (!currentMap?.id) return;
 
-            const response = await fetch(url, {
+            const url = user
+                ? `/users/${user.id}/maps/${currentMap.id}/routes`
+                : `/maps/${currentMap.id}/routes`;
+
+            const response = await apiFetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ startpoint, endpoint }),
             });
+
             console.log('body:', JSON.stringify({ startpoint, endpoint }));
+
             const data = await response.json();
             if (response.ok) {
                 console.log('route data', data);
@@ -396,7 +408,11 @@ export const StaticMap = () => {
                                     />
                                 </pre>
                             ) : (
-                                <p>{ (statusMessage !== '') ? statusMessage : 'No route requested.' }</p>
+                                <p>
+                                    {statusMessage !== ''
+                                        ? statusMessage
+                                        : 'No route requested.'}
+                                </p>
                             )}
                         </>
                     )}

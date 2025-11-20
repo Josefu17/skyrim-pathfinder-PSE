@@ -4,6 +4,7 @@ import { TUser } from '../types';
 import { useAuth } from '../contexts/authContext';
 import { MESSAGETIMER } from '../support/support';
 import '../styles/login.css';
+import { apiFetch } from '../api.ts';
 
 export const Login = () => {
     const [username, setUsername] = useState<string>('');
@@ -14,16 +15,13 @@ export const Login = () => {
         e.preventDefault(); // Prevent the default form behavior (page reload)
 
         try {
-            const response = await fetch(
-                `${import.meta.env.VITE_URL}/auth/login`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username }), // Serialize username as JSON
-                }
-            );
+            const response = await apiFetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username }),
+            });
 
             console.log(response);
             if (response.ok) {

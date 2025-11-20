@@ -4,6 +4,7 @@ import { TUser } from '../types';
 import { useAuth } from '../contexts/authContext';
 import { MESSAGETIMER } from '../support/support';
 import '../styles/register.css';
+import { apiFetch } from '../api.ts';
 
 export const Register = () => {
     const [username, setUsername] = useState<string>(''); // State to store the username input
@@ -16,16 +17,13 @@ export const Register = () => {
 
         try {
             // Send a POST request with the username as JSON
-            const response = await fetch(
-                `${import.meta.env.VITE_URL}/auth/register`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username }), // Serialize username as JSON
-                }
-            );
+            const response = await apiFetch('/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username }),
+            });
 
             if (response.ok) {
                 const data = await response.json();
