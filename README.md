@@ -11,8 +11,9 @@ This project was developed in winter 2024 as part of the **“Projektsystementwi
 
 ## Project Status
 
-This is an educational university project built for a single semester.  
-It is not actively maintained and serves primarily as a demonstration of architecture, testing, and DevOps practices.
+This is an educational, one-semester university project.  
+It is **not actively maintained** and is mainly published for portfolio / reference purposes.  
+The Docker setup is sufficient to spin up the stack locally for screenshots and code exploration.
 
 ---
 
@@ -21,53 +22,50 @@ It is not actively maintained and serves primarily as a demonstration of archite
 **Backend & Navigation Service**
 
 - Python (3.8+)
-- Stateless Navigation Service using Dijkstra’s algorithm
-- XML-RPC for communication with the navigation service
-- REST web backend (Python, SQLAlchemy, DAO pattern)
-- PostgreSQL with Alembic for migrations
+- Flask, SQLAlchemy, DAO pattern
+- Stateless navigation service using Dijkstra’s algorithm (XML-RPC)
+- PostgreSQL with Alembic migrations
 
 **Frontend**
 
-- Vanilla JavaScript, HTML, CSS
-- Interactive map visualization and route display
+- React with Vite
+- TypeScript
+- HTML & CSS for layout and styling
+- Map visualization and route display
 
 **Infrastructure & Tooling**
 
 - Docker & Docker Compose
-- Prometheus & Grafana for monitoring and metrics
-- Pytest for tests & coverage
-- Black & Pylint for formatting and linting
-- SonarCloud / SonarQube for static code analysis
-- Makefile for common development and CI tasks
+- Prometheus & Grafana (monitoring / metrics)
+- Pytest, Black, Pylint
+- SonarCloud / SonarQube
+- Makefile for common dev/CI tasks
 
 ---
 
-## Architecture & Main Features
+## Architecture & Features
 
-The system is split into several components:
+- **Navigation Service**
+    - Calculates shortest and alternative routes using Dijkstra’s algorithm.
+    - Exposed as a separate XML-RPC service.
 
-- **Stateless Navigation Service**
-  - Implements Dijkstra’s algorithm to calculate shortest and alternative routes.
-  - Exposed via XML-RPC as a separate service.
+- **Web Backend (REST API)**
+    - Bridges frontend, navigation service, and database.
+    - Exposes endpoints for maps, cities, route calculation, users, health, and metrics.
 
-- **Web Backend**
-  - Provides REST endpoints for the frontend and external tools (e.g. Postman).
-  - Orchestrates calls to the navigation service and the database.
-  - Exposes health and metrics endpoints for monitoring.
-
-- **PostgreSQL Database**
-  - Stores cities, connections, maps, users, and route history.
-  - Managed via Alembic migrations and seeding scripts for local development.
+- **Database (PostgreSQL)**
+    - Stores cities, connections, maps, users, and route history.
+    - Managed via Alembic with migrations and seeding support.
 
 - **Frontend**
-  - Displays the map, cities, and connections.
-  - Lets users select start and end cities to calculate routes.
-  - Shows the optimal and alternative routes and their distances.
-  - Provides basic user management (register/login) and route history.
+    - Displays maps, cities, and connections.
+    - Lets users select start and end cities, view routes, and inspect route history.
+    - Basic user registration and login.
 
-- **Monitoring & Observability**
-  - Metrics for latency, traffic, errors, and saturation.
-  - Integration with Prometheus and Grafana dashboards.
+- **Dummy Maps (public version)**
+    - The original project used an internal university map service.
+    - In this public version, the backend generates a few dummy maps locally on startup
+      (e.g. `Dummy-10x10`, `Dummy-25x25`, …) and stores them in the DB.
 
 ---
 
@@ -75,63 +73,66 @@ The system is split into several components:
 
 ### Prerequisites
 
-- Python 3.8+
 - Docker & Docker Compose
-- `make` (optional, but handy for common tasks)
-- A `.env` file with database connection details (e.g. `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`)
+
+(Optional: Python 3.8+ if you want to poke at backend services without Docker.)
+
+---
+
+### Environment Configuration
+
+The root folder contains an `.env.template` for local development.
+
+1. Copy it to `.env`:
+
+   ```bash
+   cp .env.template .env
+   ```
+
+2. Adjust the values if needed.
+   The default settings are enough for a standard local Docker setup.
+
+---
 
 ### Quick Start (Docker)
 
-1. Clone the repository:
+From the project root:
 
-   ```bash
-   git clone <this-repo-url>
-   cd group2-navigation-system
-````
+```bash
+docker compose up -d --build
+```
 
-2. Create a `.env` file in the project root and fill in the required `DB_*` variables
-   (see the example in the repository or `docker-compose.yml` for reference).
+Then open:
 
-3. Start all services:
+* **Frontend:** [http://localhost:4242](http://localhost:4242)
+* **Backend API:** [http://localhost:4243](http://localhost:4243)
 
-   ```bash
-   docker compose up -d
-   # or, if available:
-   make start
-   ```
+To stop everything:
 
-4. Open the ports defined in `docker-compose.yml` in your browser
-   (backend and, if configured, frontend).
+```bash
+docker compose down
+```
 
-To work on individual components locally (without Docker), you can run the navigation service and web backend
-as Python modules and point them to your local PostgreSQL instance. See the project’s documentation and dev
-files (`docs/`, `backend/`) for details.
+To reset the database as well:
+
+```bash
+docker compose down -v
+```
 
 ---
 
 ## Testing & Code Quality
 
-* **Tests & Coverage**
-
-  * Python tests implemented with `pytest`.
-  * Coverage reports for the backend.
-
-* **Linting & Formatting**
-
-  * `black` for formatting.
-  * `pylint` for linting.
-
-* **Static Code Analysis**
-
-  * Integrated with SonarCloud / SonarQube for additional quality and security checks.
-  * Run automatically in the CI pipeline.
+* Backend tests written with **pytest** (see `backend/`).
+* Code style enforced via **Black** and **Pylint**.
+* Static analysis integrated with **SonarCloud / SonarQube** in the original CI pipeline.
 
 ---
 
 ## Team
 
-Developed collaboratively as part of the PSE course at Hochschule Darmstadt. Developers:
+Developed collaboratively as part of the PSE course at Hochschule Darmstadt:
 
-- **Arian Farzad**
-- **Târik-Cemal Atis**
-- **Yusuf Birdane**
+- **Arian Farzad**: Backend  (API, tests), Navigation Service
+- **Yusuf Birdane**: Backend (API, tests), Database Setup and migrations.
+- **Târik-Cemal Atis**: Frontend Development

@@ -1,6 +1,5 @@
 services:
   web-frontend:
-    image: registry.code.fbi.h-da.de/bpse-wise2425/group2/web-frontend:latest
     container_name: group2-web-frontend
     build:
       context: .
@@ -11,7 +10,6 @@ services:
       - app-network
 
   navigation-service:
-    image: registry.code.fbi.h-da.de/bpse-wise2425/group2/navigation-service:latest
     container_name: group2-navigation-service
     build:
       context: .
@@ -28,7 +26,6 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
 
   web-backend:
-    image: registry.code.fbi.h-da.de/bpse-wise2425/group2/web-backend:latest
     container_name: group2-web-backend
     build:
       context: .
